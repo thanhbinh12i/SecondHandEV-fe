@@ -1,4 +1,3 @@
-//api
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosResponse, type AxiosInstance } from "axios";
 
@@ -11,7 +10,7 @@ class Http {
       headers: {
         "Content-Type": "application/json",
       },
-      withCredentials: true,
+      withCredentials: false,
     });
     this.instance.interceptors.request.use(
       (config) => {

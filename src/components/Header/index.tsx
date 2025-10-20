@@ -16,6 +16,7 @@ import {
   Slide,
   ListItemButton,
 } from "@mui/material";
+import { Link } from "react-router-dom";
 
 const Header: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -230,19 +231,22 @@ const Header: React.FC = () => {
               </ListItemButton>
             ))}
             <Divider sx={{ my: 2 }} />
-            <ListItemButton
-              sx={{
-                borderRadius: 2,
-                mb: 1,
-                "&:hover": {
-                  bgcolor: "rgba(16, 185, 129, 0.1)",
-                  transform: "translateX(8px)",
-                  transition: "all 0.3s ease",
-                },
-              }}
-            >
-              <ListItemText primary="Đăng nhập" />
-            </ListItemButton>
+            <Link to="/auth/login">
+              <ListItemButton
+                sx={{
+                  borderRadius: 2,
+                  mb: 1,
+                  "&:hover": {
+                    bgcolor: "rgba(16, 185, 129, 0.1)",
+                    transform: "translateX(8px)",
+                    transition: "all 0.3s ease",
+                  },
+                }}
+              >
+                <ListItemText primary="Đăng nhập" />
+              </ListItemButton>
+            </Link>
+
             <ListItemButton
               sx={{
                 borderRadius: 2,
