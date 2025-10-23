@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Zap, Menu, X } from "lucide-react";
 import {
   AppBar,
@@ -16,14 +16,23 @@ import {
   Slide,
   ListItemButton,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { AppContext } from "src/contexts/app.context";
+import UserDropdown from "../UserDropdown";
 
 const Header: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const trigger = useScrollTrigger();
-
+  const navigate = useNavigate();
   const menuItems = ["Mua xe", "Mua pin", "Về chúng tôi", "Liên hệ"];
+  const { isAuthenticated } = useContext(AppContext);
 
+  console.log(isAuthenticated);
+
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    setMobileOpen(false);
+  };
   return (
     <>
       <Slide appear={false} direction="down" in={!trigger}>
@@ -116,34 +125,47 @@ const Header: React.FC = () => {
                 ))}
               </Box>
 
-              <Box sx={{ display: { xs: "none", md: "flex" }, gap: 1.5 }}>
-                <Button
-                  sx={{
-                    color: "#334155",
-                    fontWeight: 500,
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      color: "#059669",
-                      bgcolor: "transparent",
-                      transform: "translateY(-2px)",
-                    },
-                  }}
-                >
-                  Đăng nhập
-                </Button>
+              <Box
+                sx={{
+                  display: { xs: "none", md: "flex" },
+                  alignItems: "center",
+                  gap: 1.5,
+                }}
+              >
+                {isAuthenticated ? (
+                  <>
+                    <UserDropdown />
+                  </>
+                ) : (
+                  <Button
+                    onClick={() => handleNavigate("/auth/login")}
+                    sx={{
+                      color: "#334155",
+                      fontWeight: 500,
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        color: "#059669",
+                        bgcolor: "transparent",
+                        transform: "translateY(-2px)",
+                      },
+                    }}
+                  >
+                    Đăng nhập
+                  </Button>
+                )}
                 <Button
                   variant="contained"
                   sx={{
                     background: "linear-gradient(to right, #10b981, #2563eb)",
                     fontWeight: 600,
-                    px: 3,
+                    px: 2,
                     borderRadius: 2,
                     position: "relative",
                     overflow: "hidden",
                     transition: "all 0.3s ease",
                     "&:hover": {
                       boxShadow: "0 10px 25px rgba(16, 185, 129, 0.4)",
-                      transform: "translateY(-2px)",
+                      transform: "translateY(-1px)",
                     },
                     "&::before": {
                       content: '""',
@@ -231,21 +253,28 @@ const Header: React.FC = () => {
               </ListItemButton>
             ))}
             <Divider sx={{ my: 2 }} />
-            <Link to="/auth/login">
-              <ListItemButton
-                sx={{
-                  borderRadius: 2,
-                  mb: 1,
-                  "&:hover": {
-                    bgcolor: "rgba(16, 185, 129, 0.1)",
-                    transform: "translateX(8px)",
-                    transition: "all 0.3s ease",
-                  },
-                }}
-              >
-                <ListItemText primary="Đăng nhập" />
-              </ListItemButton>
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <UserDropdown />
+              </>
+            ) : (
+              <>
+                <ListItemButton
+                  onClick={() => handleNavigate("/auth/login")}
+                  sx={{
+                    borderRadius: 2,
+                    mb: 1,
+                    "&:hover": {
+                      bgcolor: "rgba(16, 185, 129, 0.1)",
+                      transform: "translateX(8px)",
+                      transition: "all 0.3s ease",
+                    },
+                  }}
+                >
+                  <ListItemText primary="Đăng nhập" />
+                </ListItemButton>
+              </>
+            )}
 
             <ListItemButton
               sx={{

@@ -5,15 +5,18 @@ class Http {
   instance: AxiosInstance;
   constructor() {
     this.instance = axios.create({
-      baseURL: "http://localhost:7292/api/",
+      baseURL: "https://localhost:7292/api/",
       timeout: 10000,
       headers: {
         "Content-Type": "application/json",
       },
-      withCredentials: false,
     });
     this.instance.interceptors.request.use(
       (config) => {
+        const token = localStorage.getItem("token");
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
         return config;
       },
       (error) => {

@@ -74,6 +74,7 @@ const LoginPage: React.FC = () => {
       const result = await loginMutation.mutateAsync(loginData);
       if (result?.data) {
         setSuccess("Đăng nhập thành công! Đang chuyển hướng...");
+        localStorage.setItem("token", result.data.token ?? "");
         setIsAuthenticated(true);
         setProfile(result?.data?.member ?? null);
         setTimeout(() => {
@@ -86,8 +87,6 @@ const LoginPage: React.FC = () => {
       console.log(error);
       setError("Đăng nhập thất bại!");
     }
-
-    console.log("Login data:", loginData);
   };
 
   const features = [
@@ -443,18 +442,6 @@ const LoginPage: React.FC = () => {
               </Box>
             </Box>
           </Paper>
-
-          <Typography
-            variant="body2"
-            sx={{
-              textAlign: "center",
-              mt: 4,
-              color: "white",
-              textShadow: "0 2px 4px rgba(0,0,0,0.3)",
-            }}
-          >
-            © 2025 EVMarket. All rights reserved.
-          </Typography>
         </Container>
       </Box>
     </ThemeProvider>

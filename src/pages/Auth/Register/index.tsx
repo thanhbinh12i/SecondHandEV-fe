@@ -609,18 +609,6 @@ const RegisterPage: React.FC = () => {
               </Box>
             </Box>
           </Paper>
-
-          <Typography
-            variant="body2"
-            sx={{
-              textAlign: "center",
-              mt: 4,
-              color: "white",
-              textShadow: "0 2px 4px rgba(0,0,0,0.3)",
-            }}
-          >
-            © 2025 EVMarket. All rights reserved.
-          </Typography>
         </Container>
       </Box>
     </ThemeProvider>

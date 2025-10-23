@@ -1,26 +1,8 @@
-/* eslint-disable react-refresh/only-export-components */
-import { createContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { AppContext, initialAppContext } from "./app.context";
 import { useAccountMe } from "src/queries/useUser";
 import { MemberDto } from "src/types/user.type";
-import { getProfileFromLS, setProfileToLS } from "src/utils/utils";
-
-interface AppContextInterface {
-  isAuthenticated: boolean;
-  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-  profile: MemberDto | null;
-  setProfile: (profile: MemberDto | null) => void;
-  reset: () => void;
-}
-
-const initialAppContext: AppContextInterface = {
-  isAuthenticated: Boolean(getProfileFromLS()),
-  setIsAuthenticated: () => null,
-  profile: getProfileFromLS(),
-  setProfile: () => null,
-  reset: () => null,
-};
-
-export const AppContext = createContext<AppContextInterface>(initialAppContext);
+import { setProfileToLS } from "src/utils/utils";
 
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
@@ -46,7 +28,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (isSuccess && data?.data) {
-      handleSetProfile(data?.data);
+      // handleSetProfile(data.data);
     } else if (isError) {
       reset();
     }
