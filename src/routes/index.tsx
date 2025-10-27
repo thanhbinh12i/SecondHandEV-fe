@@ -4,6 +4,7 @@ import HomePage from "src/pages/Client/home";
 import LoginPage from "src/pages/Auth/Login";
 import RegisterPage from "src/pages/Auth/Register";
 import AuthLayout from "src/layouts/AuthLayout";
+import AdminLayout from "src/layouts/AdminLayout";
 
 const RouteElements: React.FC = () => {
   const routeElements = useRoutes([
@@ -30,6 +31,11 @@ const RouteElements: React.FC = () => {
           element: <RegisterPage />,
         },
       ],
+    },
+    {
+      path: "admin",
+      element: <AdminLayout />,
+      children: [],
     },
   ]);
   return routeElements;
