@@ -5,6 +5,7 @@ import LoginPage from "src/pages/Auth/Login";
 import RegisterPage from "src/pages/Auth/Register";
 import AuthLayout from "src/layouts/AuthLayout";
 import AdminLayout from "src/layouts/AdminLayout";
+import UserManagement from "src/pages/Admin/User";
 
 const RouteElements: React.FC = () => {
   const routeElements = useRoutes([
@@ -35,7 +36,12 @@ const RouteElements: React.FC = () => {
     {
       path: "admin",
       element: <AdminLayout />,
-      children: [],
+      children: [
+        {
+          path: "users",
+          element: <UserManagement />,
+        },
+      ],
     },
   ]);
   return routeElements;

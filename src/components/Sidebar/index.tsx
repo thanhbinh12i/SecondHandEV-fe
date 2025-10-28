@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Drawer,
   List,
@@ -25,8 +26,8 @@ import {
   Menu,
   X,
   Zap,
-  Search,
 } from "lucide-react";
+import { AppContext } from "src/contexts/app.context";
 
 interface MenuItem {
   id: string;
@@ -38,9 +39,11 @@ interface MenuItem {
 }
 
 const AdminSidebar: React.FC = () => {
-  const [activeItem, setActiveItem] = useState("dashboard");
+  const navigate = useNavigate();
+  const location = useLocation();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const { profile } = useContext(AppContext);
 
   const menuItems: MenuItem[] = [
     {
@@ -54,26 +57,6 @@ const AdminSidebar: React.FC = () => {
       label: "Quản lý người dùng",
       icon: <Users size={20} />,
       path: "/admin/users",
-      children: [
-        {
-          id: "all-users",
-          label: "Tất cả người dùng",
-          icon: <Users size={18} />,
-          path: "/admin/users/all",
-        },
-        {
-          id: "members",
-          label: "Thành viên",
-          icon: <Users size={18} />,
-          path: "/admin/users/members",
-        },
-        {
-          id: "sellers",
-          label: "Người bán",
-          icon: <Users size={18} />,
-          path: "/admin/users/sellers",
-        },
-      ],
     },
     {
       id: "vehicles",
@@ -158,18 +141,35 @@ const AdminSidebar: React.FC = () => {
     },
   ];
 
-  const handleItemClick = (id: string, hasChildren: boolean) => {
-    setActiveItem(id);
-
-    if (hasChildren) {
+  const handleItemClick = (item: MenuItem) => {
+    if (item.children) {
       setExpandedItems((prev) =>
-        prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+        prev.includes(item.id)
+          ? prev.filter((id) => id !== item.id)
+          : [...prev, item.id]
       );
+    } else {
+      navigate(item.path);
+      setIsMobileOpen(false);
     }
   };
 
   const isExpanded = (id: string) => expandedItems.includes(id);
-  const isActive = (id: string) => activeItem === id;
+
+  const isActive = (path: string) => location.pathname === path;
+
+  const hasActiveChild = (item: MenuItem): boolean => {
+    if (!item.children) return false;
+    return item.children.some((child) => location.pathname === child.path);
+  };
+
+  const getInitials = (name?: string) => {
+    if (!name) return "A";
+    return name.charAt(0).toUpperCase();
+  };
+
+  const userName = profile?.displayName || "Admin";
+  const userInitial = getInitials(userName);
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full bg-gradient-to-b from-slate-900 to-slate-800">
@@ -181,7 +181,7 @@ const AdminSidebar: React.FC = () => {
             </div>
             <div>
               <Typography className="text-white font-bold text-lg">
-                EVMarket
+                SecondHandEV
               </Typography>
               <Typography className="text-emerald-400 text-xs">
                 Admin Panel
@@ -196,18 +196,6 @@ const AdminSidebar: React.FC = () => {
             <X size={20} />
           </IconButton>
         </div>
-
-        <div className="relative">
-          <Search
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"
-            size={18}
-          />
-          <input
-            type="text"
-            placeholder="Tìm kiếm..."
-            className="w-full pl-10 pr-4 py-2 bg-slate-800 text-white rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none text-sm"
-          />
-        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto py-4 px-3">
@@ -215,11 +203,11 @@ const AdminSidebar: React.FC = () => {
           {menuItems.map((item) => (
             <div key={item.id}>
               <ListItemButton
-                onClick={() => handleItemClick(item.id, !!item.children)}
+                onClick={() => handleItemClick(item)}
                 className={`
                   rounded-xl mb-1 transition-all duration-200
                   ${
-                    isActive(item.id)
+                    isActive(item.path) || hasActiveChild(item)
                       ? "bg-gradient-to-r from-emerald-500 to-blue-600 shadow-lg"
                       : "hover:bg-slate-800"
                   }
@@ -228,16 +216,20 @@ const AdminSidebar: React.FC = () => {
                   px: 2,
                   py: 1.5,
                   "&:hover": {
-                    bgcolor: isActive(item.id)
-                      ? undefined
-                      : "rgba(30, 41, 59, 0.8)",
+                    bgcolor:
+                      isActive(item.path) || hasActiveChild(item)
+                        ? undefined
+                        : "rgba(30, 41, 59, 0.8)",
                   },
                 }}
               >
                 <ListItemIcon
                   sx={{
                     minWidth: 40,
-                    color: isActive(item.id) ? "white" : "#94a3b8",
+                    color:
+                      isActive(item.path) || hasActiveChild(item)
+                        ? "white"
+                        : "#94a3b8",
                   }}
                 >
                   {item.icon}
@@ -247,8 +239,12 @@ const AdminSidebar: React.FC = () => {
                   sx={{
                     "& .MuiTypography-root": {
                       fontSize: "0.875rem",
-                      fontWeight: isActive(item.id) ? 600 : 500,
-                      color: isActive(item.id) ? "white" : "#cbd5e1",
+                      fontWeight:
+                        isActive(item.path) || hasActiveChild(item) ? 600 : 500,
+                      color:
+                        isActive(item.path) || hasActiveChild(item)
+                          ? "white"
+                          : "#cbd5e1",
                     },
                   }}
                 />
@@ -257,10 +253,14 @@ const AdminSidebar: React.FC = () => {
                     badgeContent={item.badge}
                     sx={{
                       "& .MuiBadge-badge": {
-                        backgroundColor: isActive(item.id)
-                          ? "white"
-                          : "#10b981",
-                        color: isActive(item.id) ? "#10b981" : "white",
+                        backgroundColor:
+                          isActive(item.path) || hasActiveChild(item)
+                            ? "white"
+                            : "#10b981",
+                        color:
+                          isActive(item.path) || hasActiveChild(item)
+                            ? "#10b981"
+                            : "white",
                         fontSize: "0.65rem",
                         fontWeight: 700,
                         minWidth: 20,
@@ -274,14 +274,18 @@ const AdminSidebar: React.FC = () => {
                     <ChevronDown
                       size={18}
                       className={
-                        isActive(item.id) ? "text-white" : "text-slate-400"
+                        isActive(item.path) || hasActiveChild(item)
+                          ? "text-white"
+                          : "text-slate-400"
                       }
                     />
                   ) : (
                     <ChevronRight
                       size={18}
                       className={
-                        isActive(item.id) ? "text-white" : "text-slate-400"
+                        isActive(item.path) || hasActiveChild(item)
+                          ? "text-white"
+                          : "text-slate-400"
                       }
                     />
                   ))}
@@ -293,11 +297,11 @@ const AdminSidebar: React.FC = () => {
                     {item.children.map((child) => (
                       <ListItemButton
                         key={child.id}
-                        onClick={() => setActiveItem(child.id)}
+                        onClick={() => handleItemClick(child)}
                         className={`
                           rounded-lg mb-1 ml-4 transition-all duration-200
                           ${
-                            isActive(child.id)
+                            isActive(child.path)
                               ? "bg-emerald-500/20 border-l-4 border-emerald-500"
                               : "hover:bg-slate-800 border-l-4 border-transparent"
                           }
@@ -310,7 +314,7 @@ const AdminSidebar: React.FC = () => {
                         <ListItemIcon
                           sx={{
                             minWidth: 36,
-                            color: isActive(child.id) ? "#10b981" : "#94a3b8",
+                            color: isActive(child.path) ? "#10b981" : "#94a3b8",
                           }}
                         >
                           {child.icon}
@@ -320,8 +324,10 @@ const AdminSidebar: React.FC = () => {
                           sx={{
                             "& .MuiTypography-root": {
                               fontSize: "0.8125rem",
-                              fontWeight: isActive(child.id) ? 600 : 400,
-                              color: isActive(child.id) ? "#10b981" : "#cbd5e1",
+                              fontWeight: isActive(child.path) ? 600 : 400,
+                              color: isActive(child.path)
+                                ? "#10b981"
+                                : "#cbd5e1",
                             },
                           }}
                         />
@@ -356,20 +362,22 @@ const AdminSidebar: React.FC = () => {
             sx={{
               width: 40,
               height: 40,
-              bgcolor: "rgba(16, 185, 129, 0.1)",
+              bgcolor: "rgba(16, 185, 129, 0.2)",
               color: "#10b981",
-              border: "2px solid rgba(16, 185, 129, 0.3)",
+              border: "2px solid white",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
               fontWeight: 700,
+              fontSize: "1.1rem",
             }}
           >
-            A
+            {userInitial}
           </Avatar>
           <div className="flex-1 min-w-0">
             <Typography className="text-white font-semibold text-sm truncate">
-              Admin User
+              {profile?.displayName}
             </Typography>
             <Typography className="text-slate-400 text-xs truncate">
-              admin@evmarket.com
+              {profile?.email}
             </Typography>
           </div>
           <IconButton size="small" sx={{ color: "#94a3b8" }}>
@@ -407,6 +415,11 @@ const AdminSidebar: React.FC = () => {
         variant="permanent"
         sx={{
           display: { xs: "none", lg: "block" },
+          "& .MuiDrawer-paper": {
+            width: 280,
+            boxSizing: "border-box",
+            border: "none",
+          },
         }}
       >
         <SidebarContent />
@@ -421,6 +434,10 @@ const AdminSidebar: React.FC = () => {
         }}
         sx={{
           display: { xs: "block", lg: "none" },
+          "& .MuiDrawer-paper": {
+            width: 280,
+            boxSizing: "border-box",
+          },
         }}
       >
         <SidebarContent />

@@ -5,14 +5,16 @@ import AdminSidebar from "src/components/Sidebar";
 
 const AdminLayout: React.FC = () => {
   return (
-    <Box className="flex min-h-screen w-full bg-gray-50">
+    <Box className="min-h-screen w-full bg-gray-50">
       <AdminSidebar />
 
       <Box
         component="main"
-        className="flex-1 p-6 overflow-auto"
+        className="p-6 overflow-auto"
         sx={{
-          width: { lg: "calc(100% - 280px)" },
+          ml: { xs: 0, lg: "300px" },
+          minHeight: "100vh",
+          pt: { xs: "80px", lg: "24px" },
         }}
       >
         <Outlet />
