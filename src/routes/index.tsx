@@ -6,6 +6,7 @@ import RegisterPage from "src/pages/Auth/Register";
 import AuthLayout from "src/layouts/AuthLayout";
 import AdminLayout from "src/layouts/AdminLayout";
 import UserManagement from "src/pages/Admin/User";
+import CreateListingPage from "src/pages/Client/postListing";
 
 const RouteElements: React.FC = () => {
   const routeElements = useRoutes([
@@ -16,6 +17,10 @@ const RouteElements: React.FC = () => {
         {
           index: true,
           element: <HomePage />,
+        },
+        {
+          path: "post",
+          element: <CreateListingPage />,
         },
       ],
     },
