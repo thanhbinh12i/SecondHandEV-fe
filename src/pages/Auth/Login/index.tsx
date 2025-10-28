@@ -98,46 +98,49 @@ const LoginPage: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
+      <style>
+        {`
+          @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+
+          @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-20px, 20px) rotate(180deg); }
+          }
+
+          @keyframes slideInLeft {
+            from {
+              opacity: 0;
+              transform: translateX(-30px);
+            }
+            to {
+              opacity: 1;
+              transform: translateX(0);
+            }
+          }
+        `}
+      </style>
+
       <Box
+        className="!min-h-screen !flex !items-center !py-8"
         sx={{
-          minHeight: "100vh",
           background:
             "linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%)",
           backgroundSize: "400% 400%",
           animation: "gradientShift 15s ease infinite",
-          display: "flex",
-          alignItems: "center",
-          py: 4,
-          "@keyframes gradientShift": {
-            "0%": { backgroundPosition: "0% 50%" },
-            "50%": { backgroundPosition: "100% 50%" },
-            "100%": { backgroundPosition: "0% 50%" },
-          },
         }}
       >
         <Container maxWidth="lg">
           <Paper
             elevation={24}
-            sx={{
-              display: "flex",
-              borderRadius: 4,
-              overflow: "hidden",
-              minHeight: "600px",
-              background: "rgba(255, 255, 255, 0.98)",
-              backdropFilter: "blur(10px)",
-            }}
+            className="!flex !rounded-3xl !overflow-hidden !min-h-[600px] !bg-white/98 !backdrop-blur-lg"
           >
             <Box
+              className="!flex-1 !bg-gradient-to-br !from-emerald-500 !to-blue-600 !p-12 !hidden md:!flex !flex-col !justify-center !text-white !relative !overflow-hidden"
               sx={{
-                flex: 1,
-                background: "linear-gradient(135deg, #10b981 0%, #2563eb 100%)",
-                p: 6,
-                display: { xs: "none", md: "flex" },
-                flexDirection: "column",
-                justifyContent: "center",
-                color: "white",
-                position: "relative",
-                overflow: "hidden",
                 "&::before": {
                   content: '""',
                   position: "absolute",
@@ -149,160 +152,85 @@ const LoginPage: React.FC = () => {
                     "radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)",
                   animation: "float 20s ease-in-out infinite",
                 },
-                "@keyframes float": {
-                  "0%, 100%": { transform: "translate(0, 0) rotate(0deg)" },
-                  "50%": { transform: "translate(-20px, 20px) rotate(180deg)" },
-                },
               }}
             >
-              <Box sx={{ position: "relative", zIndex: 1 }}>
-                <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
-                  <Box
-                    sx={{
-                      background: "rgba(255, 255, 255, 0.2)",
-                      p: 2,
-                      borderRadius: 3,
-                      backdropFilter: "blur(10px)",
-                    }}
-                  >
+              <Box className="!relative !z-10">
+                <Box className="!flex !items-center !mb-8">
+                  <Box className="!bg-white/20 !p-4 !rounded-2xl !backdrop-blur-lg">
                     <Zap size={40} />
                   </Box>
-                  <Typography variant="h4" sx={{ ml: 2, fontWeight: 700 }}>
-                    EVMarket
+                  <Typography variant="h4" className="!ml-4 !font-bold">
+                    SecondHandEV
                   </Typography>
                 </Box>
 
-                <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
+                <Typography variant="h5" className="!mb-6 !font-semibold">
                   Nền tảng giao dịch xe điện & pin hàng đầu
                 </Typography>
 
                 <Typography
                   variant="body1"
-                  sx={{ mb: 4, opacity: 0.9, lineHeight: 1.8 }}
+                  className="!mb-8 !opacity-90 !leading-relaxed"
                 >
                   Tham gia cùng hàng ngàn người dùng đã tin tưởng EVMarket để
                   mua bán xe điện và pin một cách an toàn, nhanh chóng.
                 </Typography>
 
-                <Box sx={{ mt: 6 }}>
+                {/* Features List */}
+                <Box className="!mt-12">
                   {features.map((feature, index) => (
                     <Box
                       key={index}
+                      className="!flex !items-center !mb-6"
                       sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        mb: 3,
                         animation: `slideInLeft 0.6s ease-out ${
                           index * 0.1
                         }s both`,
-                        "@keyframes slideInLeft": {
-                          from: {
-                            opacity: 0,
-                            transform: "translateX(-30px)",
-                          },
-                          to: {
-                            opacity: 1,
-                            transform: "translateX(0)",
-                          },
-                        },
                       }}
                     >
-                      <Box
-                        sx={{
-                          background: "rgba(255, 255, 255, 0.2)",
-                          p: 1.5,
-                          borderRadius: 2,
-                          display: "flex",
-                          mr: 2,
-                        }}
-                      >
+                      <Box className="!bg-white/20 !p-3 !rounded-xl !flex !mr-4">
                         <feature.icon size={24} />
                       </Box>
-                      <Typography>{feature.text}</Typography>
+                      <Typography className="!text-base">
+                        {feature.text}
+                      </Typography>
                     </Box>
                   ))}
                 </Box>
-
-                <Box
-                  sx={{
-                    mt: 6,
-                    p: 3,
-                    background: "rgba(255, 255, 255, 0.1)",
-                    borderRadius: 2,
-                    backdropFilter: "blur(10px)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                  }}
-                >
-                  <Typography variant="h6" sx={{ mb: 1 }}>
+                <Box className="!mt-12 !p-6 !bg-white/10 !rounded-xl !backdrop-blur-lg !border !border-white/20">
+                  <Typography variant="h6" className="!mb-2 !font-bold">
                     2,500+ xe điện
                   </Typography>
-                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  <Typography variant="body2" className="!opacity-90">
                     Được giao dịch thành công mỗi tháng
                   </Typography>
                 </Box>
               </Box>
             </Box>
 
-            <Box
-              sx={{
-                flex: 1,
-                p: { xs: 4, md: 6 },
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-              }}
-            >
-              <Box
-                sx={{
-                  display: { xs: "flex", md: "none" },
-                  alignItems: "center",
-                  justifyContent: "center",
-                  mb: 4,
-                }}
-              >
-                <Box
-                  sx={{
-                    background:
-                      "linear-gradient(135deg, #10b981 0%, #2563eb 100%)",
-                    p: 1.5,
-                    borderRadius: 2,
-                  }}
-                >
-                  <Zap color="white" size={32} />
+            <Box className="!flex-1 !p-8 md:!p-12 !flex !flex-col !justify-center">
+              <Box className="!flex md:!hidden !items-center !justify-center !mb-8">
+                <Box className="!bg-gradient-to-br !from-emerald-500 !to-blue-600 !p-3 !rounded-xl">
+                  <Zap className="!text-white" size={32} />
                 </Box>
                 <Typography
                   variant="h5"
-                  sx={{
-                    ml: 2,
-                    fontWeight: 700,
-                    background: "linear-gradient(to right, #10b981, #2563eb)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                  }}
+                  className="!ml-4 !font-bold !bg-gradient-to-r !from-emerald-500 !to-blue-600 !bg-clip-text !text-transparent"
                 >
-                  EVMarket
+                  SecondHandEV
                 </Typography>
               </Box>
 
               <Typography
                 variant="h4"
-                sx={{
-                  mb: 1,
-                  fontWeight: 700,
-                  color: "#1e293b",
-                  textAlign: "center",
-                }}
+                className="!mb-2 !font-bold !text-slate-900 !text-center"
               >
                 Chào mừng trở lại
               </Typography>
 
               <Typography
                 variant="body2"
-                sx={{
-                  mb: 4,
-                  color: "#64748b",
-                  textAlign: "center",
-                }}
+                className="!mb-8 !text-slate-600 !text-center"
               >
                 Đăng nhập để tiếp tục sử dụng dịch vụ
               </Typography>
@@ -310,7 +238,7 @@ const LoginPage: React.FC = () => {
               {error && (
                 <Alert
                   severity="error"
-                  sx={{ mb: 3 }}
+                  className="!mb-6"
                   onClose={() => setError("")}
                 >
                   {error}
@@ -320,7 +248,7 @@ const LoginPage: React.FC = () => {
               {success && (
                 <Alert
                   severity="success"
-                  sx={{ mb: 3 }}
+                  className="!mb-6"
                   onClose={() => setSuccess("")}
                 >
                   {success}
@@ -335,11 +263,11 @@ const LoginPage: React.FC = () => {
                   type="email"
                   value={loginData.email}
                   onChange={handleChange}
-                  sx={{ mb: 3 }}
+                  className="!mb-6"
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Mail size={20} color="#64748b" />
+                        <Mail size={20} className="!text-slate-500" />
                       </InputAdornment>
                     ),
                   }}
@@ -352,11 +280,11 @@ const LoginPage: React.FC = () => {
                   type={showPassword ? "text" : "password"}
                   value={loginData.password}
                   onChange={handleChange}
-                  sx={{ mb: 2 }}
+                  className="!mb-4"
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Lock size={20} color="#64748b" />
+                        <Lock size={20} className="!text-slate-500" />
                       </InputAdornment>
                     ),
                     endAdornment: (
@@ -376,17 +304,11 @@ const LoginPage: React.FC = () => {
                   }}
                 />
 
-                <Box
-                  sx={{ display: "flex", justifyContent: "flex-end", mb: 3 }}
-                >
+                <Box className="!flex !justify-end !mb-6">
                   <MuiLink
                     href="#"
                     underline="hover"
-                    sx={{
-                      color: "#10b981",
-                      fontSize: "0.875rem",
-                      fontWeight: 500,
-                    }}
+                    className="!text-emerald-600 !text-sm !font-medium"
                   >
                     Quên mật khẩu?
                   </MuiLink>
@@ -397,43 +319,25 @@ const LoginPage: React.FC = () => {
                   fullWidth
                   variant="contained"
                   size="large"
+                  disabled={loginMutation.isPending}
                   endIcon={<ArrowRight size={20} />}
-                  sx={{
-                    background: "linear-gradient(to right, #10b981, #2563eb)",
-                    py: 1.5,
-                    fontSize: "1rem",
-                    fontWeight: 600,
-                    textTransform: "none",
-                    boxShadow: "0 10px 25px rgba(16, 185, 129, 0.3)",
-                    "&:hover": {
-                      boxShadow: "0 15px 35px rgba(16, 185, 129, 0.4)",
-                      transform: "translateY(-2px)",
-                    },
-                    transition: "all 0.3s ease",
-                  }}
+                  className="!bg-gradient-to-r !from-emerald-500 !to-blue-600 !py-3 !text-base !font-semibold !normal-case !shadow-xl hover:!shadow-2xl hover:!-translate-y-0.5 !transition-all !duration-300"
                 >
-                  Đăng nhập
+                  {loginMutation.isPending ? "Đang đăng nhập..." : "Đăng nhập"}
                 </Button>
 
-                <Divider sx={{ my: 3 }}>
-                  <Typography variant="body2" color="text.secondary">
+                <Divider className="!my-6">
+                  <Typography variant="body2" className="!text-slate-500">
                     HOẶC
                   </Typography>
                 </Divider>
 
-                <Box sx={{ textAlign: "center" }}>
-                  <Typography variant="body2" color="text.secondary">
+                <Box className="!text-center">
+                  <Typography variant="body2" className="!text-slate-600">
                     Chưa có tài khoản?{" "}
                     <MuiLink
                       href="/auth/register"
-                      sx={{
-                        color: "#10b981",
-                        fontWeight: 600,
-                        textDecoration: "none",
-                        "&:hover": {
-                          textDecoration: "underline",
-                        },
-                      }}
+                      className="!text-emerald-600 !font-semibold !no-underline hover:!underline"
                     >
                       Đăng ký ngay
                     </MuiLink>

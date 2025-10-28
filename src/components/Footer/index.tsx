@@ -22,67 +22,81 @@ const Footer: React.FC = () => {
       title: "Công ty",
       links: ["Về chúng tôi", "Blog", "Tuyển dụng", "Liên hệ"],
     },
+    {
+      title: "Hỗ trợ",
+      links: [
+        "Trung tâm hỗ trợ",
+        "Câu hỏi thường gặp",
+        "Hướng dẫn mua",
+        "Hướng dẫn bán",
+      ],
+    },
   ];
 
   const socialIcons = [
-    { icon: Facebook, color: "#1877f2" },
-    { icon: Twitter, color: "#1da1f2" },
-    { icon: Instagram, color: "#e4405f" },
-    { icon: Linkedin, color: "#0a66c2" },
+    { icon: Facebook, color: "#1877f2", label: "Facebook" },
+    { icon: Twitter, color: "#1da1f2", label: "Twitter" },
+    { icon: Instagram, color: "#e4405f", label: "Instagram" },
+    { icon: Linkedin, color: "#0a66c2", label: "LinkedIn" },
   ];
 
   return (
-    <Box
-      component="footer"
-      sx={{ bgcolor: "#0f172a", color: "white", pt: 8, pb: 4 }}
-    >
+    <Box component="footer" className="!bg-slate-900 !text-white !pt-16 !pb-8">
+      <style>
+        {`
+          @keyframes fadeInUp {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          @keyframes fadeIn {
+            from {
+              opacity: 0;
+            }
+            to {
+              opacity: 1;
+            }
+          }
+        `}
+      </style>
+
       <Container maxWidth="xl">
-        <Grid container spacing={4} sx={{ mb: 6 }}>
-          <Grid size={{ xs: 12, sm: 4 }}>
+        <Grid container spacing={4} className="!mb-12">
+          <Grid size={{ xs: 12, md: 4 }}>
             <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                mb: 2,
-                animation: "fadeInUp 0.6s ease-out",
-              }}
+              className="!flex !items-center !gap-2 !mb-4"
+              sx={{ animation: "fadeInUp 0.6s ease-out" }}
             >
-              <Box
-                sx={{
-                  background:
-                    "linear-gradient(135deg, #10b981 0%, #2563eb 100%)",
-                  p: 1.5,
-                  borderRadius: 2,
-                  display: "flex",
-                  boxShadow: "0 4px 15px rgba(16, 185, 129, 0.3)",
-                }}
-              >
-                <Zap color="white" size={24} />
+              <Box className="!bg-gradient-to-br !from-emerald-500 !to-blue-600 !p-3 !rounded-xl !flex !shadow-lg">
+                <Zap className="!text-white" size={24} />
               </Box>
-              <Typography variant="h6" fontWeight={700}>
+              <Typography variant="h6" className="!font-bold !text-white">
                 SecondHandEV
               </Typography>
             </Box>
             <Typography
               variant="body2"
-              sx={{ color: "#94a3b8", mb: 3, lineHeight: 1.8 }}
+              className="!text-slate-400 !mb-6 !leading-relaxed"
             >
               Nền tảng giao dịch xe điện và pin hàng đầu Việt Nam. Kết nối người
               mua và người bán một cách an toàn, nhanh chóng.
             </Typography>
-            <Box sx={{ display: "flex", gap: 1.5 }}>
+            <Box className="!flex !gap-3">
               {socialIcons.map((social, index) => (
                 <IconButton
-                  key={index}
+                  key={social.label}
+                  aria-label={social.label}
+                  className="!bg-white/10 !text-white hover:!-translate-y-1 hover:!scale-110 !transition-all !duration-300"
                   sx={{
-                    bgcolor: "rgba(255, 255, 255, 0.1)",
-                    color: "white",
-                    transition: "all 0.3s ease",
                     animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`,
                     "&:hover": {
                       bgcolor: social.color,
-                      transform: "translateY(-5px) scale(1.1)",
                       boxShadow: `0 10px 20px ${social.color}40`,
                     },
                   }}
@@ -94,12 +108,11 @@ const Footer: React.FC = () => {
           </Grid>
 
           {footerSections.map((section, sectionIndex) => (
-            <Grid size={{ xs: 12, sm: 4, md: 3 }} key={section.title}>
+            <Grid size={{ xs: 12, sm: 6, md: 2.66 }} key={section.title}>
               <Typography
                 variant="h6"
-                fontWeight={700}
+                className="!font-bold !text-white !mb-6"
                 sx={{
-                  mb: 3,
                   animation: `fadeInUp 0.6s ease-out ${
                     (sectionIndex + 1) * 0.1
                   }s both`,
@@ -107,13 +120,12 @@ const Footer: React.FC = () => {
               >
                 {section.title}
               </Typography>
-              <List sx={{ p: 0 }}>
+              <List className="!p-0">
                 {section.links.map((link, linkIndex) => (
                   <ListItem
                     key={link}
+                    className="!p-0 !mb-3"
                     sx={{
-                      p: 0,
-                      mb: 1.5,
                       animation: `fadeInUp 0.6s ease-out ${
                         (sectionIndex + 1) * 0.1 + linkIndex * 0.05
                       }s both`,
@@ -122,30 +134,7 @@ const Footer: React.FC = () => {
                     <MuiLink
                       href="#"
                       underline="none"
-                      sx={{
-                        color: "#94a3b8",
-                        fontSize: "0.9rem",
-                        transition: "all 0.3s ease",
-                        position: "relative",
-                        "&:hover": {
-                          color: "#10b981",
-                          transform: "translateX(5px)",
-                        },
-                        "&::before": {
-                          content: '""',
-                          position: "absolute",
-                          left: -15,
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          width: 0,
-                          height: 2,
-                          bgcolor: "#10b981",
-                          transition: "width 0.3s ease",
-                        },
-                        "&:hover::before": {
-                          width: 10,
-                        },
-                      }}
+                      className="!text-slate-400 !text-sm hover:!text-emerald-500 hover:!translate-x-1 !transition-all !duration-300 !relative before:!content-[''] before:!absolute before:!-left-4 before:!top-1/2 before:!-translate-y-1/2 before:!w-0 before:!h-0.5 before:!bg-emerald-500 before:!transition-all before:!duration-300 hover:before:!w-2.5"
                     >
                       {link}
                     </MuiLink>
@@ -156,34 +145,21 @@ const Footer: React.FC = () => {
           ))}
         </Grid>
 
-        <Divider sx={{ bgcolor: "#1e293b", mb: 4 }} />
+        <Divider className="!bg-slate-800 !mb-8" />
 
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: 2,
-          }}
-        >
-          <Typography variant="body2" sx={{ color: "#94a3b8" }}>
-            © 2025 EVMarket. All rights reserved.
+        <Box className="!flex !justify-between !items-center !flex-wrap !gap-4">
+          <Typography variant="body2" className="!text-slate-400">
+            © 2025 SecondHandEV. All rights reserved.
           </Typography>
-          <Box sx={{ display: "flex", gap: 3 }}>
+          <Box className="!flex !gap-6">
             {["Điều khoản", "Chính sách", "Cookie"].map((item, index) => (
               <MuiLink
                 key={item}
                 href="#"
                 underline="none"
+                className="!text-slate-400 !text-sm hover:!text-emerald-500 !transition-colors !duration-300"
                 sx={{
-                  color: "#94a3b8",
-                  fontSize: "0.875rem",
-                  transition: "color 0.3s ease",
                   animation: `fadeIn 0.6s ease-out ${index * 0.1}s both`,
-                  "&:hover": {
-                    color: "#10b981",
-                  },
                 }}
               >
                 {item}
