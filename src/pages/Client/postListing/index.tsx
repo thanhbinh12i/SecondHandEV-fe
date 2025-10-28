@@ -37,6 +37,7 @@ import {
 } from "lucide-react";
 import { usePostListingMutation } from "src/queries/useListing";
 import { ListingCreateRequest } from "src/types/listing.type";
+import { convertFileToBase64, compressImage } from "src/utils/utils";
 
 const CreateListingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -92,28 +93,42 @@ const CreateListingPage: React.FC = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const files = event.target.files;
-    if (files) {
-      setUploading(true);
-      const newImages: string[] = [];
+    if (!files || files.length === 0) return;
 
-      Array.from(files).forEach((file) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          newImages.push(reader.result as string);
-          if (newImages.length === files.length) {
-            setPreviewImages((prev) => [...prev, ...newImages]);
-            setFormData((prev) => ({
-              ...prev,
-              imageUrls: [...(prev.imageUrls || []), ...newImages],
-              primaryImageUrl: prev.primaryImageUrl || newImages[0],
-            }));
-            setUploading(false);
-          }
-        };
-        reader.readAsDataURL(file);
+    setUploading(true);
+    const newImages: string[] = [];
+
+    try {
+      for (const file of Array.from(files)) {
+        const compressedFile = await compressImage(file);
+        if (compressedFile) {
+          const base64String = await convertFileToBase64(compressedFile);
+          newImages.push(base64String);
+        } else {
+          const base64String = await convertFileToBase64(file);
+          newImages.push(base64String);
+        }
+      }
+      setPreviewImages((prev) => [...prev, ...newImages]);
+      setFormData((prev) => ({
+        ...prev,
+        imageUrls: [...(prev.imageUrls || []), ...newImages],
+        primaryImageUrl: prev.primaryImageUrl || newImages[0],
+      }));
+    } catch (error) {
+      console.error("Error processing images:", error);
+      setSnackbar({
+        open: true,
+        message: "Có lỗi khi tải ảnh lên. Vui lòng thử lại.",
+        severity: "error",
       });
+    } finally {
+      setUploading(false);
+      event.target.value = "";
     }
   };
 
@@ -146,7 +161,6 @@ const CreateListingPage: React.FC = () => {
 
   const handleSubmit = async () => {
     if (postListingMutation.isPending) return;
-
     if (!formData.title.trim()) {
       setSnackbar({
         open: true,
@@ -730,6 +744,13 @@ const CreateListingPage: React.FC = () => {
               Quay lại
             </Button>
             <div className="flex gap-2">
+              <Button
+                variant="outlined"
+                className="text-slate-700 border-slate-300"
+                disabled={postListingMutation.isPending}
+              >
+                Lưu nháp
+              </Button>
               {activeStep === steps.length - 1 ? (
                 <Button
                   variant="contained"
