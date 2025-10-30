@@ -27,31 +27,70 @@ import {
 import {
   Upload,
   X,
-  DollarSign,
   Calendar,
   Tag,
   FileText,
   CheckCircle,
   ArrowRight,
   ArrowLeft,
+  Zap,
+  Battery,
+  Gauge,
 } from "lucide-react";
-import { usePostListingMutation } from "src/queries/useListing";
-import { ListingCreateRequest } from "src/types/listing.type";
+import {
+  usePostBatteryMutation,
+  usePostEbikeMutation,
+} from "src/queries/useListing";
 import { convertFileToBase64, compressImage } from "src/utils/utils";
+
+interface BatteryFields {
+  voltage?: number;
+  capacityWh?: number;
+  weightKg?: number;
+  condition?: string;
+  ageYears?: number;
+}
+
+interface EbikeFields {
+  motorPowerW?: number;
+  batteryVoltage?: number;
+  rangeKm?: number;
+  frameSize?: string;
+  condition?: string;
+  mileageKm?: number;
+  weightKg?: number;
+  yearOfManufacture?: number;
+}
+
+type DynamicFormData = {
+  categoryId: number;
+  title: string;
+  description: string;
+  year: number;
+  price: number;
+  listingType: string;
+  listingStatus: string;
+  primaryImageUrl: string;
+  imageUrls: string[];
+  brand: string;
+  model: string;
+} & BatteryFields &
+  EbikeFields;
 
 const CreateListingPage: React.FC = () => {
   const navigate = useNavigate();
-  const postListingMutation = usePostListingMutation();
+  const postBatteryMutation = usePostBatteryMutation();
+  const postEbikeMutation = usePostEbikeMutation();
 
   const [activeStep, setActiveStep] = useState(0);
-  const [formData, setFormData] = useState<ListingCreateRequest>({
+  const [formData, setFormData] = useState<DynamicFormData>({
     categoryId: 1,
     title: "",
     description: "",
     year: new Date().getFullYear(),
     price: 0,
-    listingType: "fixed",
-    listingStatus: "active",
+    listingType: "buy_now",
+    listingStatus: "pending",
     primaryImageUrl: "",
     imageUrls: [],
     brand: "",
@@ -73,24 +112,34 @@ const CreateListingPage: React.FC = () => {
   ];
 
   const categories = [
-    { id: 1, name: "Xe điện" },
-    { id: 2, name: "Pin xe điện" },
-    { id: 3, name: "Phụ kiện" },
+    { id: 1, name: "Pin xe điện" },
+    { id: 2, name: "Xe điện" },
   ];
 
-  const brands = [
-    "VinFast",
-    "Tesla",
-    "BYD",
-    "Honda",
-    "Yamaha",
-    "Pega",
-    "Yadea",
-    "Khác",
-  ];
+  const brands = ["VinFast", "Tesla", "Giant", "Xiaomi", "Yadea"];
+  const conditions = ["Mới", "Như mới", "Đã sử dụng", "Cần sửa chữa"];
+  const frameSizes = ["XS", "S", "M", "L", "XL"];
 
-  const handleInputChange = (field: keyof ListingCreateRequest, value: any) => {
+  const handleInputChange = (field: keyof DynamicFormData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleCategoryChange = (categoryId: number) => {
+    // Reset dynamic fields when category changes
+    const baseData = {
+      categoryId,
+      title: formData.title,
+      description: formData.description,
+      year: formData.year,
+      price: formData.price,
+      listingType: "buy_now",
+      listingStatus: "pending",
+      primaryImageUrl: formData.primaryImageUrl,
+      imageUrls: formData.imageUrls,
+      brand: formData.brand,
+      model: formData.model,
+    };
+    setFormData(baseData as DynamicFormData);
   };
 
   const handleImageUpload = async (
@@ -160,7 +209,11 @@ const CreateListingPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (postListingMutation.isPending) return;
+    const currentMutation =
+      formData.categoryId === 1 ? postBatteryMutation : postEbikeMutation;
+
+    if (currentMutation.isPending) return;
+
     if (!formData.title.trim()) {
       setSnackbar({
         open: true,
@@ -202,7 +255,48 @@ const CreateListingPage: React.FC = () => {
     }
 
     try {
-      await postListingMutation.mutateAsync(formData);
+      if (formData.categoryId === 1) {
+        const requestData = {
+          title: formData.title,
+          description: formData.description,
+          year: formData.year,
+          price: formData.price,
+          listingType: formData.listingType,
+          listingStatus: formData.listingStatus,
+          primaryImageUrl: formData.primaryImageUrl,
+          imageUrls: formData.imageUrls,
+          brand: formData.brand,
+          model: formData.model,
+          voltage: formData.voltage,
+          capacityWh: formData.capacityWh,
+          weightKg: formData.weightKg,
+          condition: formData.condition,
+          ageYears: formData.ageYears,
+        };
+        await postBatteryMutation.mutateAsync(requestData);
+      } else {
+        const requestData = {
+          title: formData.title,
+          description: formData.description,
+          year: formData.year,
+          price: formData.price,
+          listingType: formData.listingType,
+          listingStatus: formData.listingStatus,
+          primaryImageUrl: formData.primaryImageUrl,
+          imageUrls: formData.imageUrls,
+          brand: formData.brand,
+          model: formData.model,
+          motorPowerW: formData.motorPowerW,
+          batteryVoltage: formData.batteryVoltage,
+          rangeKm: formData.rangeKm,
+          frameSize: formData.frameSize,
+          condition: formData.condition,
+          mileageKm: formData.mileageKm,
+          weightKg: formData.weightKg,
+          yearOfManufacture: formData.year,
+        };
+        await postEbikeMutation.mutateAsync(requestData);
+      }
 
       setSnackbar({
         open: true,
@@ -233,6 +327,274 @@ const CreateListingPage: React.FC = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
+  const renderCategorySpecificFields = () => {
+    if (formData.categoryId === 1) {
+      return (
+        <>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <TextField
+              fullWidth
+              type="number"
+              label="Điện áp (V)"
+              value={formData.voltage || ""}
+              onChange={(e) =>
+                handleInputChange("voltage", parseFloat(e.target.value))
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Zap size={20} className="text-slate-400" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Typography variant="body2" className="text-slate-500">
+                      V
+                    </Typography>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <TextField
+              fullWidth
+              type="number"
+              label="Dung lượng (Wh)"
+              value={formData.capacityWh || ""}
+              onChange={(e) =>
+                handleInputChange("capacityWh", parseFloat(e.target.value))
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Battery size={20} className="text-slate-400" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Typography variant="body2" className="text-slate-500">
+                      Wh
+                    </Typography>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <TextField
+              fullWidth
+              type="number"
+              label="Trọng lượng (kg)"
+              value={formData.weightKg || ""}
+              onChange={(e) =>
+                handleInputChange("weightKg", parseFloat(e.target.value))
+              }
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Typography variant="body2" className="text-slate-500">
+                      kg
+                    </Typography>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <TextField
+              fullWidth
+              type="number"
+              label="Tuổi pin (năm)"
+              value={formData.ageYears || ""}
+              onChange={(e) =>
+                handleInputChange("ageYears", parseInt(e.target.value))
+              }
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Typography variant="body2" className="text-slate-500">
+                      năm
+                    </Typography>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <FormControl fullWidth>
+              <InputLabel>Tình trạng</InputLabel>
+              <Select
+                value={formData.condition || ""}
+                label="Tình trạng"
+                onChange={(e) => handleInputChange("condition", e.target.value)}
+              >
+                {conditions.map((cond) => (
+                  <MenuItem key={cond} value={cond}>
+                    {cond}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        </>
+      );
+    } else if (formData.categoryId === 2) {
+      return (
+        <>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <TextField
+              fullWidth
+              type="number"
+              label="Công suất động cơ (W)"
+              value={formData.motorPowerW || ""}
+              onChange={(e) =>
+                handleInputChange("motorPowerW", parseFloat(e.target.value))
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Zap size={20} className="text-slate-400" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Typography variant="body2" className="text-slate-500">
+                      W
+                    </Typography>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <TextField
+              fullWidth
+              type="number"
+              label="Điện áp pin (V)"
+              value={formData.batteryVoltage || ""}
+              onChange={(e) =>
+                handleInputChange("batteryVoltage", parseFloat(e.target.value))
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Battery size={20} className="text-slate-400" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Typography variant="body2" className="text-slate-500">
+                      V
+                    </Typography>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <TextField
+              fullWidth
+              type="number"
+              label="Quãng đường (km)"
+              value={formData.rangeKm || ""}
+              onChange={(e) =>
+                handleInputChange("rangeKm", parseFloat(e.target.value))
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Gauge size={20} className="text-slate-400" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Typography variant="body2" className="text-slate-500">
+                      km
+                    </Typography>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <FormControl fullWidth>
+              <InputLabel>Kích thước khung</InputLabel>
+              <Select
+                value={formData.frameSize || ""}
+                label="Kích thước khung"
+                onChange={(e) => handleInputChange("frameSize", e.target.value)}
+              >
+                {frameSizes.map((size) => (
+                  <MenuItem key={size} value={size}>
+                    {size}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <TextField
+              fullWidth
+              type="number"
+              label="Số km đã đi"
+              value={formData.mileageKm || ""}
+              onChange={(e) =>
+                handleInputChange("mileageKm", parseFloat(e.target.value))
+              }
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Typography variant="body2" className="text-slate-500">
+                      km
+                    </Typography>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <TextField
+              fullWidth
+              type="number"
+              label="Trọng lượng (kg)"
+              value={formData.weightKg || ""}
+              onChange={(e) =>
+                handleInputChange("weightKg", parseFloat(e.target.value))
+              }
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Typography variant="body2" className="text-slate-500">
+                      kg
+                    </Typography>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <FormControl fullWidth>
+              <InputLabel>Tình trạng</InputLabel>
+              <Select
+                value={formData.condition || ""}
+                label="Tình trạng"
+                onChange={(e) => handleInputChange("condition", e.target.value)}
+              >
+                {conditions.map((cond) => (
+                  <MenuItem key={cond} value={cond}>
+                    {cond}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        </>
+      );
+    }
+    return null;
+  };
+
   const renderStepContent = () => {
     switch (activeStep) {
       case 0:
@@ -253,7 +615,7 @@ const CreateListingPage: React.FC = () => {
                   value={formData.categoryId}
                   label="Danh mục *"
                   onChange={(e) =>
-                    handleInputChange("categoryId", e.target.value)
+                    handleCategoryChange(e.target.value as number)
                   }
                 >
                   {categories.map((cat) => (
@@ -270,7 +632,11 @@ const CreateListingPage: React.FC = () => {
                 label="Tiêu đề tin đăng *"
                 value={formData.title}
                 onChange={(e) => handleInputChange("title", e.target.value)}
-                placeholder="VD: Xe điện VinFast Klara S 2023 - Màu đỏ"
+                placeholder={
+                  formData.categoryId === 1
+                    ? "VD: Pin xe điện 48V 20Ah - Còn mới 90%"
+                    : "VD: Xe điện VinFast Klara S 2023 - Màu đỏ"
+                }
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -360,31 +726,8 @@ const CreateListingPage: React.FC = () => {
                 }}
               />
             </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <TextField
-                fullWidth
-                type="number"
-                label="Giá bán *"
-                value={formData.price}
-                onChange={(e) =>
-                  handleInputChange("price", parseFloat(e.target.value))
-                }
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <DollarSign size={20} className="text-slate-400" />
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <Typography variant="body2" className="text-slate-500">
-                        VND
-                      </Typography>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
+            {renderCategorySpecificFields()}
+
             <Grid size={{ xs: 12, md: 6 }}>
               <FormControl fullWidth>
                 <InputLabel>Loại tin</InputLabel>
@@ -395,27 +738,30 @@ const CreateListingPage: React.FC = () => {
                     handleInputChange("listingType", e.target.value)
                   }
                 >
-                  <MenuItem value="fixed">Giá cố định</MenuItem>
-                  <MenuItem value="negotiable">Có thể thương lượng</MenuItem>
+                  <MenuItem value="buy_now">Mua ngay</MenuItem>
                   <MenuItem value="auction">Đấu giá</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <FormControl fullWidth>
-                <InputLabel>Trạng thái</InputLabel>
-                <Select
-                  value={formData.listingStatus}
-                  label="Trạng thái"
-                  onChange={(e) =>
-                    handleInputChange("listingStatus", e.target.value)
-                  }
-                >
-                  <MenuItem value="active">Đang bán</MenuItem>
-                  <MenuItem value="pending">Chờ duyệt</MenuItem>
-                  <MenuItem value="sold">Đã bán</MenuItem>
-                </Select>
-              </FormControl>
+            <Grid size={{ xs: 12 }}>
+              <TextField
+                fullWidth
+                type="number"
+                label="Giá bán *"
+                value={formData.price}
+                onChange={(e) =>
+                  handleInputChange("price", parseFloat(e.target.value))
+                }
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Typography variant="body2" className="text-slate-500">
+                        VND
+                      </Typography>
+                    </InputAdornment>
+                  ),
+                }}
+              />
             </Grid>
           </Grid>
         );
@@ -604,6 +950,16 @@ const CreateListingPage: React.FC = () => {
                       {formData.year}
                     </Typography>
                   </div>
+                  {formData.condition && (
+                    <div className="flex justify-between">
+                      <Typography variant="body2" className="text-slate-600">
+                        Tình trạng:
+                      </Typography>
+                      <Typography variant="body2" className="font-semibold">
+                        {formData.condition}
+                      </Typography>
+                    </div>
+                  )}
                 </div>
               </Paper>
             </Grid>
@@ -658,6 +1014,137 @@ const CreateListingPage: React.FC = () => {
                 </div>
               </Paper>
             </Grid>
+
+            {formData.categoryId === 1 && (
+              <Grid size={{ xs: 12 }}>
+                <Paper className="p-4">
+                  <Typography
+                    variant="subtitle2"
+                    className="text-slate-600 mb-3 font-semibold"
+                  >
+                    Thông số kỹ thuật Pin
+                  </Typography>
+                  <div className="space-y-2">
+                    {formData.voltage && (
+                      <div className="flex justify-between">
+                        <Typography variant="body2" className="text-slate-600">
+                          Điện áp:
+                        </Typography>
+                        <Typography variant="body2" className="font-semibold">
+                          {formData.voltage}V
+                        </Typography>
+                      </div>
+                    )}
+                    {formData.capacityWh && (
+                      <div className="flex justify-between">
+                        <Typography variant="body2" className="text-slate-600">
+                          Dung lượng:
+                        </Typography>
+                        <Typography variant="body2" className="font-semibold">
+                          {formData.capacityWh}Wh
+                        </Typography>
+                      </div>
+                    )}
+                    {formData.weightKg && (
+                      <div className="flex justify-between">
+                        <Typography variant="body2" className="text-slate-600">
+                          Trọng lượng:
+                        </Typography>
+                        <Typography variant="body2" className="font-semibold">
+                          {formData.weightKg}kg
+                        </Typography>
+                      </div>
+                    )}
+                    {formData.ageYears && (
+                      <div className="flex justify-between">
+                        <Typography variant="body2" className="text-slate-600">
+                          Tuổi pin:
+                        </Typography>
+                        <Typography variant="body2" className="font-semibold">
+                          {formData.ageYears} năm
+                        </Typography>
+                      </div>
+                    )}
+                  </div>
+                </Paper>
+              </Grid>
+            )}
+
+            {formData.categoryId === 2 && (
+              <Grid size={{ xs: 12 }}>
+                <Paper className="p-4">
+                  <Typography
+                    variant="subtitle2"
+                    className="text-slate-600 mb-3 font-semibold"
+                  >
+                    Thông số kỹ thuật Xe điện
+                  </Typography>
+                  <div className="space-y-2">
+                    {formData.motorPowerW && (
+                      <div className="flex justify-between">
+                        <Typography variant="body2" className="text-slate-600">
+                          Công suất động cơ:
+                        </Typography>
+                        <Typography variant="body2" className="font-semibold">
+                          {formData.motorPowerW}W
+                        </Typography>
+                      </div>
+                    )}
+                    {formData.batteryVoltage && (
+                      <div className="flex justify-between">
+                        <Typography variant="body2" className="text-slate-600">
+                          Điện áp pin:
+                        </Typography>
+                        <Typography variant="body2" className="font-semibold">
+                          {formData.batteryVoltage}V
+                        </Typography>
+                      </div>
+                    )}
+                    {formData.rangeKm && (
+                      <div className="flex justify-between">
+                        <Typography variant="body2" className="text-slate-600">
+                          Quãng đường:
+                        </Typography>
+                        <Typography variant="body2" className="font-semibold">
+                          {formData.rangeKm}km
+                        </Typography>
+                      </div>
+                    )}
+                    {formData.frameSize && (
+                      <div className="flex justify-between">
+                        <Typography variant="body2" className="text-slate-600">
+                          Kích thước khung:
+                        </Typography>
+                        <Typography variant="body2" className="font-semibold">
+                          {formData.frameSize}
+                        </Typography>
+                      </div>
+                    )}
+                    {formData.mileageKm && (
+                      <div className="flex justify-between">
+                        <Typography variant="body2" className="text-slate-600">
+                          Số km đã đi:
+                        </Typography>
+                        <Typography variant="body2" className="font-semibold">
+                          {formData.mileageKm}km
+                        </Typography>
+                      </div>
+                    )}
+                    {formData.weightKg && (
+                      <div className="flex justify-between">
+                        <Typography variant="body2" className="text-slate-600">
+                          Trọng lượng:
+                        </Typography>
+                        <Typography variant="body2" className="font-semibold">
+                          {formData.weightKg}kg
+                        </Typography>
+                      </div>
+                    )}
+                  </div>
+                </Paper>
+              </Grid>
+            )}
+
             {formData.description && (
               <Grid size={{ xs: 12 }}>
                 <Paper className="p-4">
@@ -737,35 +1224,38 @@ const CreateListingPage: React.FC = () => {
             <Button
               variant="outlined"
               onClick={handleBack}
-              disabled={activeStep === 0 || postListingMutation.isPending}
+              disabled={
+                activeStep === 0 ||
+                postBatteryMutation.isPending ||
+                postEbikeMutation.isPending
+              }
               startIcon={<ArrowLeft size={18} />}
               className="text-slate-700 border-slate-300"
             >
               Quay lại
             </Button>
             <div className="flex gap-2">
-              <Button
-                variant="outlined"
-                className="text-slate-700 border-slate-300"
-                disabled={postListingMutation.isPending}
-              >
-                Lưu nháp
-              </Button>
               {activeStep === steps.length - 1 ? (
                 <Button
                   variant="contained"
                   onClick={handleSubmit}
-                  disabled={postListingMutation.isPending}
+                  disabled={
+                    postBatteryMutation.isPending || postEbikeMutation.isPending
+                  }
                   endIcon={<CheckCircle size={18} />}
                   className="bg-gradient-to-r from-emerald-500 to-blue-600"
                 >
-                  {postListingMutation.isPending ? "Đang đăng..." : "Đăng tin"}
+                  {postBatteryMutation.isPending || postEbikeMutation.isPending
+                    ? "Đang đăng..."
+                    : "Đăng tin"}
                 </Button>
               ) : (
                 <Button
                   variant="contained"
                   onClick={handleNext}
-                  disabled={postListingMutation.isPending}
+                  disabled={
+                    postBatteryMutation.isPending || postEbikeMutation.isPending
+                  }
                   endIcon={<ArrowRight size={18} />}
                   className="bg-gradient-to-r from-emerald-500 to-blue-600"
                 >
