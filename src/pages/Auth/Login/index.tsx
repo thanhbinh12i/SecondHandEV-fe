@@ -79,7 +79,7 @@ const LoginPage: React.FC = () => {
         setProfile(result?.data?.member ?? null);
         setTimeout(() => {
           navigate("/");
-        }, 2000);
+        }, 1500);
       } else {
         setError("Tài khoản và mật khẩu không đúng!");
       }

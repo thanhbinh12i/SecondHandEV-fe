@@ -25,7 +25,6 @@ export interface ListingUpdateRequest {
   model?: string;
 }
 
-// ListingDetailDtos.ts
 export interface BatteryDetailDto {
   brand?: string;
   model?: string;
@@ -72,7 +71,6 @@ export interface ListingDto {
   ebike?: EbikeDetailDto;
 }
 
-// ListingSearchRequest.ts
 export interface ListingSearchRequest {
   keyword?: string;
   categoryId?: number;

@@ -2,7 +2,7 @@ import { UserListResponse } from "src/types/user.type";
 import http from "src/utils/http";
 
 const userApiRequests = {
-  me: () => http.get("Auth/me"),
+  me: () => http.get("Auth/profile"),
   userList: (params?: {
     page?: number;
     pageSize?: number;

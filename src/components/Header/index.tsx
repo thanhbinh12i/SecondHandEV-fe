@@ -24,7 +24,12 @@ const Header: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const trigger = useScrollTrigger();
   const navigate = useNavigate();
-  const menuItems = ["Mua xe", "Mua pin", "Về chúng tôi", "Liên hệ"];
+  const menuItems = [
+    { label: "Mua xe", path: "/e-bikes" },
+    { label: "Mua pin", path: "/batteries" },
+    { label: "Về chúng tôi", path: "/" },
+    { label: "Liên hệ", path: "/" },
+  ];
   const { isAuthenticated } = useContext(AppContext);
 
   const handleNavigate = (path: string) => {
@@ -88,7 +93,8 @@ const Header: React.FC = () => {
               <Box className="!hidden md:!flex !gap-8">
                 {menuItems.map((item, index) => (
                   <Button
-                    key={item}
+                    key={index}
+                    onClick={() => handleNavigate(item.path)}
                     className="!text-slate-700 !font-medium !relative hover:!text-emerald-600 hover:!bg-transparent hover:!-translate-y-0.5 !transition-all !duration-300 after:!content-[''] after:!absolute after:!bottom-0 after:!left-1/2 after:!-translate-x-1/2 after:!w-0 after:!h-0.5 after:!bg-emerald-600 after:!transition-all after:!duration-300 hover:after:!w-4/5"
                     sx={{
                       animation: `fadeInDown 0.5s ease-out ${
@@ -96,7 +102,7 @@ const Header: React.FC = () => {
                       }s both`,
                     }}
                   >
-                    {item}
+                    {item.label}
                   </Button>
                 ))}
               </Box>
@@ -202,15 +208,18 @@ const Header: React.FC = () => {
           <List className="!space-y-2">
             {menuItems.map((item, index) => (
               <ListItemButton
-                key={item}
-                onClick={() => setMobileOpen(false)}
+                key={index}
+                onClick={() => {
+                  handleNavigate(item.path);
+                  setMobileOpen(false);
+                }}
                 className="!rounded-xl !mb-2 hover:!bg-emerald-50 hover:!translate-x-2 !transition-all !duration-300"
                 sx={{
                   animation: `slideInRight 0.3s ease-out ${index * 0.1}s both`,
                 }}
               >
                 <ListItemText
-                  primary={item}
+                  primary={item.label}
                   primaryTypographyProps={{
                     className: "!font-medium !text-slate-700",
                   }}
