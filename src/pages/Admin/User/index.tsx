@@ -28,7 +28,7 @@ import {
   Select,
   SelectChangeEvent,
 } from "@mui/material";
-import { Search, MoreVertical, Edit, Trash2, Eye, Filter } from "lucide-react";
+import { Search, MoreVertical, Trash2, Eye, Filter } from "lucide-react";
 import { useGetUserList } from "src/queries/useUser";
 import { AdminMemberDto } from "src/types/user.type";
 
@@ -322,10 +322,6 @@ const UserManagement: React.FC = () => {
           <Eye size={18} className="mr-2" />
           Xem chi tiết
         </MenuItem>
-        <MenuItem onClick={handleMenuClose}>
-          <Edit size={18} className="mr-2" />
-          Chỉnh sửa
-        </MenuItem>
         <MenuItem onClick={handleMenuClose} className="text-red-600">
           <Trash2 size={18} className="mr-2" />
           Xóa
@@ -506,12 +502,6 @@ const UserManagement: React.FC = () => {
         </DialogContent>
         <DialogActions className="p-4">
           <Button onClick={() => setViewDialogOpen(false)}>Đóng</Button>
-          <Button
-            variant="contained"
-            className="bg-gradient-to-r from-emerald-500 to-blue-600"
-          >
-            Chỉnh sửa
-          </Button>
         </DialogActions>
       </Dialog>
     </Box>
