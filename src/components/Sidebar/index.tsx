@@ -62,49 +62,13 @@ const AdminSidebar: React.FC = () => {
       id: "vehicles",
       label: "Quản lý xe điện",
       icon: <Car size={20} />,
-      path: "/admin/vehicles",
-      children: [
-        {
-          id: "all-vehicles",
-          label: "Tất cả xe",
-          icon: <Car size={18} />,
-          path: "/admin/vehicles/all",
-        },
-        {
-          id: "pending",
-          label: "Chờ duyệt",
-          icon: <Car size={18} />,
-          path: "/admin/vehicles/pending",
-          badge: 8,
-        },
-        {
-          id: "approved",
-          label: "Đã duyệt",
-          icon: <Car size={18} />,
-          path: "/admin/vehicles/approved",
-        },
-      ],
+      path: "/admin/e-bikes",
     },
     {
       id: "batteries",
       label: "Quản lý pin",
       icon: <Battery size={20} />,
       path: "/admin/batteries",
-      children: [
-        {
-          id: "all-batteries",
-          label: "Tất cả pin",
-          icon: <Battery size={18} />,
-          path: "/admin/batteries/all",
-        },
-        {
-          id: "battery-pending",
-          label: "Chờ duyệt",
-          icon: <Battery size={18} />,
-          path: "/admin/batteries/pending",
-          badge: 3,
-        },
-      ],
     },
     {
       id: "orders",

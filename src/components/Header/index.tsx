@@ -24,182 +24,155 @@ const Header: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const trigger = useScrollTrigger();
   const navigate = useNavigate();
-  const menuItems = ["Mua xe", "Mua pin", "Về chúng tôi", "Liên hệ"];
+  const menuItems = [
+    { label: "Mua xe", path: "/e-bikes" },
+    { label: "Mua pin", path: "/batteries" },
+    { label: "Về chúng tôi", path: "/" },
+    { label: "Liên hệ", path: "/" },
+  ];
   const { isAuthenticated } = useContext(AppContext);
-
-  console.log(isAuthenticated);
 
   const handleNavigate = (path: string) => {
     navigate(path);
     setMobileOpen(false);
   };
+
   return (
     <>
+      <style>
+        {`
+          @keyframes fadeInDown {
+            from {
+              opacity: 0;
+              transform: translateY(-20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          @keyframes slideInRight {
+            from {
+              opacity: 0;
+              transform: translateX(30px);
+            }
+            to {
+              opacity: 1;
+              transform: translateX(0);
+            }
+          }
+        `}
+      </style>
+
       <Slide appear={false} direction="down" in={!trigger}>
         <AppBar
           position="sticky"
           elevation={trigger ? 4 : 1}
-          sx={{
-            bgcolor: trigger
-              ? "rgba(255, 255, 255, 0.98)"
-              : "rgba(255, 255, 255, 0.85)",
-            backdropFilter: "blur(12px)",
-            transition: "all 0.3s ease-in-out",
-            borderBottom: "1px solid rgba(226, 232, 240, 0.5)",
-          }}
+          className={`!backdrop-blur-xl !transition-all !duration-300 !border-b !border-slate-200/50 ${
+            trigger ? "!bg-white/98" : "!bg-white/85"
+          }`}
         >
           <Container maxWidth="xl">
-            <Toolbar sx={{ justifyContent: "space-between", px: { xs: 0 } }}>
+            <Toolbar className="!justify-between !px-0">
               <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  cursor: "pointer",
-                  transition: "transform 0.3s ease",
-                  "&:hover": {
-                    transform: "scale(1.05)",
-                  },
-                }}
+                onClick={() => handleNavigate("/")}
+                className="!flex !items-center !gap-2 !cursor-pointer hover:!scale-105 !transition-transform !duration-300"
               >
-                <Box
-                  sx={{
-                    background:
-                      "linear-gradient(135deg, #10b981 0%, #2563eb 100%)",
-                    p: 1.5,
-                    borderRadius: 2,
-                    display: "flex",
-                    boxShadow: "0 4px 15px rgba(16, 185, 129, 0.3)",
-                  }}
-                >
-                  <Zap color="white" size={24} />
+                <Box className="!bg-gradient-to-br !from-emerald-500 !to-blue-600 !p-3 !rounded-xl !flex !shadow-lg">
+                  <Zap className="!text-white" size={24} />
                 </Box>
                 <Typography
                   variant="h6"
-                  sx={{
-                    fontWeight: 700,
-                    background: "linear-gradient(to right, #059669, #2563eb)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                  }}
+                  className="!font-bold !bg-gradient-to-r !from-emerald-600 !to-blue-600 !bg-clip-text !text-transparent"
                 >
                   SecondHandEV
                 </Typography>
               </Box>
 
-              <Box sx={{ display: { xs: "none", md: "flex" }, gap: 4 }}>
+              <Box className="!hidden md:!flex !gap-8">
                 {menuItems.map((item, index) => (
                   <Button
-                    key={item}
+                    key={index}
+                    onClick={() => handleNavigate(item.path)}
+                    className="!text-slate-700 !font-medium !relative hover:!text-emerald-600 hover:!bg-transparent hover:!-translate-y-0.5 !transition-all !duration-300 after:!content-[''] after:!absolute after:!bottom-0 after:!left-1/2 after:!-translate-x-1/2 after:!w-0 after:!h-0.5 after:!bg-emerald-600 after:!transition-all after:!duration-300 hover:after:!w-4/5"
                     sx={{
-                      color: "#334155",
-                      fontWeight: 500,
-                      position: "relative",
                       animation: `fadeInDown 0.5s ease-out ${
                         index * 0.1
                       }s both`,
-                      "&:hover": {
-                        color: "#059669",
-                        bgcolor: "transparent",
-                        transform: "translateY(-2px)",
-                      },
-                      "&::after": {
-                        content: '""',
-                        position: "absolute",
-                        bottom: 0,
-                        left: "50%",
-                        transform: "translateX(-50%)",
-                        width: 0,
-                        height: "2px",
-                        bgcolor: "#059669",
-                        transition: "width 0.3s ease",
-                      },
-                      "&:hover::after": {
-                        width: "80%",
-                      },
-                      transition: "all 0.3s ease",
                     }}
                   >
-                    {item}
+                    {item.label}
                   </Button>
                 ))}
               </Box>
 
-              <Box
-                sx={{
-                  display: { xs: "none", md: "flex" },
-                  alignItems: "center",
-                  gap: 1.5,
-                }}
-              >
+              <Box className="!hidden md:!flex !items-center !gap-3">
                 {isAuthenticated ? (
                   <>
                     <UserDropdown />
+                    <Button
+                      onClick={() => handleNavigate("/post")}
+                      variant="contained"
+                      className="!bg-gradient-to-r !from-emerald-500 !to-blue-600 !font-semibold !px-6 !py-2 !rounded-xl !relative !overflow-hidden hover:!shadow-xl hover:!-translate-y-0.5 !transition-all !duration-300"
+                      sx={{
+                        "&::before": {
+                          content: '""',
+                          position: "absolute",
+                          top: 0,
+                          left: "-100%",
+                          width: "100%",
+                          height: "100%",
+                          background:
+                            "linear-gradient(to right, #2563eb, #10b981)",
+                          transition: "left 0.5s ease",
+                        },
+                        "&:hover::before": {
+                          left: 0,
+                        },
+                        "& > span": {
+                          position: "relative",
+                          zIndex: 1,
+                        },
+                      }}
+                    >
+                      <span>Đăng tin</span>
+                    </Button>
                   </>
                 ) : (
                   <Button
                     onClick={() => handleNavigate("/auth/login")}
+                    variant="contained"
+                    className="!bg-gradient-to-r !from-emerald-500 !to-blue-600 !font-semibold !px-6 !py-2 !rounded-xl !relative !overflow-hidden hover:!shadow-xl hover:!-translate-y-0.5 !transition-all !duration-300"
                     sx={{
-                      color: "#334155",
-                      fontWeight: 500,
-                      transition: "all 0.3s ease",
-                      "&:hover": {
-                        color: "#059669",
-                        bgcolor: "transparent",
-                        transform: "translateY(-2px)",
+                      "&::before": {
+                        content: '""',
+                        position: "absolute",
+                        top: 0,
+                        left: "-100%",
+                        width: "100%",
+                        height: "100%",
+                        background:
+                          "linear-gradient(to right, #2563eb, #10b981)",
+                        transition: "left 0.5s ease",
+                      },
+                      "&:hover::before": {
+                        left: 0,
+                      },
+                      "& > span": {
+                        position: "relative",
+                        zIndex: 1,
                       },
                     }}
                   >
-                    Đăng nhập
+                    <span>Đăng nhập</span>
                   </Button>
                 )}
-                <Button
-                  variant="contained"
-                  sx={{
-                    background: "linear-gradient(to right, #10b981, #2563eb)",
-                    fontWeight: 600,
-                    px: 2,
-                    borderRadius: 2,
-                    position: "relative",
-                    overflow: "hidden",
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      boxShadow: "0 10px 25px rgba(16, 185, 129, 0.4)",
-                      transform: "translateY(-1px)",
-                    },
-                    "&::before": {
-                      content: '""',
-                      position: "absolute",
-                      top: 0,
-                      left: "-100%",
-                      width: "100%",
-                      height: "100%",
-                      background: "linear-gradient(to right, #2563eb, #10b981)",
-                      transition: "left 0.5s ease",
-                    },
-                    "&:hover::before": {
-                      left: 0,
-                    },
-                    "& > span": {
-                      position: "relative",
-                      zIndex: 1,
-                    },
-                  }}
-                >
-                  <span>Đăng tin</span>
-                </Button>
               </Box>
 
+              {/* Mobile Menu Button */}
               <IconButton
-                sx={{
-                  display: { md: "none" },
-                  color: "#334155",
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    transform: "rotate(90deg)",
-                    color: "#059669",
-                  },
-                }}
+                className="!block md:!hidden !text-slate-700 hover:!rotate-90 hover:!text-emerald-600 !transition-all !duration-300"
                 onClick={() => setMobileOpen(true)}
               >
                 <Menu size={24} />
@@ -208,87 +181,84 @@ const Header: React.FC = () => {
           </Container>
         </AppBar>
       </Slide>
+
       <Drawer
         anchor="right"
         open={mobileOpen}
         onClose={() => setMobileOpen(false)}
+        PaperProps={{
+          className: "!w-80",
+        }}
       >
-        <Box sx={{ p: 2 }}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: 2,
-            }}
-          >
-            <Typography variant="h6" sx={{ fontWeight: 700, color: "#059669" }}>
+        <Box className="!p-4">
+          <Box className="!flex !justify-between !items-center !mb-4">
+            <Typography variant="h6" className="!font-bold !text-emerald-600">
               Menu
             </Typography>
             <IconButton
               onClick={() => setMobileOpen(false)}
-              sx={{ color: "#334155" }}
+              className="!text-slate-700 hover:!rotate-90 hover:!text-emerald-600 !transition-all !duration-300"
             >
               <X size={24} />
             </IconButton>
           </Box>
-          <Divider sx={{ mb: 2 }} />
-          <List>
+
+          <Divider className="!mb-4" />
+
+          <List className="!space-y-2">
             {menuItems.map((item, index) => (
               <ListItemButton
-                key={item}
-                onClick={() => setMobileOpen(false)}
+                key={index}
+                onClick={() => {
+                  handleNavigate(item.path);
+                  setMobileOpen(false);
+                }}
+                className="!rounded-xl !mb-2 hover:!bg-emerald-50 hover:!translate-x-2 !transition-all !duration-300"
                 sx={{
-                  borderRadius: 2,
-                  mb: 1,
                   animation: `slideInRight 0.3s ease-out ${index * 0.1}s both`,
-                  "&:hover": {
-                    bgcolor: "rgba(16, 185, 129, 0.1)",
-                    transform: "translateX(8px)",
-                    transition: "all 0.3s ease",
-                  },
                 }}
               >
-                <ListItemText primary={item} />
+                <ListItemText
+                  primary={item.label}
+                  primaryTypographyProps={{
+                    className: "!font-medium !text-slate-700",
+                  }}
+                />
               </ListItemButton>
             ))}
-            <Divider sx={{ my: 2 }} />
+
+            <Divider className="!my-4" />
+
             {isAuthenticated ? (
               <>
-                <UserDropdown />
-              </>
-            ) : (
-              <>
+                <Box className="!mb-3">
+                  <UserDropdown />
+                </Box>
                 <ListItemButton
-                  onClick={() => handleNavigate("/auth/login")}
-                  sx={{
-                    borderRadius: 2,
-                    mb: 1,
-                    "&:hover": {
-                      bgcolor: "rgba(16, 185, 129, 0.1)",
-                      transform: "translateX(8px)",
-                      transition: "all 0.3s ease",
-                    },
-                  }}
+                  onClick={() => handleNavigate("/post")}
+                  className="!rounded-xl !bg-emerald-50 hover:!bg-emerald-100 hover:!translate-x-2 !transition-all !duration-300 !mt-4"
                 >
-                  <ListItemText primary="Đăng nhập" />
+                  <ListItemText
+                    primary="Đăng tin"
+                    primaryTypographyProps={{
+                      className: "!font-semibold !text-emerald-600",
+                    }}
+                  />
                 </ListItemButton>
               </>
+            ) : (
+              <ListItemButton
+                onClick={() => handleNavigate("/auth/login")}
+                className="!rounded-xl !bg-emerald-50 hover:!bg-emerald-100 hover:!translate-x-2 !transition-all !duration-300"
+              >
+                <ListItemText
+                  primary="Đăng nhập"
+                  primaryTypographyProps={{
+                    className: "!font-semibold !text-emerald-600",
+                  }}
+                />
+              </ListItemButton>
             )}
-
-            <ListItemButton
-              sx={{
-                borderRadius: 2,
-                bgcolor: "rgba(16, 185, 129, 0.1)",
-                "&:hover": {
-                  bgcolor: "rgba(16, 185, 129, 0.2)",
-                  transform: "translateX(8px)",
-                  transition: "all 0.3s ease",
-                },
-              }}
-            >
-              <ListItemText primary="Đăng tin" />
-            </ListItemButton>
           </List>
         </Box>
       </Drawer>
