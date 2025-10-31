@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from "react";
 import {
   Box,
@@ -42,6 +43,8 @@ import {
   Bike,
 } from "lucide-react";
 import { ListingDto } from "src/types/listing.type";
+import { useGetListing } from "src/queries/useListing";
+import { useUpdateStatusMutation } from "src/queries/useListing";
 
 const EBikeAllPage: React.FC = () => {
   const [page, setPage] = useState(0);
@@ -59,191 +62,13 @@ const EBikeAllPage: React.FC = () => {
     severity: "success" as "success" | "error",
   });
 
+  const { data } = useGetListing({ categoryId: 2 });
+  const updateStatusMutation = useUpdateStatusMutation();
+
   const DEFAULT_IMAGE =
     "https://images.unsplash.com/photo-1571333250630-f0230c320b6d?w=800&h=600&q=80";
 
-  const mockListings: ListingDto[] = [
-    {
-      listingId: 20,
-      memberId: 5,
-      categoryId: 2,
-      categoryName: "Xe điện",
-      title: "VinFast Impes 1500W Premium Scooter",
-      description: "Xe máy điện VinFast Impes cao cấp, pin rời tiện lợi",
-      year: 2024,
-      price: 52000000,
-      listingType: "buy_now",
-      listingStatus: "pending",
-      createdAt: "2025-10-28T14:30:00",
-      sellerDisplayName: "Nguyễn Thị Mai",
-      sellerEmail: "mai@email.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600",
-      imageUrls: [],
-      brand: "VinFast",
-      model: "Impes",
-      ebike: {
-        motorPowerW: 1500,
-        batteryVoltage: 60,
-        rangeKm: 80,
-        frameSize: "M",
-        condition: "Mới",
-        mileageKm: 0,
-        weightKg: 85,
-        yearOfManufacture: 2024,
-      },
-    },
-    {
-      listingId: 1,
-      memberId: 1,
-      categoryId: 2,
-      categoryName: "Xe điện",
-      title: "Giant 750W Mountain E-Bike",
-      description: "Xe đạp địa hình Giant, mạnh mẽ cho leo núi",
-      year: 2021,
-      price: 22000000,
-      listingType: "buy_now",
-      listingStatus: "active",
-      createdAt: "2025-09-25T21:36:39",
-      sellerDisplayName: "Nguyễn Văn An",
-      sellerEmail: "an.nguyen@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?w=800&h=600",
-      imageUrls: [],
-      brand: "Giant",
-      model: "MTB750",
-      ebike: {
-        motorPowerW: 750,
-        batteryVoltage: 48,
-        rangeKm: 60,
-        frameSize: "L",
-        condition: "Đã sử dụng",
-        mileageKm: 1200,
-        weightKg: 28,
-        yearOfManufacture: 2021,
-      },
-    },
-    {
-      listingId: 21,
-      memberId: 6,
-      categoryId: 2,
-      categoryName: "Xe điện",
-      title: "Brompton Electric P Line 250W",
-      description: "Xe đạp gấp điện Brompton nhập khẩu Anh",
-      year: 2024,
-      price: 95000000,
-      listingType: "negotiable",
-      listingStatus: "pending",
-      createdAt: "2025-10-28T10:15:00",
-      sellerDisplayName: "Trần Văn Long",
-      sellerEmail: "long@email.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1559294582-2f3f2e2c4ab4?w=800&h=600",
-      imageUrls: [],
-      brand: "Brompton",
-      model: "P Line",
-      ebike: {
-        motorPowerW: 250,
-        batteryVoltage: 36,
-        rangeKm: 40,
-        frameSize: "S",
-        condition: "Mới",
-        mileageKm: 0,
-        weightKg: 16,
-        yearOfManufacture: 2024,
-      },
-    },
-    {
-      listingId: 2,
-      memberId: 2,
-      categoryId: 2,
-      categoryName: "Xe điện",
-      title: "Trek 500W City E-Bike",
-      description: "Xe đạp điện Trek phù hợp đi làm",
-      year: 2020,
-      price: 18000000,
-      listingType: "negotiable",
-      listingStatus: "active",
-      createdAt: "2025-09-25T21:36:39",
-      sellerDisplayName: "Trần Thị Hoa",
-      sellerEmail: "hoa.tran@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=800&h=600",
-      imageUrls: [],
-      brand: "Trek",
-      model: "City500",
-      ebike: {
-        motorPowerW: 500,
-        batteryVoltage: 48,
-        rangeKm: 50,
-        frameSize: "M",
-        condition: "Như mới",
-        mileageKm: 800,
-        weightKg: 24,
-        yearOfManufacture: 2020,
-      },
-    },
-    {
-      listingId: 22,
-      memberId: 7,
-      categoryId: 2,
-      categoryName: "Xe điện",
-      title: "Super Soco TC Max 3000W",
-      description: "Xe mô tô điện Super Soco công suất cao",
-      year: 2024,
-      price: 78000000,
-      listingType: "buy_now",
-      listingStatus: "pending",
-      createdAt: "2025-10-27T16:45:00",
-      sellerDisplayName: "Lê Hoàng Nam",
-      sellerEmail: "nam@email.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=800&h=600",
-      imageUrls: [],
-      brand: "Super Soco",
-      model: "TC Max",
-      ebike: {
-        motorPowerW: 3000,
-        batteryVoltage: 72,
-        rangeKm: 120,
-        frameSize: "L",
-        condition: "Mới",
-        mileageKm: 0,
-        weightKg: 95,
-        yearOfManufacture: 2024,
-      },
-    },
-    {
-      listingId: 3,
-      memberId: 3,
-      categoryId: 2,
-      categoryName: "Xe điện",
-      title: "FoldX 350W Foldable E-Bike",
-      description: "Xe gấp gọn FoldX tiện lợi",
-      year: 2019,
-      price: 12000000,
-      listingType: "buy_now",
-      listingStatus: "active",
-      createdAt: "2025-09-25T21:36:39",
-      sellerDisplayName: "Lê Minh Tuấn",
-      sellerEmail: "tuan.le@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1559294582-2f3f2e2c4ab4?w=800&h=600",
-      imageUrls: [],
-      brand: "FoldX",
-      model: "FX350",
-      ebike: {
-        motorPowerW: 350,
-        batteryVoltage: 36,
-        rangeKm: 35,
-        frameSize: "S",
-        condition: "Đã sử dụng",
-        mileageKm: 2500,
-        weightKg: 18,
-        yearOfManufacture: 2019,
-      },
-    },
-  ];
+  const listings = data?.data.items;
 
   const getStatusColor = (status?: string) => {
     switch (status) {
@@ -253,6 +78,8 @@ const EBikeAllPage: React.FC = () => {
         return "!bg-amber-100 !text-amber-700";
       case "sold":
         return "!bg-slate-100 !text-slate-700";
+      case "rejected":
+        return "!bg-red-100 !text-red-700";
       default:
         return "!bg-slate-100 !text-slate-700";
     }
@@ -266,6 +93,8 @@ const EBikeAllPage: React.FC = () => {
         return "Chờ duyệt";
       case "sold":
         return "Đã bán";
+      case "rejected":
+        return "Đã từ chối";
       default:
         return "Không xác định";
     }
@@ -284,9 +113,9 @@ const EBikeAllPage: React.FC = () => {
     }
   };
 
-  const filteredListings = mockListings.filter((listing) => {
+  const filteredListings = listings?.filter((listing) => {
     const matchesSearch =
-      listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      listing.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       listing.brand?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       listing.sellerDisplayName
         ?.toLowerCase()
@@ -298,7 +127,7 @@ const EBikeAllPage: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const paginatedListings = filteredListings.slice(
+  const paginatedListings = filteredListings?.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
@@ -307,25 +136,26 @@ const EBikeAllPage: React.FC = () => {
     {
       icon: Package,
       label: "Tổng tin đăng",
-      value: mockListings.length,
+      value: listings?.length || 0,
       color: "!from-blue-500 !to-cyan-600",
     },
     {
       icon: Clock,
       label: "Chờ duyệt",
-      value: mockListings.filter((l) => l.listingStatus === "pending").length,
+      value: listings?.filter((l) => l.listingStatus === "pending").length || 0,
       color: "!from-amber-500 !to-orange-600",
     },
     {
       icon: CheckCircle,
       label: "Đã duyệt",
-      value: mockListings.filter((l) => l.listingStatus === "active").length,
+      value: listings?.filter((l) => l.listingStatus === "active").length || 0,
       color: "!from-emerald-500 !to-green-600",
     },
     {
       icon: AlertTriangle,
-      label: "Cần xử lý",
-      value: mockListings.filter((l) => l.listingStatus === "pending").length,
+      label: "Đã từ chối",
+      value:
+        listings?.filter((l) => l.listingStatus === "rejected").length || 0,
       color: "!from-red-500 !to-pink-600",
     },
   ];
@@ -347,21 +177,53 @@ const EBikeAllPage: React.FC = () => {
     handleMenuClose();
   };
 
-  const handleApprove = () => {
-    setSnackbar({
-      open: true,
-      message: "Đã duyệt tin đăng thành công!",
-      severity: "success",
-    });
+  const handleApprove = async () => {
+    if (!selectedListing?.listingId) return;
+
+    try {
+      await updateStatusMutation.mutateAsync({
+        id: selectedListing.listingId,
+        body: { status: "active" },
+      });
+
+      setSnackbar({
+        open: true,
+        message: "Đã duyệt tin đăng thành công!",
+        severity: "success",
+      });
+      setDetailDialogOpen(false);
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Có lỗi xảy ra khi duyệt tin đăng!",
+        severity: "error",
+      });
+    }
     handleMenuClose();
   };
 
-  const handleReject = () => {
-    setSnackbar({
-      open: true,
-      message: "Đã từ chối tin đăng!",
-      severity: "error",
-    });
+  const handleReject = async () => {
+    if (!selectedListing?.listingId) return;
+
+    try {
+      await updateStatusMutation.mutateAsync({
+        id: selectedListing.listingId,
+        body: { status: "rejected" },
+      });
+
+      setSnackbar({
+        open: true,
+        message: "Đã từ chối tin đăng!",
+        severity: "success",
+      });
+      setDetailDialogOpen(false);
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Có lỗi xảy ra khi từ chối tin đăng!",
+        severity: "error",
+      });
+    }
     handleMenuClose();
   };
 
@@ -371,13 +233,12 @@ const EBikeAllPage: React.FC = () => {
   };
 
   const getImageUrl = (listing: ListingDto): string => {
-    return listing.primaryImageUrl || listing.imageUrls[0] || DEFAULT_IMAGE;
+    return listing.primaryImageUrl || listing.imageUrls?.[0] || DEFAULT_IMAGE;
   };
 
   return (
     <Box className="!p-6">
       <Container maxWidth="xl">
-        {/* Header */}
         <Box className="!mb-6">
           <Box className="!flex !items-center !gap-3 !mb-2">
             <Box className="!w-12 !h-12 !bg-gradient-to-br !from-blue-500 !to-cyan-600 !rounded-xl !flex !items-center !justify-center">
@@ -394,7 +255,6 @@ const EBikeAllPage: React.FC = () => {
           </Box>
         </Box>
 
-        {/* Stats */}
         <Grid container spacing={3} className="!mb-6">
           {stats.map((stat, index) => (
             <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
@@ -419,7 +279,6 @@ const EBikeAllPage: React.FC = () => {
           ))}
         </Grid>
 
-        {/* Filters */}
         <Paper className="!p-4 !mb-6 !rounded-2xl">
           <Box className="!flex !flex-col md:!flex-row !gap-4 !justify-between !items-center">
             <TextField
@@ -446,13 +305,13 @@ const EBikeAllPage: React.FC = () => {
                 <MenuItem value="all">Tất cả</MenuItem>
                 <MenuItem value="pending">Chờ duyệt</MenuItem>
                 <MenuItem value="active">Đã duyệt</MenuItem>
+                <MenuItem value="rejected">Đã từ chối</MenuItem>
                 <MenuItem value="sold">Đã bán</MenuItem>
               </Select>
             </FormControl>
           </Box>
         </Paper>
 
-        {/* Table */}
         <Paper className="!shadow-xl !rounded-2xl">
           <TableContainer>
             <Table>
@@ -469,7 +328,7 @@ const EBikeAllPage: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {paginatedListings.map((listing) => (
+                {paginatedListings?.map((listing) => (
                   <TableRow
                     key={listing.listingId}
                     className="hover:!bg-slate-50 !transition-colors"
@@ -536,7 +395,7 @@ const EBikeAllPage: React.FC = () => {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={filteredListings.length}
+            count={filteredListings?.length || 0}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={(_, newPage) => setPage(newPage)}
@@ -548,7 +407,6 @@ const EBikeAllPage: React.FC = () => {
           />
         </Paper>
 
-        {/* Context Menu */}
         <Menu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
@@ -558,25 +416,12 @@ const EBikeAllPage: React.FC = () => {
             <Eye size={18} className="!mr-2" />
             Xem chi tiết
           </MenuItem>
-          {selectedListing?.listingStatus === "pending" && (
-            <>
-              <MenuItem onClick={handleApprove} className="!text-emerald-600">
-                <CheckCircle size={18} className="!mr-2" />
-                Duyệt tin
-              </MenuItem>
-              <MenuItem onClick={handleReject} className="!text-red-600">
-                <AlertTriangle size={18} className="!mr-2" />
-                Từ chối
-              </MenuItem>
-            </>
-          )}
           <MenuItem onClick={handleMenuClose} className="!text-red-600">
             <Trash2 size={18} className="!mr-2" />
             Xóa
           </MenuItem>
         </Menu>
 
-        {/* Detail Dialog */}
         <Dialog
           open={detailDialogOpen}
           onClose={() => setDetailDialogOpen(false)}
@@ -607,115 +452,132 @@ const EBikeAllPage: React.FC = () => {
                     {selectedListing.description}
                   </Typography>
                 </Grid>
-
-                {/* E-Bike Specs */}
-                <Grid size={{ xs: 12 }}>
-                  <Paper className="!p-4 !bg-slate-50">
-                    <Typography
-                      variant="subtitle2"
-                      className="!font-bold !mb-3 !flex !items-center !gap-2"
-                    >
-                      <Bike size={18} className="!text-blue-500" />
-                      Thông số kỹ thuật
-                    </Typography>
-                    <Grid container spacing={2}>
-                      <Grid size={{ xs: 6, md: 4 }}>
-                        <Typography
-                          variant="caption"
-                          className="!text-slate-600"
-                        >
-                          Công suất động cơ
-                        </Typography>
-                        <Typography className="!font-bold !text-orange-600">
-                          {selectedListing.ebike?.motorPowerW}W
-                        </Typography>
+                {selectedListing.ebike && (
+                  <Grid size={{ xs: 12 }}>
+                    <Paper className="!p-4 !bg-slate-50">
+                      <Typography
+                        variant="subtitle2"
+                        className="!font-bold !mb-3 !flex !items-center !gap-2"
+                      >
+                        <Bike size={18} className="!text-blue-500" />
+                        Thông số kỹ thuật
+                      </Typography>
+                      <Grid container spacing={2}>
+                        {selectedListing.ebike.motorPowerW && (
+                          <Grid size={{ xs: 6, md: 4 }}>
+                            <Typography
+                              variant="caption"
+                              className="!text-slate-600"
+                            >
+                              Công suất động cơ
+                            </Typography>
+                            <Typography className="!font-bold !text-orange-600">
+                              {selectedListing.ebike.motorPowerW}W
+                            </Typography>
+                          </Grid>
+                        )}
+                        {selectedListing.ebike.batteryVoltage && (
+                          <Grid size={{ xs: 6, md: 4 }}>
+                            <Typography
+                              variant="caption"
+                              className="!text-slate-600"
+                            >
+                              Điện áp pin
+                            </Typography>
+                            <Typography className="!font-bold !text-purple-600">
+                              {selectedListing.ebike.batteryVoltage}V
+                            </Typography>
+                          </Grid>
+                        )}
+                        {selectedListing.ebike.rangeKm && (
+                          <Grid size={{ xs: 6, md: 4 }}>
+                            <Typography
+                              variant="caption"
+                              className="!text-slate-600"
+                            >
+                              Quãng đường
+                            </Typography>
+                            <Typography className="!font-bold !text-blue-600">
+                              {selectedListing.ebike.rangeKm}km
+                            </Typography>
+                          </Grid>
+                        )}
+                        {selectedListing.ebike.frameSize && (
+                          <Grid size={{ xs: 6, md: 4 }}>
+                            <Typography
+                              variant="caption"
+                              className="!text-slate-600"
+                            >
+                              Kích thước khung
+                            </Typography>
+                            <Typography className="!font-bold">
+                              {selectedListing.ebike.frameSize}
+                            </Typography>
+                          </Grid>
+                        )}
+                        {selectedListing.ebike.mileageKm !== undefined && (
+                          <Grid size={{ xs: 6, md: 4 }}>
+                            <Typography
+                              variant="caption"
+                              className="!text-slate-600"
+                            >
+                              Số km đã đi
+                            </Typography>
+                            <Typography className="!font-bold">
+                              {selectedListing.ebike.mileageKm.toLocaleString()}
+                              km
+                            </Typography>
+                          </Grid>
+                        )}
+                        {selectedListing.ebike.weightKg && (
+                          <Grid size={{ xs: 6, md: 4 }}>
+                            <Typography
+                              variant="caption"
+                              className="!text-slate-600"
+                            >
+                              Trọng lượng
+                            </Typography>
+                            <Typography className="!font-bold">
+                              {selectedListing.ebike.weightKg}kg
+                            </Typography>
+                          </Grid>
+                        )}
+                        {selectedListing.ebike.yearOfManufacture && (
+                          <Grid size={{ xs: 6, md: 4 }}>
+                            <Typography
+                              variant="caption"
+                              className="!text-slate-600"
+                            >
+                              Năm sản xuất
+                            </Typography>
+                            <Typography className="!font-bold">
+                              {selectedListing.ebike.yearOfManufacture}
+                            </Typography>
+                          </Grid>
+                        )}
+                        {selectedListing.ebike.condition && (
+                          <Grid size={{ xs: 6, md: 4 }}>
+                            <Typography
+                              variant="caption"
+                              className="!text-slate-600"
+                            >
+                              Tình trạng
+                            </Typography>
+                            <Box className="!mt-1">
+                              <Chip
+                                label={selectedListing.ebike.condition}
+                                size="small"
+                                className={getConditionColor(
+                                  selectedListing.ebike.condition
+                                )}
+                              />
+                            </Box>
+                          </Grid>
+                        )}
                       </Grid>
-                      <Grid size={{ xs: 6, md: 4 }}>
-                        <Typography
-                          variant="caption"
-                          className="!text-slate-600"
-                        >
-                          Điện áp pin
-                        </Typography>
-                        <Typography className="!font-bold !text-purple-600">
-                          {selectedListing.ebike?.batteryVoltage}V
-                        </Typography>
-                      </Grid>
-                      <Grid size={{ xs: 6, md: 4 }}>
-                        <Typography
-                          variant="caption"
-                          className="!text-slate-600"
-                        >
-                          Quãng đường
-                        </Typography>
-                        <Typography className="!font-bold !text-blue-600">
-                          {selectedListing.ebike?.rangeKm}km
-                        </Typography>
-                      </Grid>
-                      <Grid size={{ xs: 6, md: 4 }}>
-                        <Typography
-                          variant="caption"
-                          className="!text-slate-600"
-                        >
-                          Kích thước khung
-                        </Typography>
-                        <Typography className="!font-bold">
-                          {selectedListing.ebike?.frameSize}
-                        </Typography>
-                      </Grid>
-                      <Grid size={{ xs: 6, md: 4 }}>
-                        <Typography
-                          variant="caption"
-                          className="!text-slate-600"
-                        >
-                          Số km đã đi
-                        </Typography>
-                        <Typography className="!font-bold">
-                          {selectedListing.ebike?.mileageKm?.toLocaleString()}km
-                        </Typography>
-                      </Grid>
-                      <Grid size={{ xs: 6, md: 4 }}>
-                        <Typography
-                          variant="caption"
-                          className="!text-slate-600"
-                        >
-                          Trọng lượng
-                        </Typography>
-                        <Typography className="!font-bold">
-                          {selectedListing.ebike?.weightKg}kg
-                        </Typography>
-                      </Grid>
-                      <Grid size={{ xs: 6, md: 4 }}>
-                        <Typography
-                          variant="caption"
-                          className="!text-slate-600"
-                        >
-                          Năm sản xuất
-                        </Typography>
-                        <Typography className="!font-bold">
-                          {selectedListing.ebike?.yearOfManufacture}
-                        </Typography>
-                      </Grid>
-                      <Grid size={{ xs: 6, md: 4 }}>
-                        <Typography
-                          variant="caption"
-                          className="!text-slate-600"
-                        >
-                          Tình trạng
-                        </Typography>
-                        <Box className="!mt-1">
-                          <Chip
-                            label={selectedListing.ebike?.condition}
-                            size="small"
-                            className={getConditionColor(
-                              selectedListing.ebike?.condition
-                            )}
-                          />
-                        </Box>
-                      </Grid>
-                    </Grid>
-                  </Paper>
-                </Grid>
+                    </Paper>
+                  </Grid>
+                )}
 
                 <Grid size={{ xs: 6 }}>
                   <Typography variant="caption" className="!text-slate-600">
@@ -768,16 +630,20 @@ const EBikeAllPage: React.FC = () => {
                   color="success"
                   onClick={handleApprove}
                   startIcon={<CheckCircle size={18} />}
+                  disabled={updateStatusMutation.isPending}
                 >
-                  Duyệt tin
+                  {updateStatusMutation.isPending
+                    ? "Đang xử lý..."
+                    : "Duyệt tin"}
                 </Button>
                 <Button
                   variant="outlined"
                   color="error"
                   onClick={handleReject}
                   startIcon={<AlertTriangle size={18} />}
+                  disabled={updateStatusMutation.isPending}
                 >
-                  Từ chối
+                  {updateStatusMutation.isPending ? "Đang xử lý..." : "Từ chối"}
                 </Button>
               </>
             )}
@@ -785,7 +651,6 @@ const EBikeAllPage: React.FC = () => {
           </DialogActions>
         </Dialog>
 
-        {/* Snackbar */}
         <Snackbar
           open={snackbar.open}
           autoHideDuration={3000}

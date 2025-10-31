@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from "react";
 import {
   Box,
@@ -42,6 +43,8 @@ import {
   Battery,
 } from "lucide-react";
 import { ListingDto } from "src/types/listing.type";
+import { useGetListing } from "src/queries/useListing";
+import { useUpdateStatusMutation } from "src/queries/useListing";
 
 const BatteryAllPage: React.FC = () => {
   const [page, setPage] = useState(0);
@@ -59,173 +62,13 @@ const BatteryAllPage: React.FC = () => {
     severity: "success" as "success" | "error",
   });
 
+  const { data } = useGetListing({ categoryId: 1 }); // categoryId 1 for batteries
+  const updateStatusMutation = useUpdateStatusMutation();
+
   const DEFAULT_IMAGE =
     "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=800&h=600&q=80";
 
-  const mockListings: ListingDto[] = [
-    {
-      listingId: 10,
-      memberId: 1,
-      categoryId: 1,
-      categoryName: "Pin xe điện",
-      title: "Pin Lithium 48V 20Ah cho xe điện VinFast",
-      description: "Pin chất lượng cao, còn mới 95%, bảo hành 6 tháng",
-      year: 2024,
-      price: 8500000,
-      listingType: "buy_now",
-      listingStatus: "pending",
-      createdAt: "2025-10-28T14:30:00",
-      sellerDisplayName: "Nguyễn Văn A",
-      sellerEmail: "nguyenvana@email.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=800&h=600",
-      imageUrls: [],
-      brand: "VinFast",
-      model: "Standard",
-      battery: {
-        voltage: 48,
-        capacityWh: 960,
-        weightKg: 12.5,
-        condition: "Như mới",
-        ageYears: 1,
-      },
-    },
-    {
-      listingId: 11,
-      memberId: 2,
-      categoryId: 1,
-      categoryName: "Pin xe điện",
-      title: "Pin Samsung 60V 30Ah - Dung lượng lớn",
-      description: "Pin Samsung chính hãng, mới 100%",
-      year: 2024,
-      price: 15000000,
-      listingType: "buy_now",
-      listingStatus: "active",
-      createdAt: "2025-10-27T10:15:00",
-      sellerDisplayName: "Trần Thị B",
-      sellerEmail: "tranthib@email.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1609262772830-c1e7b6a48d6c?w=800&h=600",
-      imageUrls: [],
-      brand: "Samsung",
-      model: "SDI 30Ah",
-      battery: {
-        voltage: 60,
-        capacityWh: 1800,
-        weightKg: 18.0,
-        condition: "Mới",
-        ageYears: 0,
-      },
-    },
-    {
-      listingId: 12,
-      memberId: 3,
-      categoryId: 1,
-      categoryName: "Pin xe điện",
-      title: "Pin LG 52V 25Ah - Chất lượng cao",
-      description: "Pin LG nhập khẩu, sử dụng 6 tháng",
-      year: 2024,
-      price: 11500000,
-      listingType: "negotiable",
-      listingStatus: "active",
-      createdAt: "2025-10-26T08:45:00",
-      sellerDisplayName: "Lê Văn C",
-      sellerEmail: "levanc@email.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1608454027542-f43b1e1ec7f0?w=800&h=600",
-      imageUrls: [],
-      brand: "LG",
-      model: "Chem 25Ah",
-      battery: {
-        voltage: 52,
-        capacityWh: 1300,
-        weightKg: 15.5,
-        condition: "Đã sử dụng",
-        ageYears: 0.5,
-      },
-    },
-    {
-      listingId: 13,
-      memberId: 4,
-      categoryId: 1,
-      categoryName: "Pin xe điện",
-      title: "Pin Panasonic 36V 15Ah - Gọn nhẹ",
-      description: "Pin Panasonic cho xe đạp điện, còn mới 90%",
-      year: 2023,
-      price: 6500000,
-      listingType: "buy_now",
-      listingStatus: "pending",
-      createdAt: "2025-10-25T16:20:00",
-      sellerDisplayName: "Phạm Thị D",
-      sellerEmail: "phamthid@email.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=800&h=600",
-      imageUrls: [],
-      brand: "Panasonic",
-      model: "NCR 15Ah",
-      battery: {
-        voltage: 36,
-        capacityWh: 540,
-        weightKg: 8.5,
-        condition: "Như mới",
-        ageYears: 1,
-      },
-    },
-    {
-      listingId: 14,
-      memberId: 5,
-      categoryId: 1,
-      categoryName: "Pin xe điện",
-      title: "Pin Tesla 72V 40Ah - Siêu khủng",
-      description: "Pin công suất lớn cho xe điện cao cấp",
-      year: 2024,
-      price: 25000000,
-      listingType: "buy_now",
-      listingStatus: "active",
-      createdAt: "2025-10-24T11:30:00",
-      sellerDisplayName: "Hoàng Văn E",
-      sellerEmail: "hoangvane@email.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1609262772830-c1e7b6a48d6c?w=800&h=600",
-      imageUrls: [],
-      brand: "Tesla",
-      model: "Premium 40Ah",
-      battery: {
-        voltage: 72,
-        capacityWh: 2880,
-        weightKg: 25.0,
-        condition: "Mới",
-        ageYears: 0,
-      },
-    },
-    {
-      listingId: 15,
-      memberId: 6,
-      categoryId: 1,
-      categoryName: "Pin xe điện",
-      title: "Pin BYD 48V 12Ah - Giá rẻ",
-      description: "Pin BYD tiết kiệm, phù hợp xe máy điện",
-      year: 2023,
-      price: 4500000,
-      listingType: "buy_now",
-      listingStatus: "pending",
-      createdAt: "2025-10-23T09:15:00",
-      sellerDisplayName: "Đặng Thị F",
-      sellerEmail: "dangthif@email.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1608454027542-f43b1e1ec7f0?w=800&h=600",
-      imageUrls: [],
-      brand: "BYD",
-      model: "Blade 12Ah",
-      battery: {
-        voltage: 48,
-        capacityWh: 576,
-        weightKg: 10.0,
-        condition: "Đã sử dụng",
-        ageYears: 1.5,
-      },
-    },
-  ];
+  const listings = data?.data.items;
 
   const getStatusColor = (status?: string) => {
     switch (status) {
@@ -235,6 +78,8 @@ const BatteryAllPage: React.FC = () => {
         return "!bg-amber-100 !text-amber-700";
       case "sold":
         return "!bg-slate-100 !text-slate-700";
+      case "rejected":
+        return "!bg-red-100 !text-red-700";
       default:
         return "!bg-slate-100 !text-slate-700";
     }
@@ -248,6 +93,8 @@ const BatteryAllPage: React.FC = () => {
         return "Chờ duyệt";
       case "sold":
         return "Đã bán";
+      case "rejected":
+        return "Đã từ chối";
       default:
         return "Không xác định";
     }
@@ -266,9 +113,9 @@ const BatteryAllPage: React.FC = () => {
     }
   };
 
-  const filteredListings = mockListings.filter((listing) => {
+  const filteredListings = listings?.filter((listing) => {
     const matchesSearch =
-      listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      listing.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       listing.brand?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       listing.sellerDisplayName
         ?.toLowerCase()
@@ -280,7 +127,7 @@ const BatteryAllPage: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const paginatedListings = filteredListings.slice(
+  const paginatedListings = filteredListings?.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
@@ -289,25 +136,26 @@ const BatteryAllPage: React.FC = () => {
     {
       icon: Package,
       label: "Tổng tin đăng",
-      value: mockListings.length,
+      value: listings?.length || 0,
       color: "!from-blue-500 !to-cyan-600",
     },
     {
       icon: Clock,
       label: "Chờ duyệt",
-      value: mockListings.filter((l) => l.listingStatus === "pending").length,
+      value: listings?.filter((l) => l.listingStatus === "pending").length || 0,
       color: "!from-amber-500 !to-orange-600",
     },
     {
       icon: CheckCircle,
       label: "Đã duyệt",
-      value: mockListings.filter((l) => l.listingStatus === "active").length,
+      value: listings?.filter((l) => l.listingStatus === "active").length || 0,
       color: "!from-emerald-500 !to-green-600",
     },
     {
       icon: AlertTriangle,
-      label: "Cần xử lý",
-      value: mockListings.filter((l) => l.listingStatus === "pending").length,
+      label: "Đã từ chối",
+      value:
+        listings?.filter((l) => l.listingStatus === "rejected").length || 0,
       color: "!from-red-500 !to-pink-600",
     },
   ];
@@ -329,21 +177,53 @@ const BatteryAllPage: React.FC = () => {
     handleMenuClose();
   };
 
-  const handleApprove = () => {
-    setSnackbar({
-      open: true,
-      message: "Đã duyệt tin đăng thành công!",
-      severity: "success",
-    });
+  const handleApprove = async () => {
+    if (!selectedListing?.listingId) return;
+
+    try {
+      await updateStatusMutation.mutateAsync({
+        id: selectedListing.listingId,
+        body: { status: "active" },
+      });
+
+      setSnackbar({
+        open: true,
+        message: "Đã duyệt tin đăng thành công!",
+        severity: "success",
+      });
+      setDetailDialogOpen(false);
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Có lỗi xảy ra khi duyệt tin đăng!",
+        severity: "error",
+      });
+    }
     handleMenuClose();
   };
 
-  const handleReject = () => {
-    setSnackbar({
-      open: true,
-      message: "Đã từ chối tin đăng!",
-      severity: "error",
-    });
+  const handleReject = async () => {
+    if (!selectedListing?.listingId) return;
+
+    try {
+      await updateStatusMutation.mutateAsync({
+        id: selectedListing.listingId,
+        body: { status: "rejected" },
+      });
+
+      setSnackbar({
+        open: true,
+        message: "Đã từ chối tin đăng!",
+        severity: "success",
+      });
+      setDetailDialogOpen(false);
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Có lỗi xảy ra khi từ chối tin đăng!",
+        severity: "error",
+      });
+    }
     handleMenuClose();
   };
 
@@ -353,13 +233,12 @@ const BatteryAllPage: React.FC = () => {
   };
 
   const getImageUrl = (listing: ListingDto): string => {
-    return listing.primaryImageUrl || listing.imageUrls[0] || DEFAULT_IMAGE;
+    return listing.primaryImageUrl || listing.imageUrls?.[0] || DEFAULT_IMAGE;
   };
 
   return (
     <Box className="!p-6">
       <Container maxWidth="xl">
-        {/* Header */}
         <Box className="!mb-6">
           <Box className="!flex !items-center !gap-3 !mb-2">
             <Box className="!w-12 !h-12 !bg-gradient-to-br !from-orange-500 !to-red-600 !rounded-xl !flex !items-center !justify-center">
@@ -376,7 +255,6 @@ const BatteryAllPage: React.FC = () => {
           </Box>
         </Box>
 
-        {/* Stats */}
         <Grid container spacing={3} className="!mb-6">
           {stats.map((stat, index) => (
             <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
@@ -401,7 +279,6 @@ const BatteryAllPage: React.FC = () => {
           ))}
         </Grid>
 
-        {/* Filters */}
         <Paper className="!p-4 !mb-6 !rounded-2xl">
           <Box className="!flex !flex-col md:!flex-row !gap-4 !justify-between !items-center">
             <TextField
@@ -428,13 +305,13 @@ const BatteryAllPage: React.FC = () => {
                 <MenuItem value="all">Tất cả</MenuItem>
                 <MenuItem value="pending">Chờ duyệt</MenuItem>
                 <MenuItem value="active">Đã duyệt</MenuItem>
+                <MenuItem value="rejected">Đã từ chối</MenuItem>
                 <MenuItem value="sold">Đã bán</MenuItem>
               </Select>
             </FormControl>
           </Box>
         </Paper>
 
-        {/* Table */}
         <Paper className="!shadow-xl !rounded-2xl">
           <TableContainer>
             <Table>
@@ -451,7 +328,7 @@ const BatteryAllPage: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {paginatedListings.map((listing) => (
+                {paginatedListings?.map((listing) => (
                   <TableRow
                     key={listing.listingId}
                     className="hover:!bg-slate-50 !transition-colors"
@@ -518,7 +395,7 @@ const BatteryAllPage: React.FC = () => {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={filteredListings.length}
+            count={filteredListings?.length || 0}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={(_, newPage) => setPage(newPage)}
@@ -530,7 +407,6 @@ const BatteryAllPage: React.FC = () => {
           />
         </Paper>
 
-        {/* Context Menu */}
         <Menu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
@@ -558,7 +434,6 @@ const BatteryAllPage: React.FC = () => {
           </MenuItem>
         </Menu>
 
-        {/* Detail Dialog */}
         <Dialog
           open={detailDialogOpen}
           onClose={() => setDetailDialogOpen(false)}
@@ -591,80 +466,92 @@ const BatteryAllPage: React.FC = () => {
                 </Grid>
 
                 {/* Battery Specs */}
-                <Grid size={{ xs: 12 }}>
-                  <Paper className="!p-4 !bg-slate-50">
-                    <Typography
-                      variant="subtitle2"
-                      className="!font-bold !mb-3 !flex !items-center !gap-2"
-                    >
-                      <Battery size={18} className="!text-orange-500" />
-                      Thông số kỹ thuật
-                    </Typography>
-                    <Grid container spacing={2}>
-                      <Grid size={{ xs: 6, md: 4 }}>
-                        <Typography
-                          variant="caption"
-                          className="!text-slate-600"
-                        >
-                          Điện áp
-                        </Typography>
-                        <Typography className="!font-bold !text-orange-600">
-                          {selectedListing.battery?.voltage}V
-                        </Typography>
+                {selectedListing.battery && (
+                  <Grid size={{ xs: 12 }}>
+                    <Paper className="!p-4 !bg-slate-50">
+                      <Typography
+                        variant="subtitle2"
+                        className="!font-bold !mb-3 !flex !items-center !gap-2"
+                      >
+                        <Battery size={18} className="!text-orange-500" />
+                        Thông số kỹ thuật
+                      </Typography>
+                      <Grid container spacing={2}>
+                        {selectedListing.battery.voltage && (
+                          <Grid size={{ xs: 6, md: 4 }}>
+                            <Typography
+                              variant="caption"
+                              className="!text-slate-600"
+                            >
+                              Điện áp
+                            </Typography>
+                            <Typography className="!font-bold !text-orange-600">
+                              {selectedListing.battery.voltage}V
+                            </Typography>
+                          </Grid>
+                        )}
+                        {selectedListing.battery.capacityWh && (
+                          <Grid size={{ xs: 6, md: 4 }}>
+                            <Typography
+                              variant="caption"
+                              className="!text-slate-600"
+                            >
+                              Dung lượng
+                            </Typography>
+                            <Typography className="!font-bold !text-blue-600">
+                              {selectedListing.battery.capacityWh}Wh
+                            </Typography>
+                          </Grid>
+                        )}
+                        {selectedListing.battery.weightKg && (
+                          <Grid size={{ xs: 6, md: 4 }}>
+                            <Typography
+                              variant="caption"
+                              className="!text-slate-600"
+                            >
+                              Trọng lượng
+                            </Typography>
+                            <Typography className="!font-bold">
+                              {selectedListing.battery.weightKg}kg
+                            </Typography>
+                          </Grid>
+                        )}
+                        {selectedListing.battery.ageYears !== undefined && (
+                          <Grid size={{ xs: 6, md: 4 }}>
+                            <Typography
+                              variant="caption"
+                              className="!text-slate-600"
+                            >
+                              Tuổi pin
+                            </Typography>
+                            <Typography className="!font-bold">
+                              {selectedListing.battery.ageYears} năm
+                            </Typography>
+                          </Grid>
+                        )}
+                        {selectedListing.battery.condition && (
+                          <Grid size={{ xs: 6, md: 4 }}>
+                            <Typography
+                              variant="caption"
+                              className="!text-slate-600"
+                            >
+                              Tình trạng
+                            </Typography>
+                            <Box className="!mt-1">
+                              <Chip
+                                label={selectedListing.battery.condition}
+                                size="small"
+                                className={getConditionColor(
+                                  selectedListing.battery.condition
+                                )}
+                              />
+                            </Box>
+                          </Grid>
+                        )}
                       </Grid>
-                      <Grid size={{ xs: 6, md: 4 }}>
-                        <Typography
-                          variant="caption"
-                          className="!text-slate-600"
-                        >
-                          Dung lượng
-                        </Typography>
-                        <Typography className="!font-bold !text-blue-600">
-                          {selectedListing.battery?.capacityWh}Wh
-                        </Typography>
-                      </Grid>
-                      <Grid size={{ xs: 6, md: 4 }}>
-                        <Typography
-                          variant="caption"
-                          className="!text-slate-600"
-                        >
-                          Trọng lượng
-                        </Typography>
-                        <Typography className="!font-bold">
-                          {selectedListing.battery?.weightKg}kg
-                        </Typography>
-                      </Grid>
-                      <Grid size={{ xs: 6, md: 4 }}>
-                        <Typography
-                          variant="caption"
-                          className="!text-slate-600"
-                        >
-                          Tuổi pin
-                        </Typography>
-                        <Typography className="!font-bold">
-                          {selectedListing.battery?.ageYears} năm
-                        </Typography>
-                      </Grid>
-                      <Grid size={{ xs: 6, md: 4 }}>
-                        <Typography
-                          variant="caption"
-                          className="!text-slate-600"
-                        >
-                          Tình trạng
-                        </Typography>
-                        <Box className="!mt-1">
-                          <Chip
-                            label={selectedListing.battery?.condition}
-                            size="small"
-                            className={getConditionColor(
-                              selectedListing.battery?.condition
-                            )}
-                          />
-                        </Box>
-                      </Grid>
-                    </Grid>
-                  </Paper>
-                </Grid>
+                    </Paper>
+                  </Grid>
+                )}
 
                 <Grid size={{ xs: 6 }}>
                   <Typography variant="caption" className="!text-slate-600">
@@ -717,16 +604,20 @@ const BatteryAllPage: React.FC = () => {
                   color="success"
                   onClick={handleApprove}
                   startIcon={<CheckCircle size={18} />}
+                  disabled={updateStatusMutation.isPending}
                 >
-                  Duyệt tin
+                  {updateStatusMutation.isPending
+                    ? "Đang xử lý..."
+                    : "Duyệt tin"}
                 </Button>
                 <Button
                   variant="outlined"
                   color="error"
                   onClick={handleReject}
                   startIcon={<AlertTriangle size={18} />}
+                  disabled={updateStatusMutation.isPending}
                 >
-                  Từ chối
+                  {updateStatusMutation.isPending ? "Đang xử lý..." : "Từ chối"}
                 </Button>
               </>
             )}
@@ -734,7 +625,6 @@ const BatteryAllPage: React.FC = () => {
           </DialogActions>
         </Dialog>
 
-        {/* Snackbar */}
         <Snackbar
           open={snackbar.open}
           autoHideDuration={3000}

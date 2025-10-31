@@ -46,13 +46,11 @@ const MyListingsPage: React.FC = () => {
     null
   );
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const myListing = useGetMyListing();
+  const { data } = useGetMyListing();
 
   const isLoading = false;
 
-  const mockListings: ListingDto[] = myListing.data?.data || [];
-
-  const listings = mockListings;
+  const listings = data?.data.items || [];
 
   const getStatusColor = (status?: string) => {
     switch (status) {
@@ -62,8 +60,7 @@ const MyListingsPage: React.FC = () => {
         return "!bg-amber-100 !text-amber-700";
       case "sold":
         return "!bg-slate-100 !text-slate-700";
-      case "inactive":
-      case "draft":
+      case "reject":
         return "!bg-red-100 !text-red-700";
       default:
         return "!bg-slate-100 !text-slate-700";
@@ -78,8 +75,8 @@ const MyListingsPage: React.FC = () => {
         return "Chờ duyệt";
       case "sold":
         return "Đã bán";
-      case "draft":
-        return "Nháp";
+      case "reject":
+        return "Từ chối";
       default:
         return status || "Không xác định";
     }

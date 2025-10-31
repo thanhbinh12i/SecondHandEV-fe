@@ -23,6 +23,7 @@ import {
 import { Search, Calendar, Filter, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ListingDto } from "src/types/listing.type";
+import { useGetListing } from "src/queries/useListing";
 
 const EBikeListingsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -32,393 +33,24 @@ const EBikeListingsPage: React.FC = () => {
   const [yearFilter, setYearFilter] = useState("all");
   const [priceRange, setPriceRange] = useState<number[]>([0, 1000000000]);
   const [page, setPage] = useState(1);
-
-  const isLoading = false;
+  const { data, isLoading } = useGetListing({ categoryId: 1 });
 
   const DEFAULT_IMAGE =
     "https://images.unsplash.com/photo-1571333250630-f0230c320b6d?w=800&h=600&q=80";
 
-  const mockListings: ListingDto[] = [
-    {
-      listingId: 1,
-      memberId: 1,
-      categoryId: 2,
-      categoryName: "E-Bike",
-      title: "Giant 750W Mountain E-Bike",
-      description:
-        "Xe đạp địa hình Giant, mạnh mẽ cho leo núi. Pin 48V 15Ah, tầm xa 80km.",
-      year: 2021,
-      price: 22000000,
-      listingType: "fixed",
-      listingStatus: "active",
-      createdAt: "2025-09-25T21:36:39",
-      sellerDisplayName: "Nguyễn Văn An",
-      sellerEmail: "an.nguyen@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?w=800&h=600",
-      imageUrls: [],
-      brand: "Giant",
-      model: "MTB750",
-    },
-    {
-      listingId: 2,
-      memberId: 2,
-      categoryId: 2,
-      categoryName: "E-Bike",
-      title: "Trek 500W City E-Bike",
-      description:
-        "Xe đạp điện Trek phù hợp đi làm và thành phố. Thiết kế sang trọng.",
-      year: 2020,
-      price: 18000000,
-      listingType: "auction",
-      listingStatus: "active",
-      createdAt: "2025-09-25T21:36:39",
-      sellerDisplayName: "Trần Thị Hoa",
-      sellerEmail: "hoa.tran@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=800&h=600",
-      imageUrls: [],
-      brand: "Trek",
-      model: "City500",
-    },
-    {
-      listingId: 3,
-      memberId: 3,
-      categoryId: 2,
-      categoryName: "E-Bike",
-      title: "FoldX 350W Foldable E-Bike",
-      description:
-        "Xe gấp gọn FoldX tiện lợi, dễ mang theo. Pin nhẹ, sạc nhanh.",
-      year: 2019,
-      price: 12000000,
-      listingType: "fixed",
-      listingStatus: "active",
-      createdAt: "2025-09-25T21:36:39",
-      sellerDisplayName: "Lê Minh Tuấn",
-      sellerEmail: "tuan.le@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1559294582-2f3f2e2c4ab4?w=800&h=600",
-      imageUrls: [],
-      brand: "FoldX",
-      model: "FX350",
-    },
-    {
-      listingId: 4,
-      memberId: 1,
-      categoryId: 2,
-      categoryName: "E-Bike",
-      title: "Specialized Turbo Vado 600W",
-      description:
-        "Xe đạp điện cao cấp Specialized, động cơ mạnh mẽ, pin 604Wh.",
-      year: 2023,
-      price: 45000000,
-      listingType: "fixed",
-      listingStatus: "active",
-      createdAt: "2025-10-15T14:20:00",
-      sellerDisplayName: "Nguyễn Văn An",
-      sellerEmail: "an.nguyen@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1571333250630-f0230c320b6d?w=800&h=600",
-      imageUrls: [],
-      brand: "Specialized",
-      model: "Turbo Vado",
-    },
-    {
-      listingId: 5,
-      memberId: 2,
-      categoryId: 2,
-      categoryName: "E-Bike",
-      title: "Yamaha PAS 400W City Cruiser",
-      description: "Xe đạp điện Yamaha nhập khẩu, êm ái, phù hợp phụ nữ.",
-      year: 2022,
-      price: 25000000,
-      listingType: "auction",
-      listingStatus: "active",
-      createdAt: "2025-10-10T09:30:00",
-      sellerDisplayName: "Trần Thị Hoa",
-      sellerEmail: "hoa.tran@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600",
-      imageUrls: [],
-      brand: "Yamaha",
-      model: "PAS City",
-    },
-    {
-      listingId: 6,
-      memberId: 3,
-      categoryId: 2,
-      categoryName: "E-Bike",
-      title: "VinFast Klara S 1200W",
-      description:
-        "Xe máy điện VinFast Klara S, pin rời tiện lợi, bảo hành 3 năm.",
-      year: 2023,
-      price: 28000000,
-      listingType: "fixed",
-      listingStatus: "active",
-      createdAt: "2025-10-20T16:45:00",
-      sellerDisplayName: "Lê Minh Tuấn",
-      sellerEmail: "tuan.le@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600",
-      imageUrls: [],
-      brand: "VinFast",
-      model: "Klara S",
-    },
-    {
-      listingId: 7,
-      memberId: 1,
-      categoryId: 2,
-      categoryName: "E-Bike",
-      title: "BMC Alpenchallenge AMP 500W",
-      description: "Xe đạp điện thể thao BMC, nhẹ, bền, phù hợp đường dài.",
-      year: 2024,
-      price: 38000000,
-      listingType: "fixed",
-      listingStatus: "active",
-      createdAt: "2025-10-18T11:00:00",
-      sellerDisplayName: "Nguyễn Văn An",
-      sellerEmail: "an.nguyen@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?w=800&h=600",
-      imageUrls: [],
-      brand: "BMC",
-      model: "Alpenchallenge",
-    },
-    {
-      listingId: 8,
-      memberId: 2,
-      categoryId: 2,
-      categoryName: "E-Bike",
-      title: "Yadea G5 800W Scooter",
-      description: "Xe máy điện Yadea G5, thiết kế trẻ trung, giá tốt.",
-      year: 2023,
-      price: 15000000,
-      listingType: "auction",
-      listingStatus: "active",
-      createdAt: "2025-09-28T13:20:00",
-      sellerDisplayName: "Trần Thị Hoa",
-      sellerEmail: "hoa.tran@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=800&h=600",
-      imageUrls: [],
-      brand: "Yadea",
-      model: "G5",
-    },
-    {
-      listingId: 9,
-      memberId: 3,
-      categoryId: 2,
-      categoryName: "E-Bike",
-      title: "Pega Cap A 600W Classic",
-      description: "Xe máy điện Pega phong cách cổ điển, màu xanh độc đáo.",
-      year: 2022,
-      price: 19000000,
-      listingType: "fixed",
-      listingStatus: "active",
-      createdAt: "2025-09-20T10:15:00",
-      sellerDisplayName: "Lê Minh Tuấn",
-      sellerEmail: "tuan.le@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1559294582-2f3f2e2c4ab4?w=800&h=600",
-      imageUrls: [],
-      brand: "Pega",
-      model: "Cap A",
-    },
-    {
-      listingId: 10,
-      memberId: 1,
-      categoryId: 2,
-      categoryName: "E-Bike",
-      title: "Tesla Cyberquad 1500W ATV",
-      description:
-        "Xe địa hình điện Tesla Cyberquad, mạnh mẽ, phong cách tương lai.",
-      year: 2024,
-      price: 85000000,
-      listingType: "fixed",
-      listingStatus: "active",
-      createdAt: "2025-10-25T15:30:00",
-      sellerDisplayName: "Nguyễn Văn An",
-      sellerEmail: "an.nguyen@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1571333250630-f0230c320b6d?w=800&h=600",
-      imageUrls: [],
-      brand: "Tesla",
-      model: "Cyberquad",
-    },
-    {
-      listingId: 11,
-      memberId: 2,
-      categoryId: 2,
-      categoryName: "E-Bike",
-      title: "Cannondale Quick Neo 400W",
-      description:
-        "Xe đạp điện Cannondale nhẹ, thích hợp tập luyện và đi chơi.",
-      year: 2023,
-      price: 32000000,
-      listingType: "auction",
-      listingStatus: "active",
-      createdAt: "2025-10-05T08:45:00",
-      sellerDisplayName: "Trần Thị Hoa",
-      sellerEmail: "hoa.tran@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?w=800&h=600",
-      imageUrls: [],
-      brand: "Cannondale",
-      model: "Quick Neo",
-    },
-    {
-      listingId: 12,
-      memberId: 3,
-      categoryId: 2,
-      categoryName: "E-Bike",
-      title: "DYU D3F 250W Mini E-Bike",
-      description: "Xe đạp điện mini DYU siêu nhỏ gọn, phù hợp sinh viên.",
-      year: 2022,
-      price: 8500000,
-      listingType: "fixed",
-      listingStatus: "active",
-      createdAt: "2025-09-15T12:00:00",
-      sellerDisplayName: "Lê Minh Tuấn",
-      sellerEmail: "tuan.le@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1559294582-2f3f2e2c4ab4?w=800&h=600",
-      imageUrls: [],
-      brand: "DYU",
-      model: "D3F",
-    },
-    {
-      listingId: 13,
-      memberId: 1,
-      categoryId: 2,
-      categoryName: "E-Bike",
-      title: "Haibike XDURO 700W Mountain",
-      description: "Xe đạp điện leo núi Haibike Đức, suspension đầy đủ.",
-      year: 2023,
-      price: 55000000,
-      listingType: "fixed",
-      listingStatus: "active",
-      createdAt: "2025-10-12T14:30:00",
-      sellerDisplayName: "Nguyễn Văn An",
-      sellerEmail: "an.nguyen@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=800&h=600",
-      imageUrls: [],
-      brand: "Haibike",
-      model: "XDURO",
-    },
-    {
-      listingId: 14,
-      memberId: 2,
-      categoryId: 2,
-      categoryName: "E-Bike",
-      title: "Xiaomi Himo C26 350W",
-      description: "Xe đạp điện Xiaomi Himo thiết kế đẹp, giá rẻ.",
-      year: 2021,
-      price: 11000000,
-      listingType: "auction",
-      listingStatus: "active",
-      createdAt: "2025-09-10T09:20:00",
-      sellerDisplayName: "Trần Thị Hoa",
-      sellerEmail: "hoa.tran@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1571333250630-f0230c320b6d?w=800&h=600",
-      imageUrls: [],
-      brand: "Xiaomi",
-      model: "Himo C26",
-    },
-    {
-      listingId: 15,
-      memberId: 3,
-      categoryId: 2,
-      categoryName: "E-Bike",
-      title: "Gogoro S2 ABS 1200W Smart Scooter",
-      description:
-        "Xe máy điện Gogoro thông minh, đổi pin nhanh, công nghệ cao.",
-      year: 2024,
-      price: 48000000,
-      listingType: "fixed",
-      listingStatus: "active",
-      createdAt: "2025-10-22T17:00:00",
-      sellerDisplayName: "Lê Minh Tuấn",
-      sellerEmail: "tuan.le@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600",
-      imageUrls: [],
-      brand: "Gogoro",
-      model: "S2 ABS",
-    },
-    {
-      listingId: 16,
-      memberId: 1,
-      categoryId: 2,
-      categoryName: "E-Bike",
-      title: "Cube Touring Hybrid 500W",
-      description: "Xe đạp điện touring Cube, pin lớn, đi xa 120km.",
-      year: 2023,
-      price: 42000000,
-      listingType: "fixed",
-      listingStatus: "active",
-      createdAt: "2025-10-08T11:45:00",
-      sellerDisplayName: "Nguyễn Văn An",
-      sellerEmail: "an.nguyen@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?w=800&h=600",
-      imageUrls: [],
-      brand: "Cube",
-      model: "Touring Hybrid",
-    },
-    {
-      listingId: 17,
-      memberId: 2,
-      categoryId: 2,
-      categoryName: "E-Bike",
-      title: "NIU MQi+ Sport 1500W",
-      description: "Xe máy điện NIU cao cấp, màn hình cảm ứng, kết nối app.",
-      year: 2024,
-      price: 38000000,
-      listingType: "auction",
-      listingStatus: "active",
-      createdAt: "2025-10-19T13:15:00",
-      sellerDisplayName: "Trần Thị Hoa",
-      sellerEmail: "hoa.tran@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=800&h=600",
-      imageUrls: [],
-      brand: "NIU",
-      model: "MQi+ Sport",
-    },
-    {
-      listingId: 18,
-      memberId: 3,
-      categoryId: 2,
-      categoryName: "E-Bike",
-      title: "Scott E-Spark 600W Full Suspension",
-      description: "Xe đạp điện thể thao Scott, giảm xóc toàn phần.",
-      year: 2023,
-      price: 62000000,
-      listingType: "fixed",
-      listingStatus: "active",
-      createdAt: "2025-10-14T10:30:00",
-      sellerDisplayName: "Lê Minh Tuấn",
-      sellerEmail: "tuan.le@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1559294582-2f3f2e2c4ab4?w=800&h=600",
-      imageUrls: [],
-      brand: "Scott",
-      model: "E-Spark",
-    },
-  ];
-
-  const listings = mockListings;
-  const totalPages = Math.ceil(listings.length / 12);
-  const paginatedListings = listings.slice((page - 1) * 12, page * 12);
+  const listings = data?.data.items;
+  const activeListings = listings?.filter(
+    (listing) => listing.listingStatus === "active"
+  );
+  const totalPages = Math.ceil((activeListings?.length ?? 0) / 12);
+  const paginatedListings = activeListings?.slice((page - 1) * 12, page * 12);
 
   const brands = [
-    ...new Set(mockListings.map((l) => l.brand).filter(Boolean)),
+    ...new Set(listings?.map((l) => l.brand).filter(Boolean)),
   ].sort();
-  const years = [
-    ...new Set(mockListings.map((l) => l.year).filter(Boolean)),
-  ].sort((a, b) => b! - a!);
+  const years = [...new Set(listings?.map((l) => l.year).filter(Boolean))].sort(
+    (a, b) => b! - a!
+  );
 
   const getImageUrl = (listing: ListingDto): string => {
     return listing.primaryImageUrl || listing.imageUrls[0] || DEFAULT_IMAGE;
@@ -452,7 +84,7 @@ const EBikeListingsPage: React.FC = () => {
       <Container maxWidth="xl">
         <Box className="!mb-8">
           <Typography variant="h3" className="!font-bold !text-slate-900 !mb-3">
-            Xe đạp & Xe máy điện
+            Xe điện
           </Typography>
           <Typography variant="h6" className="!text-slate-600">
             Khám phá các dòng xe điện hiện đại, thân thiện môi trường
@@ -576,12 +208,13 @@ const EBikeListingsPage: React.FC = () => {
           <Grid size={{ xs: 12, md: 9 }}>
             <Box className="!flex !justify-between !items-center !mb-6">
               <Typography variant="body1" className="!text-slate-600">
-                Hiển thị {paginatedListings.length} / {listings.length} kết quả
+                Hiển thị {paginatedListings?.length} / {activeListings?.length}{" "}
+                kết quả
               </Typography>
             </Box>
 
             <Grid container spacing={3}>
-              {paginatedListings.map((listing) => (
+              {paginatedListings?.map((listing) => (
                 <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={listing.listingId}>
                   <Card
                     onClick={() => handleCardClick(listing.listingId)}

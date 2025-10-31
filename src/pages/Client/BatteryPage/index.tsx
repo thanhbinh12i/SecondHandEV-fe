@@ -23,7 +23,7 @@ import {
 import { Search, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ListingDto } from "src/types/listing.type";
-// import { useGetListings } from "src/queries/useListing";
+import { useGetListing } from "src/queries/useListing";
 
 const BatteryListingsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -32,137 +32,17 @@ const BatteryListingsPage: React.FC = () => {
   const [brandFilter, setBrandFilter] = useState("all");
   const [priceRange, setPriceRange] = useState<number[]>([0, 1000000000]);
   const [page, setPage] = useState(1);
-
-  const isLoading = false;
+  const { data, isLoading } = useGetListing({ categoryId: 2 });
 
   const DEFAULT_IMAGE =
     "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800&h=600&q=80";
 
-  const mockListings: ListingDto[] = [
-    {
-      listingId: 8,
-      memberId: 5,
-      categoryId: 1,
-      categoryName: "Battery",
-      title: "Pin LiFePO4 60kWh - VinFast VF8 (2023)",
-      description: "Pin còn rất mới, bảo hành 2 năm",
-      year: 2023,
-      price: 180000000,
-      listingType: "auction",
-      listingStatus: "active",
-      createdAt: "2025-10-28T10:06:44",
-      sellerDisplayName: "iEm Bình Nè",
-      sellerEmail: "nptbinh17092004@gmail.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800&h=600",
-      imageUrls: [],
-      brand: "VinFast",
-      model: "VF8",
-    },
-    {
-      listingId: 6,
-      memberId: 3,
-      categoryId: 1,
-      categoryName: "Battery",
-      title: "Panasonic 48V 700Wh Battery",
-      description: "Pin Panasonic dung lượng cao, đi xa.",
-      year: 2020,
-      price: 4500000,
-      listingType: "fixed",
-      listingStatus: "active",
-      createdAt: "2025-09-25T21:37:35",
-      sellerDisplayName: "Lê Minh Tuấn",
-      sellerEmail: "tuan.le@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1625231334168-35067f8853ed?w=800&h=600",
-      imageUrls: [],
-      brand: "Panasonic",
-      model: "48V700",
-    },
-    {
-      listingId: 5,
-      memberId: 2,
-      categoryId: 1,
-      categoryName: "Battery",
-      title: "LG 36V 300Wh Battery",
-      description: "Pin LG nhỏ gọn, phù hợp xe thành phố.",
-      year: 2022,
-      price: 2500000,
-      listingType: "fixed",
-      listingStatus: "active",
-      createdAt: "2025-09-25T21:37:35",
-      sellerDisplayName: "Trần Thị Hoa",
-      sellerEmail: "hoa.tran@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600",
-      imageUrls: [],
-      brand: "LG",
-      model: "36V300C",
-    },
-    {
-      listingId: 4,
-      memberId: 1,
-      categoryId: 1,
-      categoryName: "Battery",
-      title: "Samsung 48V 500Wh Battery",
-      description: "Pin Samsung dung lượng 500Wh, còn sử dụng tốt.",
-      year: 2021,
-      price: 3500000,
-      listingType: "fixed",
-      listingStatus: "active",
-      createdAt: "2025-09-25T21:37:35",
-      sellerDisplayName: "Nguyễn Văn An",
-      sellerEmail: "an.nguyen@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1609557927087-f9cf8e88de18?w=800&h=600",
-      imageUrls: [],
-      brand: "Samsung",
-      model: "48V500",
-    },
-    {
-      listingId: 3,
-      memberId: 1,
-      categoryId: 1,
-      categoryName: "Battery",
-      title: "BYD Blade Battery 75kWh",
-      description: "Pin BYD Blade công nghệ mới nhất, an toàn cao",
-      year: 2024,
-      price: 95000000,
-      listingType: "fixed",
-      listingStatus: "active",
-      createdAt: "2025-08-15T14:20:00",
-      sellerDisplayName: "Nguyễn Văn An",
-      sellerEmail: "an.nguyen@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800&h=600",
-      imageUrls: [],
-      brand: "BYD",
-      model: "Blade 75",
-    },
-    {
-      listingId: 2,
-      memberId: 2,
-      categoryId: 1,
-      categoryName: "Battery",
-      title: "Tesla Model 3 Battery Pack 60kWh",
-      description: "Pin Tesla chính hãng, độ bền cao",
-      year: 2022,
-      price: 150000000,
-      listingType: "auction",
-      listingStatus: "active",
-      createdAt: "2025-07-10T09:30:00",
-      sellerDisplayName: "Trần Thị Hoa",
-      sellerEmail: "hoa.tran@example.com",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1625231334168-35067f8853ed?w=800&h=600",
-      imageUrls: [],
-      brand: "Tesla",
-      model: "Model 3",
-    },
-  ];
-
-  const listings = mockListings;
-  const totalPages = 3;
+  const listings = data?.data.items;
+  const activeListings = listings?.filter(
+    (listing) => listing.listingStatus === "active"
+  );
+  const totalPages = Math.ceil((activeListings?.length ?? 0) / 12);
+  const paginatedListings = activeListings?.slice((page - 1) * 12, page * 12);
 
   const brands = ["VinFast", "Samsung", "LG", "Panasonic", "BYD", "Tesla"];
 
@@ -305,12 +185,13 @@ const BatteryListingsPage: React.FC = () => {
           <Grid size={{ xs: 12, md: 9 }}>
             <Box className="!flex !justify-between !items-center !mb-6">
               <Typography variant="body1" className="!text-slate-600">
-                Hiển thị {listings.length} kết quả
+                Hiển thị {paginatedListings?.length} / {activeListings?.length}{" "}
+                kết quả
               </Typography>
             </Box>
 
             <Grid container spacing={3}>
-              {listings.map((listing) => (
+              {paginatedListings?.map((listing) => (
                 <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={listing.listingId}>
                   <Card
                     onClick={() => handleCardClick(listing.listingId)}

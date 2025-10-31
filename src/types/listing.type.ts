@@ -1,11 +1,11 @@
 export interface ListingCreateRequest {
-  categoryId: number; // 1 = Battery, 2 = E-Bike
+  categoryId: number;
   title: string;
   description?: string;
   year?: number;
   price: number;
-  listingType?: string; // "fixed" or "buy_now"
-  listingStatus?: string; // "active", "draft", etc.
+  listingType?: string;
+  listingStatus?: string;
   primaryImageUrl?: string;
   imageUrls?: string[];
   brand?: string;
@@ -47,8 +47,16 @@ export interface EbikeDetailDto {
   weightKg?: number;
   yearOfManufacture?: number;
 }
+export interface ListingResponseDto {
+  items: ListingDto[];
+  totalItems: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+}
 
-// ListingDtos.ts
 export interface ListingDto {
   listingId: number;
   memberId: number;
@@ -58,9 +66,9 @@ export interface ListingDto {
   description?: string;
   year?: number;
   price?: number;
-  listingType?: string; // "fixed", "buy_now", etc.
-  listingStatus?: string; // "active", "draft", etc.
-  createdAt?: string; // ISO date string
+  listingType?: string;
+  listingStatus?: string;
+  createdAt?: string;
   sellerDisplayName?: string;
   sellerEmail?: string;
   primaryImageUrl?: string;
@@ -80,19 +88,18 @@ export interface ListingSearchRequest {
   listingStatus?: string;
   yearFrom?: number;
   yearTo?: number;
-  page?: number; // default: 1, min: 1
-  pageSize?: number; // default: 12, min: 1, max: 200
-  sortBy?: string; // "createdAt" | "price" | "year" | "title"
-  sortDir?: string; // "asc" | "desc"
+  page?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortDir?: string;
 }
 
-// MyListingAndCreateDtos.ts
 export interface MyListingSearchRequest {
-  status?: string; // "draft" | "active" | "rejected", etc.
-  page?: number; // default: 1, min: 1
-  pageSize?: number; // default: 12, min: 1, max: 200
-  sortBy?: string; // default: "createdAt"
-  sortDir?: string; // default: "desc"
+  status?: string;
+  page?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortDir?: string;
 }
 
 export interface CreateBatteryListingRequest {
@@ -100,8 +107,8 @@ export interface CreateBatteryListingRequest {
   description?: string;
   year?: number;
   price: number;
-  listingType?: string; // default: "buy_now"
-  listingStatus?: string; // default: "pending"
+  listingType?: string;
+  listingStatus?: string;
   primaryImageUrl?: string;
   imageUrls?: string[];
   brand?: string;
@@ -118,8 +125,8 @@ export interface CreateEbikeListingRequest {
   description?: string;
   year?: number;
   price: number;
-  listingType?: string; // default: "buy_now"
-  listingStatus?: string; // default: "pending"
+  listingType?: string;
+  listingStatus?: string;
   primaryImageUrl?: string;
   imageUrls?: string[];
   brand?: string;
