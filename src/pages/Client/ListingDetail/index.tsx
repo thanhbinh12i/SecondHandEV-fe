@@ -35,6 +35,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  ShoppingCart,
 } from "lucide-react";
 import { useGetListingById } from "src/queries/useListing";
 
@@ -95,6 +96,7 @@ const ListingDetailPage: React.FC = () => {
 
   const isBattery = listing.categoryId === 1;
   const isEBike = listing.categoryId === 2;
+  const isFixedPrice = listing.listingType === "fixed";
 
   const imageUrls =
     listing.imageUrls && listing.imageUrls.length > 0
@@ -117,6 +119,10 @@ const ListingDetailPage: React.FC = () => {
         prev === imageUrls.length - 1 ? 0 : prev + 1
       );
     }
+  };
+
+  const handleBuyNow = () => {
+    navigate(`/order/${id}`);
   };
 
   const handleContact = () => {
@@ -335,16 +341,29 @@ const ListingDetailPage: React.FC = () => {
               <Divider className="!my-4" />
 
               <Box className="!space-y-2">
-                <Button
-                  fullWidth
-                  variant="contained"
-                  size="large"
-                  startIcon={<MessageCircle size={20} />}
-                  className="!bg-gradient-to-r !from-emerald-500 !to-green-600 !text-white !py-3"
-                  onClick={handleContact}
-                >
-                  Liên hệ người bán
-                </Button>
+                {isFixedPrice ? (
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    size="large"
+                    startIcon={<ShoppingCart size={20} />}
+                    className="!bg-gradient-to-r !from-emerald-500 !to-green-600 !text-white !py-3"
+                    onClick={handleBuyNow}
+                  >
+                    Mua ngay
+                  </Button>
+                ) : (
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    size="large"
+                    startIcon={<Share2 size={20} />}
+                    className="!bg-gradient-to-r !from-emerald-500 !to-green-600 !text-white !py-3"
+                    onClick={handleContact}
+                  >
+                    Đấu giá
+                  </Button>
+                )}
                 <Box className="!flex !gap-2">
                   <Button
                     fullWidth
@@ -357,9 +376,9 @@ const ListingDetailPage: React.FC = () => {
                   <Button
                     fullWidth
                     variant="outlined"
-                    startIcon={<Share2 size={20} />}
+                    startIcon={<MessageCircle size={20} />}
                   >
-                    Chia sẻ
+                    Liên hệ người bán
                   </Button>
                 </Box>
               </Box>

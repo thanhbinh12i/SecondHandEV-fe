@@ -14,6 +14,7 @@ import EBikeAllPage from "src/pages/Admin/Ebike";
 import BatteryAllPage from "src/pages/Admin/Battery";
 import Dashboard from "src/pages/Admin/Dashboard";
 import ListingDetailPage from "src/pages/Client/ListingDetail";
+import OrderPage from "src/pages/Client/OrderPage";
 
 const RouteElements: React.FC = () => {
   const routeElements = useRoutes([
@@ -44,6 +45,10 @@ const RouteElements: React.FC = () => {
         {
           path: "listing/:id",
           element: <ListingDetailPage />,
+        },
+        {
+          path: "order/:id",
+          element: <OrderPage />,
         },
       ],
     },
