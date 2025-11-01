@@ -71,37 +71,31 @@ const AdminSidebar: React.FC = () => {
       path: "/admin/batteries",
     },
     {
+      id: "auctions",
+      label: "Đấu giá",
+      icon: <BarChart3 size={20} />,
+      path: "/admin/auctions",
+      children: [
+        {
+          id: "createauctions",
+          label: "Tạo buổi đấu giá",
+          icon: <BarChart3 size={18} />,
+          path: "/admin/auctions/create",
+        },
+        {
+          id: "auctionslist",
+          label: "Danh sách các buổi đấu giá",
+          icon: <FileText size={18} />,
+          path: "/admin/auctions/all",
+        },
+      ],
+    },
+    {
       id: "orders",
       label: "Đơn hàng",
       icon: <ShoppingCart size={20} />,
       path: "/admin/orders",
       badge: 23,
-    },
-    {
-      id: "reports",
-      label: "Báo cáo thống kê",
-      icon: <BarChart3 size={20} />,
-      path: "/admin/reports",
-      children: [
-        {
-          id: "revenue",
-          label: "Doanh thu",
-          icon: <BarChart3 size={18} />,
-          path: "/admin/reports/revenue",
-        },
-        {
-          id: "transactions",
-          label: "Giao dịch",
-          icon: <FileText size={18} />,
-          path: "/admin/reports/transactions",
-        },
-      ],
-    },
-    {
-      id: "settings",
-      label: "Cài đặt",
-      icon: <Settings size={20} />,
-      path: "/admin/settings",
     },
   ];
 
