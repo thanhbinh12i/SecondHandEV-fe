@@ -17,7 +17,7 @@ import {
   usePostBatteryMutation,
   usePostEbikeMutation,
 } from "src/queries/useListing";
-import { DynamicFormData } from "src/types/form.type";
+import { PostListingFormData } from "src/types/form.type";
 import BasicInfoStep from "src/components/Step/BasicInfoStep";
 import ListingDetailStep from "src/components/Step/ListingDetailStep";
 import ImageUploadStep from "src/components/Step/ImageUploadStep";
@@ -29,7 +29,7 @@ const CreateListingPage: React.FC = () => {
   const postEbikeMutation = usePostEbikeMutation();
 
   const [activeStep, setActiveStep] = useState(0);
-  const [formData, setFormData] = useState<DynamicFormData>({
+  const [formData, setFormData] = useState<PostListingFormData>({
     categoryId: 1,
     title: "",
     description: "",
@@ -78,7 +78,7 @@ const CreateListingPage: React.FC = () => {
       brand: formData.brand,
       model: formData.model,
     };
-    setFormData(baseData as DynamicFormData);
+    setFormData(baseData as PostListingFormData);
   };
 
   const handleNext = () => {
@@ -95,7 +95,6 @@ const CreateListingPage: React.FC = () => {
 
     if (currentMutation.isPending) return;
 
-    // Validations
     if (!formData.title.trim()) {
       setSnackbar({
         open: true,

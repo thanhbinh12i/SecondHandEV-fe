@@ -13,12 +13,12 @@ import {
 } from "@mui/material";
 import { Upload, X } from "lucide-react";
 import { convertFileToBase64, compressImage } from "src/utils/utils";
-import { DynamicFormData } from "src/types/form.type";
+import { PostListingFormData } from "src/types/form.type";
 
 interface ImageUploadStepProps {
   previewImages: string[];
   setPreviewImages: React.Dispatch<React.SetStateAction<string[]>>;
-  formData: DynamicFormData;
+  formData: PostListingFormData;
   setFormData: React.Dispatch<React.SetStateAction<any>>;
 }
 

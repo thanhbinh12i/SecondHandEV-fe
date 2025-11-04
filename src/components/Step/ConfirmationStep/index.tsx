@@ -8,10 +8,10 @@ import {
   Card,
   CardMedia,
 } from "@mui/material";
-import { DynamicFormData } from "src/types/form.type";
+import { PostListingFormData } from "src/types/form.type";
 
 interface ConfirmationStepProps {
-  formData: DynamicFormData;
+  formData: PostListingFormData;
   previewImages: string[];
   categories: { id: number; name: string }[];
 }
@@ -34,7 +34,6 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
         </Alert>
       </Grid>
 
-      {/* General Info */}
       <Grid size={{ xs: 12, md: 6 }}>
         <Paper className="p-4">
           <Typography
@@ -101,7 +100,6 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
         </Paper>
       </Grid>
 
-      {/* Price & Status */}
       <Grid size={{ xs: 12, md: 6 }}>
         <Paper className="p-4">
           <Typography
@@ -153,7 +151,6 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
         </Paper>
       </Grid>
 
-      {/* Technical Specs - Battery */}
       {formData.categoryId === 1 && (
         <Grid size={{ xs: 12 }}>
           <Paper className="p-4">
@@ -209,7 +206,6 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
         </Grid>
       )}
 
-      {/* Technical Specs - Ebike */}
       {formData.categoryId === 2 && (
         <Grid size={{ xs: 12 }}>
           <Paper className="p-4">
@@ -285,7 +281,6 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
         </Grid>
       )}
 
-      {/* Description */}
       {formData.description && (
         <Grid size={{ xs: 12 }}>
           <Paper className="p-4">
@@ -302,7 +297,6 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
         </Grid>
       )}
 
-      {/* Images Preview */}
       {previewImages.length > 0 && (
         <Grid size={{ xs: 12 }}>
           <Paper className="p-4">

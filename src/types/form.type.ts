@@ -1,6 +1,6 @@
 import { BatteryDetailDto, EbikeDetailDto } from "./listing.type";
 
-export type DynamicFormData = {
+export type PostListingFormData = {
   categoryId: number;
   title: string;
   description: string;

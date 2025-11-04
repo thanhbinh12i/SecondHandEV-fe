@@ -1,23 +1,7 @@
-const GEMINI_API_KEY = "AIzaSyCV2hWThBxqChg2LutmiVC2tUHZZuokfeo";
-const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
+import { ListingAIInfo } from "src/types/listing.type";
 
-export interface ProductInfo {
-  category: string;
-  title: string;
-  description: string;
-  brand: string;
-  model: string;
-  year: number;
-  condition: string;
-  voltage?: number;
-  capacityWh?: number;
-  ageYears?: number;
-  motorPowerW?: number;
-  batteryVoltage?: number;
-  rangeKm?: number;
-  mileageKm?: number;
-  frameSize?: string;
-}
+const GEMINI_API_KEY = "AIzaSyBRF7lehrABzn1D6S0RnlvBlDXoQDYPTWk";
+const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
 
 export interface PriceSuggestion {
   suggestedPrice: number;
@@ -26,7 +10,7 @@ export interface PriceSuggestion {
 }
 
 export class GeminiPriceService {
-  validateProductInfo(productInfo: ProductInfo): {
+  validateProductInfo(productInfo: ListingAIInfo): {
     isValid: boolean;
     missingFields: string[];
   } {
@@ -37,7 +21,7 @@ export class GeminiPriceService {
     if (!productInfo.year) missingFields.push("Năm sản xuất");
     if (!productInfo.condition) missingFields.push("Tình trạng");
 
-    if (productInfo.category === "Pin xe điện") {
+    if (productInfo.categoryId === 1) {
       if (!productInfo.voltage) missingFields.push("Điện áp");
       if (!productInfo.capacityWh) missingFields.push("Dung lượng");
     } else {
@@ -53,7 +37,7 @@ export class GeminiPriceService {
   }
 
   async generatePriceSuggestion(
-    productInfo: ProductInfo
+    productInfo: ListingAIInfo
   ): Promise<PriceSuggestion> {
     try {
       const prompt = this.buildPrompt(productInfo);
@@ -119,8 +103,8 @@ export class GeminiPriceService {
     }
   }
 
-  private buildPrompt(info: ProductInfo): string {
-    if (info.category === "Pin xe điện") {
+  private buildPrompt(info: ListingAIInfo): string {
+    if (info.categoryId === 1) {
       return `Định giá pin xe điện tại Việt Nam:
 
 Tiêu đề: ${info.title}

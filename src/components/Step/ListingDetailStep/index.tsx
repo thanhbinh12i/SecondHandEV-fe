@@ -12,16 +12,16 @@ import {
 } from "@mui/material";
 import { Calendar, Zap, Battery, Gauge } from "lucide-react";
 import AIPriceSuggestion from "src/components/AIPriceSuggestion";
-import { ProductInfo } from "src/utils/geminiService";
-import { DynamicFormData } from "src/types/form.type";
+import { PostListingFormData } from "src/types/form.type";
+import { ListingAIInfo } from "src/types/listing.type";
 
-interface ListingDetailStepStepProps {
+interface ListingDetailStepProps {
   categoryId: number;
-  formData: DynamicFormData;
+  formData: PostListingFormData;
   onFieldChange: (field: string, value: any) => void;
 }
 
-const ListingDetailStep: React.FC<ListingDetailStepStepProps> = ({
+const ListingDetailStep: React.FC<ListingDetailStepProps> = ({
   categoryId,
   formData,
   onFieldChange,
@@ -29,16 +29,17 @@ const ListingDetailStep: React.FC<ListingDetailStepStepProps> = ({
   const conditions = ["Mới", "Như mới", "Đã sử dụng", "Cần sửa chữa"];
   const frameSizes = ["XS", "S", "M", "L", "XL"];
 
-  const productInfo: ProductInfo = {
-    category: categoryId === 1 ? "Pin xe điện" : "Xe điện",
+  const listingInfo: ListingAIInfo = {
+    categoryId: categoryId,
     title: formData.title,
     description: formData.description,
     brand: formData.brand,
-    model: formData.model, // Now required
+    model: formData.model,
     year: formData.year,
     condition: formData.condition!,
     voltage: formData.voltage,
     capacityWh: formData.capacityWh,
+    weightKg: formData.weightKg,
     ageYears: formData.ageYears,
     motorPowerW: formData.motorPowerW,
     batteryVoltage: formData.batteryVoltage,
@@ -355,23 +356,8 @@ const ListingDetailStep: React.FC<ListingDetailStepStepProps> = ({
       {renderCategorySpecificFields()}
 
       <Grid size={{ xs: 12 }}>
-        <FormControl fullWidth>
-          <InputLabel>Loại tin</InputLabel>
-          <Select
-            value={formData.listingType}
-            label="Loại tin"
-            onChange={(e) => onFieldChange("listingType", e.target.value)}
-          >
-            <MenuItem value="fixed">Mua ngay</MenuItem>
-            <MenuItem value="auction">Đấu giá</MenuItem>
-          </Select>
-        </FormControl>
-      </Grid>
-
-      {/* AI Price Suggestion */}
-      <Grid size={{ xs: 12 }}>
         <AIPriceSuggestion
-          productInfo={productInfo}
+          listingInfo={listingInfo}
           onPriceSelect={(price) => onFieldChange("price", price)}
           currentPrice={formData.price}
         />
@@ -396,6 +382,19 @@ const ListingDetailStep: React.FC<ListingDetailStepStepProps> = ({
           }}
           helperText="💡 Bạn có thể sử dụng gợi ý giá từ AI ở trên"
         />
+      </Grid>
+      <Grid size={{ xs: 12 }}>
+        <FormControl fullWidth>
+          <InputLabel>Loại tin</InputLabel>
+          <Select
+            value={formData.listingType}
+            label="Loại tin"
+            onChange={(e) => onFieldChange("listingType", e.target.value)}
+          >
+            <MenuItem value="fixed">Mua ngay (3% phí giao dịch)</MenuItem>
+            <MenuItem value="auction">Đấu giá (5% phí giao dịch)</MenuItem>
+          </Select>
+        </FormControl>
       </Grid>
     </Grid>
   );

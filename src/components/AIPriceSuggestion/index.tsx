@@ -16,20 +16,17 @@ import {
   ListItemText,
 } from "@mui/material";
 import { Sparkles, Info, AlertCircle, CheckCircle } from "lucide-react";
-import {
-  geminiPriceService,
-  ProductInfo,
-  PriceSuggestion,
-} from "src/utils/geminiService";
+import { geminiPriceService, PriceSuggestion } from "src/utils/geminiService";
+import { ListingAIInfo } from "src/types/listing.type";
 
 interface AIPriceSuggestionProps {
-  productInfo: ProductInfo;
+  listingInfo: ListingAIInfo;
   onPriceSelect: (price: number) => void;
   currentPrice: number;
 }
 
 const AIPriceSuggestion: React.FC<AIPriceSuggestionProps> = ({
-  productInfo,
+  listingInfo,
   onPriceSelect,
   currentPrice,
 }) => {
@@ -38,8 +35,7 @@ const AIPriceSuggestion: React.FC<AIPriceSuggestionProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Validate product info
-  const validation = geminiPriceService.validateProductInfo(productInfo);
+  const validation = geminiPriceService.validateProductInfo(listingInfo);
 
   const handleGenerateSuggestion = async () => {
     setLoading(true);
@@ -47,7 +43,7 @@ const AIPriceSuggestion: React.FC<AIPriceSuggestionProps> = ({
 
     try {
       const suggestion = await geminiPriceService.generatePriceSuggestion(
-        productInfo
+        listingInfo
       );
       setPriceSuggestion(suggestion);
     } catch (err) {
@@ -93,17 +89,17 @@ const AIPriceSuggestion: React.FC<AIPriceSuggestionProps> = ({
   };
 
   return (
-    <Paper className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200">
+    <Paper className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-blue-200">
       <Box className="flex items-center justify-between mb-3">
         <Box className="flex items-center gap-2">
-          <Sparkles size={24} className="text-purple-600" />
-          <Typography variant="h6" className="font-bold text-purple-900">
+          <Sparkles size={24} className="text-emerald-600" />
+          <Typography variant="h6" className="font-bold text-emerald-500">
             Gợi ý giá bằng AI
           </Typography>
           <Chip
             label="Powered by Gemini"
             size="small"
-            className="bg-purple-100 text-purple-700 font-semibold"
+            className="!bg-purple-100 !text-purple-700 font-semibold"
           />
         </Box>
         <Tooltip title="AI phân tích dựa trên thông tin sản phẩm và xu hướng thị trường">
@@ -153,7 +149,6 @@ const AIPriceSuggestion: React.FC<AIPriceSuggestionProps> = ({
         </Button>
       ) : (
         <Box>
-          {/* Price Display */}
           <Box className="bg-white rounded-lg p-4 mb-4">
             <Typography variant="overline" className="text-slate-600">
               Giá đề xuất
@@ -182,7 +177,6 @@ const AIPriceSuggestion: React.FC<AIPriceSuggestionProps> = ({
             </Box>
           </Box>
 
-          {/* Quick Actions */}
           <Box className="grid grid-cols-3 gap-2 mb-4">
             <Button
               size="small"
@@ -210,7 +204,6 @@ const AIPriceSuggestion: React.FC<AIPriceSuggestionProps> = ({
             </Button>
           </Box>
 
-          {/* Price Comparison */}
           {currentPrice > 0 && getPriceComparison() && (
             <Alert
               severity={getPriceComparison()!.type as any}
@@ -221,7 +214,6 @@ const AIPriceSuggestion: React.FC<AIPriceSuggestionProps> = ({
             </Alert>
           )}
 
-          {/* Recalculate Button */}
           <Button
             size="small"
             onClick={handleGenerateSuggestion}
