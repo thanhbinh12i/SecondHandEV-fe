@@ -145,3 +145,22 @@ export interface UpdateListingStatusRequest {
   status: string;
   reason?: string;
 }
+
+export interface ListingAIInfo {
+  categoryId: number;
+  title: string;
+  description: string;
+  brand: string;
+  model: string;
+  year: number;
+  condition: string;
+  voltage?: number;
+  weightKg?: number;
+  capacityWh?: number;
+  ageYears?: number;
+  motorPowerW?: number;
+  batteryVoltage?: number;
+  rangeKm?: number;
+  mileageKm?: number;
+  frameSize?: string;
+}
