@@ -29,6 +29,7 @@ import {
   Eye,
   Edit,
   Trash2,
+  User,
 } from "lucide-react";
 import { AuctionResponse } from "src/types/auction.type";
 
@@ -64,51 +65,83 @@ const AuctionManagementPage: React.FC = () => {
         const mockAuctions: AuctionResponse[] = [
           {
             id: 1,
-            listingId: 101,
-            title: "Pin LFP 48V 200Ah Pin Xe Điện",
-            description:
-              "Pin LiFePO4 chất lượng cao, dung lượng 200Ah, điện áp 48V, tuổi thọ 5000+ chu kỳ, bảo hành 5 năm",
+            listing: {
+              listingId: 101,
+              title: "Pin LFP 48V 200Ah Pin Xe Điện",
+              description:
+                "Pin LiFePO4 chất lượng cao, dung lượng 200Ah, điện áp 48V, tuổi thọ 5000+ chu kỳ, bảo hành 5 năm",
+              price: 50000000,
+              listingType: "auction",
+            },
             startingPrice: 45000000,
-            listingType: "auction",
             startDate: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
             endDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-            sellerId: 1,
+            seller: {
+              memberId: 1,
+              displayName: "Nguyễn Văn A",
+              email: "nguyenvana@example.com",
+              phone: "0901234567",
+            },
           },
           {
             id: 2,
-            listingId: 102,
-            title: "Pin Lithium 72V 150Ah Xe Điện Cao Cấp",
-            description:
-              "Pin Lithium ion công suất cao, điện áp 72V, dung lượng 150Ah, hiệu suất 98%, tích hợp BMS thông minh",
+            listing: {
+              listingId: 102,
+              title: "Pin Lithium 72V 150Ah Xe Điện Cao Cấp",
+              description:
+                "Pin Lithium ion công suất cao, điện áp 72V, dung lượng 150Ah, hiệu suất 98%, tích hợp BMS thông minh",
+              price: 70000000,
+              listingType: "auction",
+            },
             startingPrice: 65000000,
-            listingType: "auction",
             startDate: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
             endDate: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString(),
-            sellerId: 1,
+            seller: {
+              memberId: 2,
+              displayName: "Trần Thị B",
+              email: "tranthib@example.com",
+              phone: "0912345678",
+            },
           },
           {
             id: 3,
-            listingId: 103,
-            title: "Pin LFP 48V 100Ah Đôi Bánh",
-            description:
-              "Pin LiFePO4 cho xe đôi bánh, 48V 100Ah, nhẹ, an toàn, thích hợp cho city bike",
+            listing: {
+              listingId: 103,
+              title: "Pin LFP 48V 100Ah Đôi Bánh",
+              description:
+                "Pin LiFePO4 cho xe đôi bánh, 48V 100Ah, nhẹ, an toàn, thích hợp cho city bike",
+              price: 25000000,
+              listingType: "auction",
+            },
             startingPrice: 22000000,
-            listingType: "auction",
             startDate: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
             endDate: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-            sellerId: 1,
+            seller: {
+              memberId: 3,
+              displayName: "Lê Văn C",
+              email: "levanc@example.com",
+              phone: "0923456789",
+            },
           },
           {
             id: 4,
-            listingId: 104,
-            title: "Pin Lithium 96V 200Ah Xe Điện 3 Bánh",
-            description:
-              "Pin lithium cao cấp 96V 200Ah, công suất lớn, cho xe 3 bánh chở hàng, quãng đường 300km",
+            listing: {
+              listingId: 104,
+              title: "Pin Lithium 96V 200Ah Xe Điện 3 Bánh",
+              description:
+                "Pin lithium cao cấp 96V 200Ah, công suất lớn, cho xe 3 bánh chở hàng, quãng đường 300km",
+              price: 95000000,
+              listingType: "auction",
+            },
             startingPrice: 90000000,
-            listingType: "auction",
             startDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
             endDate: new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString(),
-            sellerId: 1,
+            seller: {
+              memberId: 4,
+              displayName: "Phạm Thị D",
+              email: "phamthid@example.com",
+              phone: "0934567890",
+            },
           },
         ];
         await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -207,11 +240,17 @@ const AuctionManagementPage: React.FC = () => {
           <Box className="!flex !justify-between !items-start !mb-3">
             <Box className="!flex-1">
               <Typography variant="h6" className="!font-bold !mb-1">
-                {auction.title}
+                {auction.listing.title}
               </Typography>
               <Typography variant="body2" className="!text-slate-600 !mb-2">
-                {auction.description}
+                {auction.listing.description}
               </Typography>
+              <Box className="!flex !items-center !gap-1 !text-slate-500">
+                <User size={14} />
+                <Typography variant="caption">
+                  Người bán: {auction.seller.displayName}
+                </Typography>
+              </Box>
             </Box>
             <Box
               className={`!px-3 !py-1 !rounded-full !text-xs !font-semibold ${
@@ -457,7 +496,7 @@ const AuctionManagementPage: React.FC = () => {
                   Tên sản phẩm
                 </Typography>
                 <Typography variant="body2" className="!font-semibold">
-                  {selectedAuction.title}
+                  {selectedAuction.listing.title}
                 </Typography>
               </Box>
 
@@ -466,8 +505,36 @@ const AuctionManagementPage: React.FC = () => {
                   Mô tả
                 </Typography>
                 <Typography variant="body2" className="!text-slate-700">
-                  {selectedAuction.description}
+                  {selectedAuction.listing.description}
                 </Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="caption" className="!text-slate-600">
+                  Người bán
+                </Typography>
+                <Box className="!flex !items-center !gap-2 !mt-1">
+                  <User size={16} className="!text-slate-500" />
+                  <Typography variant="body2" className="!font-semibold">
+                    {selectedAuction.seller.displayName}
+                  </Typography>
+                </Box>
+                {selectedAuction.seller.email && (
+                  <Typography
+                    variant="caption"
+                    className="!text-slate-600 !ml-6"
+                  >
+                    Email: {selectedAuction.seller.email}
+                  </Typography>
+                )}
+                {selectedAuction.seller.phone && (
+                  <Typography
+                    variant="caption"
+                    className="!text-slate-600 !ml-6 !block"
+                  >
+                    SĐT: {selectedAuction.seller.phone}
+                  </Typography>
+                )}
               </Box>
 
               <Box>

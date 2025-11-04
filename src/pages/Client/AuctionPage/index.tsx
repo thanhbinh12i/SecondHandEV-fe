@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -33,165 +32,243 @@ import {
   Timer,
   Award,
 } from "lucide-react";
+import { AuctionResponse } from "src/types/auction.type";
 // import { useGetAuctions } from "src/queries/useAuction";
+
+interface AuctionWithBids extends AuctionResponse {
+  currentPrice?: number;
+  totalBids?: number;
+}
 
 const AuctionsPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState(0);
+  const [auctions, setAuctions] = useState<AuctionWithBids[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   //   const statusMap = ["active", "pending", "completed"];
   //   const currentStatus = statusMap[activeTab];
-
   //   const { data, isLoading, isError } = useGetAuctions({
   //     status: currentStatus,
   //   });
 
-  const isLoading = false;
   const isError = false;
 
-  const mockAuctions = [
-    {
-      id: 1,
-      listingId: 101,
-      startingPrice: 15000000,
-      currentPrice: 18500000,
-      startDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-      endDate: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(),
-      status: "active",
-      listing: {
-        id: 101,
-        title: "Pin Lithium 72V 40Ah - Chính hãng Samsung",
-        categoryName: "Pin xe điện",
-        brand: "Samsung",
-        primaryImageUrl:
-          "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800",
-      },
-    },
-    {
-      id: 2,
-      listingId: 102,
-      startingPrice: 25000000,
-      currentPrice: 32000000,
-      startDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-      endDate: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
-      status: "active",
-      listing: {
-        id: 102,
-        title: "Xe đạp điện Giant E+ Pro - Như mới 98%",
-        categoryName: "Xe đạp điện",
-        brand: "Giant",
-        primaryImageUrl:
-          "https://images.unsplash.com/photo-1571333250630-f0230c320b6d?w=800",
-      },
-    },
-    {
-      id: 3,
-      listingId: 103,
-      startingPrice: 8500000,
-      currentPrice: 9200000,
-      startDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-      endDate: new Date(Date.now() + 1 * 60 * 60 * 1000).toISOString(),
-      status: "active",
-      listing: {
-        id: 103,
-        title: "Bộ pin 48V 20Ah cho xe đạp điện - LG cells",
-        categoryName: "Pin xe điện",
-        brand: "LG",
-        primaryImageUrl:
-          "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800",
-      },
-    },
-    {
-      id: 4,
-      listingId: 104,
-      startingPrice: 18000000,
-      currentPrice: null,
-      startDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-      endDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-      status: "pending",
-      listing: {
-        id: 104,
-        title: "Xe điện Yadea V7 Pro - Bản cao cấp 2024",
-        categoryName: "Xe đạp điện",
-        brand: "Yadea",
-        primaryImageUrl:
-          "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800",
-      },
-    },
-    {
-      id: 5,
-      listingId: 105,
-      startingPrice: 12000000,
-      currentPrice: null,
-      startDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(),
-      endDate: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString(),
-      status: "pending",
-      listing: {
-        id: 105,
-        title: "Pin Tesla Powerwall 60V 50Ah",
-        categoryName: "Pin xe điện",
-        brand: "Tesla",
-        primaryImageUrl:
-          "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800",
-      },
-    },
-    {
-      id: 6,
-      listingId: 106,
-      startingPrice: 22000000,
-      currentPrice: 28500000,
-      startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-      endDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-      status: "completed",
-      listing: {
-        id: 106,
-        title: "Xe điện Vinfast Klara S - Đã qua sử dụng 6 tháng",
-        categoryName: "Xe đạp điện",
-        brand: "Vinfast",
-        primaryImageUrl:
-          "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800",
-      },
-    },
-    {
-      id: 7,
-      listingId: 107,
-      startingPrice: 6500000,
-      currentPrice: 7800000,
-      startDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-      endDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-      status: "completed",
-      listing: {
-        id: 107,
-        title: "Pin Panasonic 36V 15Ah - Còn 90% dung lượng",
-        categoryName: "Pin xe điện",
-        brand: "Panasonic",
-        primaryImageUrl:
-          "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800",
-      },
-    },
-    {
-      id: 8,
-      listingId: 108,
-      startingPrice: 32000000,
-      currentPrice: 35000000,
-      startDate: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-      endDate: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
-      status: "active",
-      listing: {
-        id: 108,
-        title: "Xe đạp điện Specialized Turbo Vado 5.0",
-        categoryName: "Xe đạp điện",
-        brand: "Specialized",
-        primaryImageUrl:
-          "https://images.unsplash.com/photo-1571333250630-f0230c320b6d?w=800",
-      },
-    },
-  ];
+  useEffect(() => {
+    const loadAuctions = async () => {
+      try {
+        setIsLoading(true);
 
-  const auctions = mockAuctions;
+        const mockAuctionsData: AuctionWithBids[] = [
+          {
+            id: 1,
+            listing: {
+              listingId: 101,
+              title: "Pin Lithium 72V 40Ah - Chính hãng Samsung",
+              description: "Pin lithium chất lượng cao, bảo hành 24 tháng",
+              price: 20000000,
+              listingType: "auction",
+            },
+            startingPrice: 15000000,
+            currentPrice: 18500000,
+            totalBids: 12,
+            startDate: new Date(
+              Date.now() - 2 * 24 * 60 * 60 * 1000
+            ).toISOString(),
+            endDate: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(),
+            seller: {
+              memberId: 1,
+              displayName: "Nguyễn Văn A",
+              email: "nguyenvana@example.com",
+            },
+          },
+          {
+            id: 2,
+            listing: {
+              listingId: 102,
+              title: "Xe đạp điện Giant E+ Pro - Như mới 98%",
+              description: "Xe đạp điện cao cấp, còn bảo hành",
+              price: 35000000,
+              listingType: "auction",
+            },
+            startingPrice: 25000000,
+            currentPrice: 32000000,
+            totalBids: 25,
+            startDate: new Date(
+              Date.now() - 1 * 24 * 60 * 60 * 1000
+            ).toISOString(),
+            endDate: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+            seller: {
+              memberId: 2,
+              displayName: "Trần Thị B",
+              email: "tranthib@example.com",
+            },
+          },
+          {
+            id: 3,
+            listing: {
+              listingId: 103,
+              title: "Bộ pin 48V 20Ah cho xe đạp điện - LG cells",
+              description: "Pin LG chính hãng, dung lượng cao",
+              price: 10000000,
+              listingType: "auction",
+            },
+            startingPrice: 8500000,
+            currentPrice: 9200000,
+            totalBids: 8,
+            startDate: new Date(
+              Date.now() - 3 * 24 * 60 * 60 * 1000
+            ).toISOString(),
+            endDate: new Date(Date.now() + 1 * 60 * 60 * 1000).toISOString(),
+            seller: {
+              memberId: 3,
+              displayName: "Lê Văn C",
+              email: "levanc@example.com",
+            },
+          },
+          {
+            id: 4,
+            listing: {
+              listingId: 104,
+              title: "Xe điện Yadea V7 Pro - Bản cao cấp 2024",
+              description: "Xe điện Yadea mới 100%",
+              price: 22000000,
+              listingType: "auction",
+            },
+            startingPrice: 18000000,
+            startDate: new Date(
+              Date.now() + 2 * 24 * 60 * 60 * 1000
+            ).toISOString(),
+            endDate: new Date(
+              Date.now() + 5 * 24 * 60 * 60 * 1000
+            ).toISOString(),
+            seller: {
+              memberId: 4,
+              displayName: "Phạm Thị D",
+              email: "phamthid@example.com",
+            },
+          },
+          {
+            id: 5,
+            listing: {
+              listingId: 105,
+              title: "Pin Tesla Powerwall 60V 50Ah",
+              description: "Pin Tesla công nghệ cao",
+              price: 15000000,
+              listingType: "auction",
+            },
+            startingPrice: 12000000,
+            startDate: new Date(
+              Date.now() + 1 * 24 * 60 * 60 * 1000
+            ).toISOString(),
+            endDate: new Date(
+              Date.now() + 4 * 24 * 60 * 60 * 1000
+            ).toISOString(),
+            seller: {
+              memberId: 5,
+              displayName: "Hoàng Văn E",
+              email: "hoangvane@example.com",
+            },
+          },
+          {
+            id: 6,
+            listing: {
+              listingId: 106,
+              title: "Xe điện Vinfast Klara S - Đã qua sử dụng 6 tháng",
+              description: "Xe Vinfast còn mới, bảo hành đầy đủ",
+              price: 30000000,
+              listingType: "auction",
+            },
+            startingPrice: 22000000,
+            currentPrice: 28500000,
+            totalBids: 18,
+            startDate: new Date(
+              Date.now() - 7 * 24 * 60 * 60 * 1000
+            ).toISOString(),
+            endDate: new Date(
+              Date.now() - 1 * 24 * 60 * 60 * 1000
+            ).toISOString(),
+            seller: {
+              memberId: 6,
+              displayName: "Vũ Thị F",
+              email: "vuthif@example.com",
+            },
+          },
+          {
+            id: 7,
+            listing: {
+              listingId: 107,
+              title: "Pin Panasonic 36V 15Ah - Còn 90% dung lượng",
+              description: "Pin Panasonic chất lượng tốt",
+              price: 8000000,
+              listingType: "auction",
+            },
+            startingPrice: 6500000,
+            currentPrice: 7800000,
+            totalBids: 15,
+            startDate: new Date(
+              Date.now() - 10 * 24 * 60 * 60 * 1000
+            ).toISOString(),
+            endDate: new Date(
+              Date.now() - 3 * 24 * 60 * 60 * 1000
+            ).toISOString(),
+            seller: {
+              memberId: 7,
+              displayName: "Đỗ Văn G",
+              email: "dovang@example.com",
+            },
+          },
+          {
+            id: 8,
+            listing: {
+              listingId: 108,
+              title: "Xe đạp điện Specialized Turbo Vado 5.0",
+              description: "Xe đạp điện cao cấp nhất",
+              price: 40000000,
+              listingType: "auction",
+            },
+            startingPrice: 32000000,
+            currentPrice: 35000000,
+            totalBids: 20,
+            startDate: new Date(
+              Date.now() - 4 * 24 * 60 * 60 * 1000
+            ).toISOString(),
+            endDate: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
+            seller: {
+              memberId: 8,
+              displayName: "Bùi Thị H",
+              email: "buithih@example.com",
+            },
+          },
+        ];
 
-  const getTimeRemaining = (endDate: string) => {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        setAuctions(mockAuctionsData);
+      } catch (error) {
+        console.error("Error loading auctions:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadAuctions();
+  }, []);
+
+  const getAuctionStatus = (
+    startDate: string,
+    endDate: string
+  ): "pending" | "active" | "completed" => {
+    const now = new Date().getTime();
+    const start = new Date(startDate).getTime();
+    const end = new Date(endDate).getTime();
+
+    if (now < start) return "pending";
+    if (now > end) return "completed";
+    return "active";
+  };
+
+  const getTimeRemaining = (endDate: string): string => {
     const now = new Date().getTime();
     const end = new Date(endDate).getTime();
     const diff = end - now;
@@ -207,7 +284,7 @@ const AuctionsPage: React.FC = () => {
     return `${minutes} phút`;
   };
 
-  const getTimeProgress = (startDate: string, endDate: string) => {
+  const getTimeProgress = (startDate: string, endDate: string): number => {
     const now = new Date().getTime();
     const start = new Date(startDate).getTime();
     const end = new Date(endDate).getTime();
@@ -216,7 +293,7 @@ const AuctionsPage: React.FC = () => {
     return Math.min(Math.max((elapsed / total) * 100, 0), 100);
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleString("vi-VN", {
       day: "2-digit",
       month: "2-digit",
@@ -226,7 +303,7 @@ const AuctionsPage: React.FC = () => {
     });
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: "pending" | "active" | "completed") => {
     switch (status) {
       case "active":
         return (
@@ -255,14 +332,34 @@ const AuctionsPage: React.FC = () => {
             icon={<Award size={14} className="!text-white" />}
           />
         );
-      default:
-        return null;
     }
   };
 
-  const filteredAuctions = auctions.filter((auction: any) =>
-    auction.listing?.title?.toLowerCase().includes(searchQuery.toLowerCase())
+  const statusMap = ["active", "pending", "completed"] as const;
+  const currentStatus = statusMap[activeTab];
+
+  const filteredByTab = auctions.filter(
+    (auction) =>
+      getAuctionStatus(auction.startDate, auction.endDate) === currentStatus
   );
+
+  const filteredAuctions = filteredByTab.filter((auction) =>
+    auction.listing.title?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const activeCount = auctions.filter(
+    (a) => getAuctionStatus(a.startDate, a.endDate) === "active"
+  ).length;
+  const pendingCount = auctions.filter(
+    (a) => getAuctionStatus(a.startDate, a.endDate) === "pending"
+  ).length;
+
+  // Mock images for display
+  const mockImages = [
+    "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800",
+    "https://images.unsplash.com/photo-1571333250630-f0230c320b6d?w=800",
+    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800",
+  ];
 
   return (
     <Box className="!min-h-screen !bg-gradient-to-br !from-slate-50 !via-blue-50/30 !to-emerald-50/30">
@@ -307,10 +404,7 @@ const AuctionsPage: React.FC = () => {
               <Box className="!flex !items-center !justify-between">
                 <Box>
                   <Typography variant="h4" className="!font-bold !mb-1">
-                    {
-                      mockAuctions.filter((a: any) => a.status === "active")
-                        .length
-                    }
+                    {activeCount}
                   </Typography>
                   <Typography variant="body2" className="!opacity-90">
                     Đang diễn ra
@@ -326,10 +420,7 @@ const AuctionsPage: React.FC = () => {
               <Box className="!flex !items-center !justify-between">
                 <Box>
                   <Typography variant="h4" className="!font-bold !mb-1">
-                    {
-                      mockAuctions.filter((a: any) => a.status === "pending")
-                        .length
-                    }
+                    {pendingCount}
                   </Typography>
                   <Typography variant="body2" className="!opacity-90">
                     Sắp diễn ra
@@ -345,7 +436,7 @@ const AuctionsPage: React.FC = () => {
               <Box className="!flex !items-center !justify-between">
                 <Box>
                   <Typography variant="h4" className="!font-bold !mb-1">
-                    {mockAuctions.length}
+                    {auctions.length}
                   </Typography>
                   <Typography variant="body2" className="!opacity-90">
                     Tổng buổi đấu giá
@@ -387,6 +478,7 @@ const AuctionsPage: React.FC = () => {
                   <Typography className="!font-semibold">
                     Đang diễn ra
                   </Typography>
+                  <Chip label={activeCount} size="small" />
                 </Box>
               }
             />
@@ -397,6 +489,7 @@ const AuctionsPage: React.FC = () => {
                   <Typography className="!font-semibold">
                     Sắp diễn ra
                   </Typography>
+                  <Chip label={pendingCount} size="small" />
                 </Box>
               }
             />
@@ -407,6 +500,10 @@ const AuctionsPage: React.FC = () => {
                   <Typography className="!font-semibold">
                     Đã kết thúc
                   </Typography>
+                  <Chip
+                    label={auctions.length - activeCount - pendingCount}
+                    size="small"
+                  />
                 </Box>
               }
             />
@@ -449,207 +546,230 @@ const AuctionsPage: React.FC = () => {
               </Paper>
             ) : (
               <Grid container spacing={4}>
-                {filteredAuctions.map((auction: any) => (
-                  <Grid size={{ xs: 12, sm: 6, md: 4 }} key={auction.id}>
-                    <Card className="!rounded-2xl !shadow-lg hover:!shadow-2xl !transition-all !duration-300 !h-full !flex !flex-col">
-                      <CardActionArea
-                        onClick={() => navigate(`/auctions/${auction.id}`)}
-                        className="!flex-1 !flex !flex-col !items-stretch"
-                      >
-                        <Box className="!relative">
-                          <CardMedia
-                            component="img"
-                            image={
-                              auction.listing?.primaryImageUrl ||
-                              auction.listing?.imageUrls?.[0] ||
-                              "https://via.placeholder.com/400x300"
-                            }
-                            alt={auction.listing?.title}
-                            className="!h-64 !object-cover"
-                          />
-                          <Box className="!absolute !top-4 !left-4 !right-4 !flex !justify-between !items-start">
-                            {getStatusBadge(auction.status)}
-                            {auction.status === "active" && (
-                              <Chip
-                                label={
-                                  <Box className="!flex !items-center !gap-1">
-                                    <TrendingUp size={14} />
+                {filteredAuctions.map((auction, index) => {
+                  const status = getAuctionStatus(
+                    auction.startDate,
+                    auction.endDate
+                  );
+
+                  return (
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={auction.id}>
+                      <Card className="!rounded-2xl !shadow-lg hover:!shadow-2xl !transition-all !duration-300 !h-full !flex !flex-col">
+                        <CardActionArea
+                          onClick={() => navigate(`/auctions/${auction.id}`)}
+                          className="!flex-1 !flex !flex-col !items-stretch"
+                        >
+                          <Box className="!relative">
+                            <CardMedia
+                              component="img"
+                              image={mockImages[index % mockImages.length]}
+                              alt={auction.listing.title}
+                              className="!h-64 !object-cover"
+                            />
+                            <Box className="!absolute !top-4 !left-4 !right-4 !flex !justify-between !items-start">
+                              {getStatusBadge(status)}
+                              {status === "active" && (
+                                <Chip
+                                  label={
+                                    <Box className="!flex !items-center !gap-1">
+                                      <TrendingUp size={14} />
+                                      <Typography
+                                        variant="caption"
+                                        className="!font-bold"
+                                      >
+                                        HOT
+                                      </Typography>
+                                    </Box>
+                                  }
+                                  size="small"
+                                  className="!bg-red-500 !text-white !font-semibold"
+                                />
+                              )}
+                            </Box>
+                          </Box>
+
+                          <CardContent className="!flex-1 !flex !flex-col">
+                            <Typography
+                              variant="h6"
+                              className="!font-bold !mb-2 !line-clamp-2"
+                            >
+                              {auction.listing.title || "Chưa có tiêu đề"}
+                            </Typography>
+
+                            <Box className="!flex !items-center !gap-2 !mb-3">
+                              {auction.seller.displayName && (
+                                <Chip
+                                  label={`👤 ${auction.seller.displayName}`}
+                                  size="small"
+                                  variant="outlined"
+                                  className="!border-emerald-500 !text-emerald-600 hover:!border-emerald-600 hover:!text-emerald-700 !font-bold"
+                                />
+                              )}
+                            </Box>
+
+                            <Box className="!mb-3">
+                              <Typography
+                                variant="caption"
+                                className="!text-slate-600"
+                              >
+                                Giá khởi điểm
+                              </Typography>
+                              <Typography
+                                variant="h5"
+                                className="!font-bold !bg-gradient-to-r !from-emerald-600 !to-blue-600 !bg-clip-text !text-transparent"
+                              >
+                                {auction.startingPrice.toLocaleString()} ₫
+                              </Typography>
+                              {auction.currentPrice &&
+                                auction.currentPrice >
+                                  auction.startingPrice && (
+                                  <>
                                     <Typography
                                       variant="caption"
-                                      className="!font-bold"
+                                      className="!text-slate-600 !mt-2 !block"
                                     >
-                                      HOT
+                                      Giá hiện tại
+                                    </Typography>
+                                    <Typography
+                                      variant="h6"
+                                      className="!font-bold !text-orange-600"
+                                    >
+                                      {auction.currentPrice.toLocaleString()} ₫
+                                    </Typography>
+                                  </>
+                                )}
+                            </Box>
+
+                            {status === "active" && (
+                              <Box className="!mb-3">
+                                <Box className="!flex !items-center !justify-between !mb-1">
+                                  <Box className="!flex !items-center !gap-1">
+                                    <Timer
+                                      size={16}
+                                      className="!text-red-500"
+                                    />
+                                    <Typography
+                                      variant="caption"
+                                      className="!font-semibold !text-red-500"
+                                    >
+                                      Còn lại:{" "}
+                                      {getTimeRemaining(auction.endDate)}
                                     </Typography>
                                   </Box>
-                                }
-                                size="small"
-                                className="!bg-red-500 !text-white !font-semibold"
-                              />
-                            )}
-                          </Box>
-                        </Box>
-
-                        <CardContent className="!flex-1 !flex !flex-col">
-                          <Typography
-                            variant="h6"
-                            className="!font-bold !mb-2 !line-clamp-2"
-                          >
-                            {auction.listing?.title || "Chưa có tiêu đề"}
-                          </Typography>
-
-                          <Box className="!flex !items-center !gap-2 !mb-3">
-                            <Chip
-                              label={auction.listing?.categoryName || "Khác"}
-                              size="small"
-                              variant="outlined"
-                            />
-                            {auction.listing?.brand && (
-                              <Chip
-                                label={auction.listing.brand}
-                                size="small"
-                                variant="outlined"
-                              />
-                            )}
-                          </Box>
-
-                          <Box className="!mb-3">
-                            <Typography
-                              variant="caption"
-                              className="!text-slate-600"
-                            >
-                              Giá khởi điểm
-                            </Typography>
-                            <Typography
-                              variant="h5"
-                              className="!font-bold !bg-gradient-to-r !from-emerald-600 !to-blue-600 !bg-clip-text !text-transparent"
-                            >
-                              {auction.startingPrice?.toLocaleString() || "0"} ₫
-                            </Typography>
-                            {auction.currentPrice &&
-                              auction.currentPrice > auction.startingPrice && (
-                                <>
                                   <Typography
                                     variant="caption"
-                                    className="!text-slate-600 !mt-2 !block"
+                                    className="!text-slate-600"
                                   >
-                                    Giá hiện tại
+                                    {Math.round(
+                                      getTimeProgress(
+                                        auction.startDate,
+                                        auction.endDate
+                                      )
+                                    )}
+                                    %
                                   </Typography>
-                                  <Typography
-                                    variant="h6"
-                                    className="!font-bold !text-orange-600"
-                                  >
-                                    {auction.currentPrice.toLocaleString()} ₫
-                                  </Typography>
-                                </>
-                              )}
-                          </Box>
-
-                          {auction.status === "active" && (
-                            <Box className="!mb-3">
-                              <Box className="!flex !items-center !justify-between !mb-1">
-                                <Box className="!flex !items-center !gap-1">
-                                  <Timer size={16} className="!text-red-500" />
+                                </Box>
+                                <LinearProgress
+                                  variant="determinate"
+                                  value={getTimeProgress(
+                                    auction.startDate,
+                                    auction.endDate
+                                  )}
+                                  className="!h-2 !rounded-full !bg-slate-200"
+                                  sx={{
+                                    "& .MuiLinearProgress-bar": {
+                                      background:
+                                        "linear-gradient(to right, #10b981, #3b82f6)",
+                                    },
+                                  }}
+                                />
+                                {auction.totalBids && (
                                   <Typography
                                     variant="caption"
-                                    className="!font-semibold !text-red-500"
+                                    className="!text-slate-600 !mt-1 !block"
                                   >
-                                    Còn lại: {getTimeRemaining(auction.endDate)}
+                                    🔥 {auction.totalBids} lượt đấu giá
+                                  </Typography>
+                                )}
+                              </Box>
+                            )}
+
+                            {status === "pending" && (
+                              <Box className="!mb-3 !p-3 !bg-blue-50 !rounded-xl">
+                                <Box className="!flex !items-center !gap-2 !mb-1">
+                                  <Calendar
+                                    size={16}
+                                    className="!text-blue-600"
+                                  />
+                                  <Typography
+                                    variant="caption"
+                                    className="!font-semibold !text-blue-600"
+                                  >
+                                    Bắt đầu
                                   </Typography>
                                 </Box>
                                 <Typography
-                                  variant="caption"
-                                  className="!text-slate-600"
+                                  variant="body2"
+                                  className="!font-bold !text-blue-700"
                                 >
-                                  {Math.round(
-                                    getTimeProgress(
-                                      auction.startDate,
-                                      auction.endDate
-                                    )
-                                  )}
-                                  %
+                                  {formatDate(auction.startDate)}
                                 </Typography>
                               </Box>
-                              <LinearProgress
-                                variant="determinate"
-                                value={getTimeProgress(
-                                  auction.startDate,
-                                  auction.endDate
+                            )}
+
+                            {status === "completed" && (
+                              <Box className="!mb-3 !p-3 !bg-slate-100 !rounded-xl">
+                                <Box className="!flex !items-center !gap-2 !mb-1">
+                                  <Award
+                                    size={16}
+                                    className="!text-slate-600"
+                                  />
+                                  <Typography
+                                    variant="caption"
+                                    className="!font-semibold !text-slate-600"
+                                  >
+                                    Kết thúc
+                                  </Typography>
+                                </Box>
+                                <Typography
+                                  variant="body2"
+                                  className="!font-bold"
+                                >
+                                  {formatDate(auction.endDate)}
+                                </Typography>
+                                {auction.totalBids && (
+                                  <Typography
+                                    variant="caption"
+                                    className="!text-slate-600 !mt-1 !block"
+                                  >
+                                    {auction.totalBids} lượt đấu giá
+                                  </Typography>
                                 )}
-                                className="!h-2 !rounded-full !bg-slate-200"
-                                sx={{
-                                  "& .MuiLinearProgress-bar": {
-                                    background:
-                                      "linear-gradient(to right, #10b981, #3b82f6)",
-                                  },
-                                }}
-                              />
-                            </Box>
-                          )}
-
-                          {auction.status === "pending" && (
-                            <Box className="!mb-3 !p-3 !bg-blue-50 !rounded-xl">
-                              <Box className="!flex !items-center !gap-2 !mb-1">
-                                <Calendar
-                                  size={16}
-                                  className="!text-blue-600"
-                                />
-                                <Typography
-                                  variant="caption"
-                                  className="!font-semibold !text-blue-600"
-                                >
-                                  Bắt đầu
-                                </Typography>
                               </Box>
-                              <Typography
-                                variant="body2"
-                                className="!font-bold !text-blue-700"
-                              >
-                                {formatDate(auction.startDate)}
-                              </Typography>
-                            </Box>
-                          )}
+                            )}
 
-                          {auction.status === "completed" && (
-                            <Box className="!mb-3 !p-3 !bg-slate-100 !rounded-xl">
-                              <Box className="!flex !items-center !gap-2 !mb-1">
-                                <Award size={16} className="!text-slate-600" />
-                                <Typography
-                                  variant="caption"
-                                  className="!font-semibold !text-slate-600"
-                                >
-                                  Kết thúc
-                                </Typography>
-                              </Box>
-                              <Typography
-                                variant="body2"
-                                className="!font-bold"
-                              >
-                                {formatDate(auction.endDate)}
-                              </Typography>
-                            </Box>
-                          )}
-
-                          <Button
-                            fullWidth
-                            variant="contained"
-                            endIcon={<ArrowRight size={18} />}
-                            className={`!mt-auto !py-2.5 !rounded-xl !font-semibold ${
-                              auction.status === "active"
-                                ? "!bg-gradient-to-r !from-emerald-500 !to-blue-600"
-                                : "!bg-gradient-to-r !from-slate-400 !to-slate-500"
-                            }`}
-                          >
-                            {auction.status === "active"
-                              ? "Tham gia đấu giá"
-                              : auction.status === "pending"
-                              ? "Xem chi tiết"
-                              : "Xem kết quả"}
-                          </Button>
-                        </CardContent>
-                      </CardActionArea>
-                    </Card>
-                  </Grid>
-                ))}
+                            <Button
+                              fullWidth
+                              variant="contained"
+                              endIcon={<ArrowRight size={18} />}
+                              className={`!mt-auto !py-2.5 !rounded-xl !font-semibold ${
+                                status === "active"
+                                  ? "!bg-gradient-to-r !from-emerald-500 !to-blue-600"
+                                  : "!bg-gradient-to-r !from-slate-400 !to-slate-500"
+                              }`}
+                            >
+                              {status === "active"
+                                ? "Tham gia đấu giá"
+                                : status === "pending"
+                                ? "Xem chi tiết"
+                                : "Xem kết quả"}
+                            </Button>
+                          </CardContent>
+                        </CardActionArea>
+                      </Card>
+                    </Grid>
+                  );
+                })}
               </Grid>
             )}
           </>

@@ -32,19 +32,14 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useGetListing } from "src/queries/useListing";
-
-interface CreateAuctionForm {
-  listingId: number | null;
-  startingPrice: string;
-  startDate: string;
-  endDate: string;
-}
+import { useCreateAuctionMutation } from "src/queries/useAuction";
+import { AuctionCreateRequest } from "src/types/auction.type";
 
 const CreateAuctionPage: React.FC = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<CreateAuctionForm>({
-    listingId: null,
-    startingPrice: "",
+  const [formData, setFormData] = useState<AuctionCreateRequest>({
+    listingId: 1,
+    startingPrice: 1000,
     startDate: "",
     endDate: "",
   });
@@ -53,16 +48,18 @@ const CreateAuctionPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
-  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState("");
 
   const { data: listingsData, isLoading } = useGetListing();
+
+  const createAuctionMutation = useCreateAuctionMutation();
 
   const listings = listingsData?.data?.items || [];
   const auctionListings = listings?.filter(
     (listing) => listing.listingType === "auction"
   );
 
-  const handleInputChange = (field: keyof CreateAuctionForm, value: any) => {
+  const handleInputChange = (field: keyof AuctionCreateRequest, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     setSubmitError("");
   };
@@ -112,20 +109,22 @@ const CreateAuctionPage: React.FC = () => {
       setSubmitError(error);
       return;
     }
+    if (createAuctionMutation.isPending) return;
 
     setIsSubmitting(true);
     setSubmitError("");
 
     try {
       const payload = {
-        listingId: formData.listingId,
+        listingId: formData.listingId!,
         startingPrice: Number(formData.startingPrice),
         startDate: new Date(formData.startDate).toISOString(),
         endDate: new Date(formData.endDate).toISOString(),
       };
 
-      console.log("Creating auction with payload:", payload);
-      setSubmitSuccess(true);
+      createAuctionMutation.mutateAsync(payload);
+
+      setSubmitSuccess("Tạo buổi đấu giá thành công...");
       setTimeout(() => {
         navigate("/admin/auctions/all");
       }, 2000);
@@ -212,8 +211,8 @@ const CreateAuctionPage: React.FC = () => {
                             setSelectedListing(null);
                             setFormData((prev) => ({
                               ...prev,
-                              listingId: null,
-                              startingPrice: "",
+                              listingId: 1,
+                              startingPrice: 10000,
                             }));
                           }}
                         >
