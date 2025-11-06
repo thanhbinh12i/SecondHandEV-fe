@@ -5,6 +5,7 @@ const auctionApiRequests = {
   postAuction: (body: AuctionCreateRequest) =>
     http.post<AuctionResponse>("auction", body),
   auctionList: () => http.get<AuctionResponse[]>("auction"),
+  myAuctions: () => http.get<AuctionResponse[]>("auction/my"),
 };
 
 export default auctionApiRequests;

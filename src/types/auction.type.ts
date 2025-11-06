@@ -17,6 +17,7 @@ export interface AuctionResponse {
   startingPrice: number;
   startDate: string;
   endDate: string;
+  status?: string;
   seller: MemberInfoDto;
 }
 export interface ListingInfoDto {

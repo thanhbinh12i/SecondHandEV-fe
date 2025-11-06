@@ -19,6 +19,7 @@ import {
   Tabs,
   Tab,
   LinearProgress,
+  Fab,
 } from "@mui/material";
 import {
   Search,
@@ -31,9 +32,11 @@ import {
   ArrowRight,
   Timer,
   Award,
+  Plus,
+  Sparkles,
 } from "lucide-react";
 import { AuctionResponse } from "src/types/auction.type";
-// import { useGetAuctions } from "src/queries/useAuction";
+import { useGetAuctionList } from "src/queries/useAuction";
 
 interface AuctionWithBids extends AuctionResponse {
   currentPrice?: number;
@@ -47,12 +50,9 @@ const AuctionsPage: React.FC = () => {
   const [auctions, setAuctions] = useState<AuctionWithBids[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  //   const statusMap = ["active", "pending", "completed"];
-  //   const currentStatus = statusMap[activeTab];
-  //   const { data, isLoading, isError } = useGetAuctions({
-  //     status: currentStatus,
-  //   });
+  const { data } = useGetAuctionList();
 
+  console.log(data);
   const isError = false;
 
   useEffect(() => {
@@ -77,6 +77,7 @@ const AuctionsPage: React.FC = () => {
               Date.now() - 2 * 24 * 60 * 60 * 1000
             ).toISOString(),
             endDate: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(),
+            status: "active",
             seller: {
               memberId: 1,
               displayName: "Nguyễn Văn A",
@@ -99,6 +100,7 @@ const AuctionsPage: React.FC = () => {
               Date.now() - 1 * 24 * 60 * 60 * 1000
             ).toISOString(),
             endDate: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+            status: "active",
             seller: {
               memberId: 2,
               displayName: "Trần Thị B",
@@ -121,6 +123,7 @@ const AuctionsPage: React.FC = () => {
               Date.now() - 3 * 24 * 60 * 60 * 1000
             ).toISOString(),
             endDate: new Date(Date.now() + 1 * 60 * 60 * 1000).toISOString(),
+            status: "active",
             seller: {
               memberId: 3,
               displayName: "Lê Văn C",
@@ -143,6 +146,7 @@ const AuctionsPage: React.FC = () => {
             endDate: new Date(
               Date.now() + 5 * 24 * 60 * 60 * 1000
             ).toISOString(),
+            status: "upcoming",
             seller: {
               memberId: 4,
               displayName: "Phạm Thị D",
@@ -165,6 +169,7 @@ const AuctionsPage: React.FC = () => {
             endDate: new Date(
               Date.now() + 4 * 24 * 60 * 60 * 1000
             ).toISOString(),
+            status: "upcoming",
             seller: {
               memberId: 5,
               displayName: "Hoàng Văn E",
@@ -189,6 +194,7 @@ const AuctionsPage: React.FC = () => {
             endDate: new Date(
               Date.now() - 1 * 24 * 60 * 60 * 1000
             ).toISOString(),
+            status: "ended",
             seller: {
               memberId: 6,
               displayName: "Vũ Thị F",
@@ -213,6 +219,7 @@ const AuctionsPage: React.FC = () => {
             endDate: new Date(
               Date.now() - 3 * 24 * 60 * 60 * 1000
             ).toISOString(),
+            status: "ended",
             seller: {
               memberId: 7,
               displayName: "Đỗ Văn G",
@@ -235,6 +242,7 @@ const AuctionsPage: React.FC = () => {
               Date.now() - 4 * 24 * 60 * 60 * 1000
             ).toISOString(),
             endDate: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
+            status: "active",
             seller: {
               memberId: 8,
               displayName: "Bùi Thị H",
@@ -254,19 +262,6 @@ const AuctionsPage: React.FC = () => {
 
     loadAuctions();
   }, []);
-
-  const getAuctionStatus = (
-    startDate: string,
-    endDate: string
-  ): "pending" | "active" | "completed" => {
-    const now = new Date().getTime();
-    const start = new Date(startDate).getTime();
-    const end = new Date(endDate).getTime();
-
-    if (now < start) return "pending";
-    if (now > end) return "completed";
-    return "active";
-  };
 
   const getTimeRemaining = (endDate: string): string => {
     const now = new Date().getTime();
@@ -303,7 +298,7 @@ const AuctionsPage: React.FC = () => {
     });
   };
 
-  const getStatusBadge = (status: "pending" | "active" | "completed") => {
+  const getStatusBadge = (status: string | undefined) => {
     switch (status) {
       case "active":
         return (
@@ -314,7 +309,7 @@ const AuctionsPage: React.FC = () => {
             icon={<Zap size={14} className="!text-white" />}
           />
         );
-      case "pending":
+      case "upcoming":
         return (
           <Chip
             label="Sắp diễn ra"
@@ -323,7 +318,7 @@ const AuctionsPage: React.FC = () => {
             icon={<Clock size={14} className="!text-white" />}
           />
         );
-      case "completed":
+      case "ended":
         return (
           <Chip
             label="Đã kết thúc"
@@ -335,26 +330,21 @@ const AuctionsPage: React.FC = () => {
     }
   };
 
-  const statusMap = ["active", "pending", "completed"] as const;
+  const statusMap = ["active", "upcoming", "ended"] as const;
   const currentStatus = statusMap[activeTab];
 
   const filteredByTab = auctions.filter(
-    (auction) =>
-      getAuctionStatus(auction.startDate, auction.endDate) === currentStatus
+    (auction) => auction.status === currentStatus
   );
 
   const filteredAuctions = filteredByTab.filter((auction) =>
     auction.listing.title?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const activeCount = auctions.filter(
-    (a) => getAuctionStatus(a.startDate, a.endDate) === "active"
-  ).length;
-  const pendingCount = auctions.filter(
-    (a) => getAuctionStatus(a.startDate, a.endDate) === "pending"
-  ).length;
+  const activeCount = auctions.filter((a) => a.status === "active").length;
+  const upcomingCount = auctions.filter((a) => a.status === "upcoming").length;
+  const endedCount = auctions.filter((a) => a.status === "ended").length;
 
-  // Mock images for display
   const mockImages = [
     "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800",
     "https://images.unsplash.com/photo-1571333250630-f0230c320b6d?w=800",
@@ -363,8 +353,12 @@ const AuctionsPage: React.FC = () => {
 
   return (
     <Box className="!min-h-screen !bg-gradient-to-br !from-slate-50 !via-blue-50/30 !to-emerald-50/30">
-      <Box className="!bg-gradient-to-r !from-emerald-500 !via-blue-500 !to-emerald-600 !text-white !py-16">
-        <Container maxWidth="xl">
+      <Box className="!bg-gradient-to-r !from-emerald-500 !via-blue-500 !to-emerald-600 !text-white !py-16 !relative !overflow-hidden">
+        <Box className="!absolute !inset-0 !opacity-10">
+          <Box className="!absolute !top-10 !left-10 !w-72 !h-72 !bg-white !rounded-full !blur-3xl" />
+          <Box className="!absolute !bottom-10 !right-10 !w-96 !h-96 !bg-blue-300 !rounded-full !blur-3xl" />
+        </Box>
+        <Container maxWidth="xl" className="!relative">
           <Box className="!text-center">
             <Box className="!flex !items-center !justify-center !gap-3 !mb-4">
               <Gavel size={48} className="!animate-bounce" />
@@ -376,7 +370,7 @@ const AuctionsPage: React.FC = () => {
               Tham gia đấu giá để sở hữu những sản phẩm độc đáo với giá tốt nhất
             </Typography>
 
-            <Box className="!max-w-2xl !mx-auto">
+            <Box className="!max-w-2xl !mx-auto !mb-6">
               <TextField
                 fullWidth
                 placeholder="Tìm kiếm buổi đấu giá..."
@@ -393,6 +387,16 @@ const AuctionsPage: React.FC = () => {
                 }}
               />
             </Box>
+
+            <Button
+              variant="contained"
+              size="large"
+              startIcon={<Sparkles size={24} />}
+              onClick={() => navigate("/auctions/create")}
+              className="!bg-white !text-emerald-600 hover:!bg-emerald-50 !font-bold !px-8 !py-3 !rounded-full !shadow-xl hover:!shadow-2xl !transition-all"
+            >
+              Tạo buổi đấu giá mới
+            </Button>
           </Box>
         </Container>
       </Box>
@@ -420,7 +424,7 @@ const AuctionsPage: React.FC = () => {
               <Box className="!flex !items-center !justify-between">
                 <Box>
                   <Typography variant="h4" className="!font-bold !mb-1">
-                    {pendingCount}
+                    {upcomingCount}
                   </Typography>
                   <Typography variant="body2" className="!opacity-90">
                     Sắp diễn ra
@@ -452,7 +456,7 @@ const AuctionsPage: React.FC = () => {
               <Box className="!flex !items-center !justify-between">
                 <Box>
                   <Typography variant="h4" className="!font-bold !mb-1">
-                    1.2K+
+                    1K+
                   </Typography>
                   <Typography variant="body2" className="!opacity-90">
                     Người tham gia
@@ -489,7 +493,7 @@ const AuctionsPage: React.FC = () => {
                   <Typography className="!font-semibold">
                     Sắp diễn ra
                   </Typography>
-                  <Chip label={pendingCount} size="small" />
+                  <Chip label={upcomingCount} size="small" />
                 </Box>
               }
             />
@@ -500,10 +504,7 @@ const AuctionsPage: React.FC = () => {
                   <Typography className="!font-semibold">
                     Đã kết thúc
                   </Typography>
-                  <Chip
-                    label={auctions.length - activeCount - pendingCount}
-                    size="small"
-                  />
+                  <Chip label={endedCount} size="small" />
                 </Box>
               }
             />
@@ -538,19 +539,25 @@ const AuctionsPage: React.FC = () => {
                 <Typography variant="h5" className="!font-bold !mb-2">
                   Không có buổi đấu giá nào
                 </Typography>
-                <Typography variant="body1" className="!text-slate-600">
+                <Typography variant="body1" className="!text-slate-600 !mb-6">
                   {searchQuery
                     ? "Không tìm thấy kết quả phù hợp với từ khóa tìm kiếm"
                     : "Hiện tại chưa có buổi đấu giá nào trong danh mục này"}
                 </Typography>
+                <Button
+                  variant="contained"
+                  size="large"
+                  startIcon={<Plus size={20} />}
+                  onClick={() => navigate("/auctions/create")}
+                  className="!bg-gradient-to-r !from-emerald-500 !to-blue-600 !font-bold !px-6"
+                >
+                  Tạo buổi đấu giá đầu tiên
+                </Button>
               </Paper>
             ) : (
               <Grid container spacing={4}>
                 {filteredAuctions.map((auction, index) => {
-                  const status = getAuctionStatus(
-                    auction.startDate,
-                    auction.endDate
-                  );
+                  const status = auction.status;
 
                   return (
                     <Grid size={{ xs: 12, sm: 6, md: 4 }} key={auction.id}>
@@ -694,7 +701,7 @@ const AuctionsPage: React.FC = () => {
                               </Box>
                             )}
 
-                            {status === "pending" && (
+                            {status === "upcoming" && (
                               <Box className="!mb-3 !p-3 !bg-blue-50 !rounded-xl">
                                 <Box className="!flex !items-center !gap-2 !mb-1">
                                   <Calendar
@@ -717,7 +724,7 @@ const AuctionsPage: React.FC = () => {
                               </Box>
                             )}
 
-                            {status === "completed" && (
+                            {status === "ended" && (
                               <Box className="!mb-3 !p-3 !bg-slate-100 !rounded-xl">
                                 <Box className="!flex !items-center !gap-2 !mb-1">
                                   <Award
@@ -760,7 +767,7 @@ const AuctionsPage: React.FC = () => {
                             >
                               {status === "active"
                                 ? "Tham gia đấu giá"
-                                : status === "pending"
+                                : status === "upcoming"
                                 ? "Xem chi tiết"
                                 : "Xem kết quả"}
                             </Button>
@@ -775,6 +782,22 @@ const AuctionsPage: React.FC = () => {
           </>
         )}
       </Container>
+
+      <Fab
+        color="primary"
+        aria-label="create auction"
+        onClick={() => navigate("/auctions/create")}
+        className="!fixed !bottom-8 !right-8 !bg-gradient-to-r !from-emerald-500 !to-blue-600 !shadow-2xl hover:!shadow-3xl !w-16 !h-16"
+        sx={{
+          "& .MuiFab-label": {
+            display: "flex",
+            flexDirection: "column",
+            gap: 0.5,
+          },
+        }}
+      >
+        <Plus size={28} />
+      </Fab>
     </Box>
   );
 };

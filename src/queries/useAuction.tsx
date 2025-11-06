@@ -13,3 +13,10 @@ export const useGetAuctionList = () => {
     queryFn: () => auctionApiRequests.auctionList,
   });
 };
+
+export const useGetMyAuctions = () => {
+  return useQuery({
+    queryKey: ["my-auctions"],
+    queryFn: () => auctionApiRequests.myAuctions,
+  });
+};
