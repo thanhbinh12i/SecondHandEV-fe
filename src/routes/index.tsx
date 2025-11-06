@@ -14,10 +14,11 @@ import EBikeAllPage from "src/pages/Admin/Ebike";
 import BatteryAllPage from "src/pages/Admin/Battery";
 import Dashboard from "src/pages/Admin/Dashboard";
 import ListingDetailPage from "src/pages/Client/ListingDetail";
-import CreateAuctionPage from "src/pages/Admin/CreateAuction";
 import AuctionManagementPage from "src/pages/Admin/Auction";
 import AuctionsPage from "src/pages/Client/AuctionPage";
 import AuctionDetailPage from "src/pages/Client/AuctionDetail";
+import CreateAuctionPage from "src/pages/Client/CreateAution";
+import MyAuctionsPage from "src/pages/Client/MyAuction";
 
 const RouteElements: React.FC = () => {
   const routeElements = useRoutes([
@@ -57,6 +58,18 @@ const RouteElements: React.FC = () => {
           path: "auctions/:id",
           element: <AuctionDetailPage />,
         },
+        {
+          path: "auctions/create/:id",
+          element: <CreateAuctionPage />,
+        },
+        {
+          path: "auctions/create",
+          element: <CreateAuctionPage />,
+        },
+        {
+          path: "my-auctions",
+          element: <MyAuctionsPage />,
+        },
       ],
     },
     {
@@ -94,11 +107,7 @@ const RouteElements: React.FC = () => {
           element: <BatteryAllPage />,
         },
         {
-          path: "auctions/create",
-          element: <CreateAuctionPage />,
-        },
-        {
-          path: "auctions/all",
+          path: "auctions",
           element: <AuctionManagementPage />,
         },
       ],

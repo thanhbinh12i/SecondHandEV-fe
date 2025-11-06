@@ -89,7 +89,7 @@ const CreateListingPage: React.FC = () => {
     description: "",
     year: new Date().getFullYear(),
     price: 0,
-    listingType: "fixed",
+    listingType: "sale",
     listingStatus: "pending",
     primaryImageUrl: "",
     imageUrls: [],
@@ -132,7 +132,7 @@ const CreateListingPage: React.FC = () => {
       description: formData.description,
       year: formData.year,
       price: formData.price,
-      listingType: "fixed",
+      listingType: "sale",
       listingStatus: "pending",
       primaryImageUrl: formData.primaryImageUrl,
       imageUrls: formData.imageUrls,
@@ -738,7 +738,7 @@ const CreateListingPage: React.FC = () => {
                     handleInputChange("listingType", e.target.value)
                   }
                 >
-                  <MenuItem value="fixed">Mua ngay</MenuItem>
+                  <MenuItem value="sale">Mua ngay</MenuItem>
                   <MenuItem value="auction">Đấu giá</MenuItem>
                 </Select>
               </FormControl>

@@ -32,6 +32,7 @@ import {
   EyeOff,
   Calendar,
   Plus,
+  Gavel,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ListingDto } from "src/types/listing.type";
@@ -46,9 +47,7 @@ const MyListingsPage: React.FC = () => {
     null
   );
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const { data } = useGetMyListing();
-
-  const isLoading = false;
+  const { data, isLoading } = useGetMyListing();
 
   const listings = data?.data.items || [];
 
@@ -79,17 +78,6 @@ const MyListingsPage: React.FC = () => {
         return "Từ chối";
       default:
         return status || "Không xác định";
-    }
-  };
-
-  const getListingTypeLabel = (type?: string) => {
-    switch (type) {
-      case "fixed":
-        return "Giá cố định";
-      case "auction":
-        return "Đấu giá";
-      default:
-        return type || "";
     }
   };
 
@@ -145,6 +133,10 @@ const MyListingsPage: React.FC = () => {
     handleMenuClose();
   };
 
+  const handleCreateAuction = (listing: ListingDto) => {
+    navigate(`/auctions/create?id=${listing.listingId}`);
+  };
+
   const formatDate = (dateString?: string) => {
     if (!dateString) return "—";
     const date = new Date(dateString);
@@ -166,7 +158,6 @@ const MyListingsPage: React.FC = () => {
   return (
     <Box className="!min-h-screen !bg-gradient-to-br !from-slate-50 !to-slate-100 !py-8">
       <Container maxWidth="xl">
-        {/* Header */}
         <Box className="!mb-8">
           <Typography variant="h4" className="!font-bold !text-slate-900 !mb-2">
             Tin đăng của tôi
@@ -176,7 +167,6 @@ const MyListingsPage: React.FC = () => {
           </Typography>
         </Box>
 
-        {/* Stats Cards */}
         <Grid container spacing={3} className="!mb-8">
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Paper className="!p-6 !bg-gradient-to-br !from-emerald-500 !to-emerald-600 !text-white">
@@ -220,7 +210,6 @@ const MyListingsPage: React.FC = () => {
           </Grid>
         </Grid>
 
-        {/* Filter Section */}
         <Paper className="!p-4 !mb-6">
           <Box className="!flex !flex-col md:!flex-row !gap-4 !justify-between !items-center">
             <TextField
@@ -248,7 +237,6 @@ const MyListingsPage: React.FC = () => {
           </Box>
         </Paper>
 
-        {/* Tabs */}
         <Paper className="!mb-6">
           <Tabs
             value={tabValue}
@@ -268,7 +256,6 @@ const MyListingsPage: React.FC = () => {
           </Tabs>
         </Paper>
 
-        {/* Listings Grid */}
         {filteredListings.length === 0 ? (
           <Paper className="!p-12 !text-center">
             <Typography variant="h6" className="!text-slate-600 !mb-4">
@@ -292,7 +279,10 @@ const MyListingsPage: React.FC = () => {
                 size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
                 key={listing.listingId}
               >
-                <Card className="!rounded-2xl !shadow-lg hover:!shadow-2xl !transition-all !duration-300 hover:!scale-105">
+                <Card
+                  sx={{ height: 450 }}
+                  className="!rounded-2xl !shadow-lg hover:!shadow-2xl !transition-all !duration-300 hover:!scale-105"
+                >
                   <Box className="!relative">
                     <CardMedia
                       component="img"
@@ -321,17 +311,14 @@ const MyListingsPage: React.FC = () => {
                   </Box>
 
                   <CardContent className="!p-4">
-                    <Typography
-                      variant="h6"
-                      className="!font-bold !text-slate-900 !mb-2 !line-clamp-2"
-                    >
+                    <Typography className="!h-5  !font-bold !text-slate-900 !mb-2 !line-clamp-2">
                       {listing.title}
                     </Typography>
 
                     {listing.description && (
                       <Typography
                         variant="body2"
-                        className="!text-slate-600 !mb-3 !line-clamp-2"
+                        className="!h-10 !text-slate-600 !mb-3 !line-clamp-2"
                       >
                         {listing.description}
                       </Typography>
@@ -362,26 +349,34 @@ const MyListingsPage: React.FC = () => {
                       )}
                     </Box>
 
-                    {listing.listingType && (
-                      <Box className="!mb-3">
-                        <Chip
-                          label={getListingTypeLabel(listing.listingType)}
-                          size="small"
-                          className="!bg-emerald-100 !text-emerald-700"
-                        />
+                    <Box className="!pt-3 !border-t !border-slate-200">
+                      <Box className="!flex !justify-between !items-center !mb-3">
+                        <Typography
+                          variant="h6"
+                          className="!h-10 !font-bold !text-emerald-600"
+                        >
+                          {listing.price?.toLocaleString() || 0} đ
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          className="!text-slate-500"
+                        >
+                          {formatDate(listing.createdAt)}
+                        </Typography>
                       </Box>
-                    )}
 
-                    <Box className="!flex !justify-between !items-center !pt-3 !border-t !border-slate-200">
-                      <Typography
-                        variant="h6"
-                        className="!font-bold !text-emerald-600"
-                      >
-                        {listing.price?.toLocaleString() || 0} đ
-                      </Typography>
-                      <Typography variant="caption" className="!text-slate-500">
-                        {formatDate(listing.createdAt)}
-                      </Typography>
+                      {listing.listingType === "auction" &&
+                        listing.listingStatus === "active" && (
+                          <Button
+                            fullWidth
+                            variant="contained"
+                            startIcon={<Gavel size={18} />}
+                            onClick={() => handleCreateAuction(listing)}
+                            className="!bg-gradient-to-r !from-purple-500 !to-pink-600 !font-semibold !rounded-xl !shadow-lg hover:!shadow-xl"
+                          >
+                            Tạo buổi đấu giá
+                          </Button>
+                        )}
                     </Box>
                   </CardContent>
                 </Card>
@@ -391,7 +386,6 @@ const MyListingsPage: React.FC = () => {
         )}
       </Container>
 
-      {/* Context Menu */}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -414,13 +408,27 @@ const MyListingsPage: React.FC = () => {
             </>
           )}
         </MenuItem>
+        {selectedListing?.listingType === "auction" &&
+          selectedListing?.listingStatus === "active" && (
+            <MenuItem
+              onClick={() => {
+                handleMenuClose();
+                if (selectedListing) {
+                  handleCreateAuction(selectedListing);
+                }
+              }}
+              className="!text-purple-600"
+            >
+              <Gavel size={18} className="!mr-2" />
+              Tạo đấu giá
+            </MenuItem>
+          )}
         <MenuItem onClick={handleDelete} className="!text-red-600">
           <Trash2 size={18} className="!mr-2" />
           Xóa tin
         </MenuItem>
       </Menu>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}

@@ -52,7 +52,7 @@ const BatteryListingsPage: React.FC = () => {
 
   const getListingTypeLabel = (type?: string) => {
     switch (type) {
-      case "fixed":
+      case "sale":
         return "Giá cố định";
       case "auction":
         return "Đấu giá";

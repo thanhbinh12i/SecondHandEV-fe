@@ -320,7 +320,7 @@ const ListingDetailPage: React.FC = () => {
                   <Typography variant="body2" className="!text-slate-600">
                     Loại tin:{" "}
                     <strong>
-                      {listing.listingType === "fixed" ? "Mua ngay" : "Đấu giá"}
+                      {listing.listingType === "sale" ? "Mua ngay" : "Đấu giá"}
                     </strong>
                   </Typography>
                 </Box>

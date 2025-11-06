@@ -5,6 +5,8 @@ import {
   ShoppingBag,
   ChevronDown,
   UserCircle,
+  Package,
+  Gavel,
 } from "lucide-react";
 import {
   Box,
@@ -64,6 +66,24 @@ const UserDropdown: React.FC = () => {
       onClick: () => {
         handleClose();
         //   navigate("/orders");
+      },
+      badge: 3,
+    },
+    {
+      icon: <Package className="w-5 h-5" />,
+      label: "Tin đăng của tôi",
+      onClick: () => {
+        handleClose();
+        navigate("/my-listings");
+      },
+      badge: 12,
+    },
+    {
+      icon: <Gavel className="w-5 h-5" />,
+      label: "Đấu giá của tôi",
+      onClick: () => {
+        handleClose();
+        navigate("/my-auctions");
       },
       badge: 3,
     },

@@ -20,7 +20,6 @@ import {
   ShoppingCart,
   Settings,
   BarChart3,
-  FileText,
   ChevronDown,
   ChevronRight,
   Menu,
@@ -75,20 +74,6 @@ const AdminSidebar: React.FC = () => {
       label: "Đấu giá",
       icon: <BarChart3 size={20} />,
       path: "/admin/auctions",
-      children: [
-        {
-          id: "createauctions",
-          label: "Tạo buổi đấu giá",
-          icon: <BarChart3 size={18} />,
-          path: "/admin/auctions/create",
-        },
-        {
-          id: "auctionslist",
-          label: "Danh sách các buổi đấu giá",
-          icon: <FileText size={18} />,
-          path: "/admin/auctions/all",
-        },
-      ],
     },
     {
       id: "orders",
