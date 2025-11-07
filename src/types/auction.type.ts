@@ -1,3 +1,5 @@
+import { ApiResponse } from "./api.type";
+
 export interface AuctionCreateRequest {
   listingId: number;
   startingPrice: number;
@@ -16,6 +18,8 @@ export interface AuctionResponse {
   listing: ListingInfoDto;
   startingPrice: number;
   startDate: string;
+  totalBids?: number;
+  currentPrice?: number;
   endDate: string;
   status?: string;
   seller: MemberInfoDto;
@@ -23,6 +27,7 @@ export interface AuctionResponse {
 export interface ListingInfoDto {
   listingId: number;
   title?: string;
+  primaryImageURL?: string;
   description?: string;
   price: number;
   listingType?: string;
@@ -34,3 +39,7 @@ export interface MemberInfoDto {
   email?: string;
   phone?: string;
 }
+
+export type AuctionApiResponse = ApiResponse<AuctionResponse>;
+
+export type AuctionListApiResponse = ApiResponse<AuctionResponse[]>;

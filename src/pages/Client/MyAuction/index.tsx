@@ -43,13 +43,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AuctionResponse } from "src/types/auction.type";
-// import { useGetMyAuctions } from "src/queries/useAuction";
-
-interface AuctionWithStatus extends AuctionResponse {
-  currentPrice?: number;
-  totalBids?: number;
-  primaryImageUrl?: string;
-}
+import { useGetMyAuctions } from "src/queries/useAuction";
 
 const MyAuctionsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -57,105 +51,12 @@ const MyAuctionsPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedAuction, setSelectedAuction] =
-    useState<AuctionWithStatus | null>(null);
+    useState<AuctionResponse | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  // const { data, isLoading } = useGetMyAuctions();
-  const isLoading = false;
+  const { data, isLoading } = useGetMyAuctions();
 
-  // Mock data
-  const mockAuctions: AuctionWithStatus[] = [
-    {
-      id: 1,
-      listing: {
-        listingId: 101,
-        title: "Pin Lithium 72V 40Ah - Chính hãng Samsung",
-        description: "Pin lithium chất lượng cao, bảo hành 24 tháng",
-        price: 20000000,
-        listingType: "auction",
-      },
-      startingPrice: 15000000,
-      startDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-      endDate: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(),
-      seller: {
-        memberId: 1,
-        displayName: "Nguyễn Văn A",
-        email: "nguyenvana@example.com",
-      },
-      status: "active",
-      currentPrice: 18500000,
-      totalBids: 12,
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800",
-    },
-    {
-      id: 2,
-      listing: {
-        listingId: 102,
-        title: "Xe đạp điện Giant E+ Pro",
-        description: "Xe đạp điện cao cấp",
-        price: 35000000,
-        listingType: "auction",
-      },
-      startingPrice: 25000000,
-      startDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-      endDate: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
-      seller: {
-        memberId: 2,
-        displayName: "Trần Thị B",
-        email: "tranthib@example.com",
-      },
-      status: "active",
-      currentPrice: 32000000,
-      totalBids: 25,
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1571333250630-f0230c320b6d?w=800",
-    },
-    {
-      id: 3,
-      listing: {
-        listingId: 103,
-        title: "Bộ pin 48V 20Ah - LG cells",
-        price: 10000000,
-        listingType: "auction",
-      },
-      startingPrice: 8500000,
-      startDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-      endDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-      seller: {
-        memberId: 3,
-        displayName: "Lê Văn C",
-        email: "levanc@example.com",
-      },
-      status: "upcoming",
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800",
-    },
-    {
-      id: 4,
-      listing: {
-        listingId: 104,
-        title: "Xe điện Vinfast Klara S",
-        price: 30000000,
-        listingType: "auction",
-      },
-      startingPrice: 22000000,
-      startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-      endDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-      seller: {
-        memberId: 4,
-        displayName: "Phạm Thị D",
-        email: "phamthid@example.com",
-      },
-      status: "completed",
-      currentPrice: 28500000,
-      totalBids: 18,
-      primaryImageUrl:
-        "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800",
-    },
-  ];
-
-  const auctions = mockAuctions;
+  const auctions = data?.data.data;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -212,7 +113,7 @@ const MyAuctionsPage: React.FC = () => {
     return Math.min(Math.max((elapsed / total) * 100, 0), 100);
   };
 
-  const filteredAuctions = auctions.filter((auction) => {
+  const filteredAuctions = auctions?.filter((auction) => {
     const matchesSearch =
       auction.listing.title
         ?.toLowerCase()
@@ -220,16 +121,16 @@ const MyAuctionsPage: React.FC = () => {
 
     const matchesTab =
       tabValue === 0 ||
-      (tabValue === 1 && auction.status === "active") ||
-      (tabValue === 2 && auction.status === "upcoming") ||
-      (tabValue === 3 && auction.status === "completed");
+      (tabValue === 1 && auction.status === "Active") ||
+      (tabValue === 2 && auction.status === "Upcoming") ||
+      (tabValue === 3 && auction.status === "Ended");
 
     return matchesSearch && matchesTab;
   });
 
   const handleMenuOpen = (
     event: React.MouseEvent<HTMLElement>,
-    auction: AuctionWithStatus
+    auction: AuctionResponse
   ) => {
     setAnchorEl(event.currentTarget);
     setSelectedAuction(auction);
@@ -285,7 +186,6 @@ const MyAuctionsPage: React.FC = () => {
   return (
     <Box className="!min-h-screen !bg-gradient-to-br !from-slate-50 !to-slate-100 !py-8">
       <Container maxWidth="xl">
-        {/* Header */}
         <Box className="!mb-8">
           <Typography variant="h4" className="!font-bold !text-slate-900 !mb-2">
             Đấu giá của tôi
@@ -295,7 +195,6 @@ const MyAuctionsPage: React.FC = () => {
           </Typography>
         </Box>
 
-        {/* Stats Cards */}
         <Grid container spacing={3} className="!mb-8">
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Paper className="!p-6 !bg-gradient-to-br !from-purple-500 !to-purple-600 !text-white !rounded-2xl">
@@ -305,7 +204,7 @@ const MyAuctionsPage: React.FC = () => {
                     Tổng đấu giá
                   </Typography>
                   <Typography variant="h3" className="!font-bold">
-                    {auctions.length}
+                    {auctions?.length}
                   </Typography>
                 </Box>
                 <Gavel size={48} className="!opacity-80" />
@@ -320,7 +219,7 @@ const MyAuctionsPage: React.FC = () => {
                     Đang diễn ra
                   </Typography>
                   <Typography variant="h3" className="!font-bold">
-                    {auctions.filter((a) => a.status === "active").length}
+                    {auctions?.filter((a) => a.status === "active").length}
                   </Typography>
                 </Box>
                 <Zap size={48} className="!opacity-80" />
@@ -335,7 +234,7 @@ const MyAuctionsPage: React.FC = () => {
                     Sắp diễn ra
                   </Typography>
                   <Typography variant="h3" className="!font-bold">
-                    {auctions.filter((a) => a.status === "upcoming").length}
+                    {auctions?.filter((a) => a.status === "upcoming").length}
                   </Typography>
                 </Box>
                 <Clock size={48} className="!opacity-80" />
@@ -350,7 +249,7 @@ const MyAuctionsPage: React.FC = () => {
                     Đã kết thúc
                   </Typography>
                   <Typography variant="h3" className="!font-bold">
-                    {auctions.filter((a) => a.status === "completed").length}
+                    {auctions?.filter((a) => a.status === "completed").length}
                   </Typography>
                 </Box>
                 <Award size={48} className="!opacity-80" />
@@ -359,7 +258,6 @@ const MyAuctionsPage: React.FC = () => {
           </Grid>
         </Grid>
 
-        {/* Filter Section */}
         <Paper className="!p-4 !mb-6 !rounded-2xl">
           <Box className="!flex !flex-col md:!flex-row !gap-4 !justify-between !items-center">
             <TextField
@@ -387,7 +285,6 @@ const MyAuctionsPage: React.FC = () => {
           </Box>
         </Paper>
 
-        {/* Tabs */}
         <Paper className="!mb-6 !rounded-2xl">
           <Tabs
             value={tabValue}
@@ -407,8 +304,7 @@ const MyAuctionsPage: React.FC = () => {
           </Tabs>
         </Paper>
 
-        {/* Auctions Grid */}
-        {filteredAuctions.length === 0 ? (
+        {filteredAuctions?.length === 0 ? (
           <Paper className="!p-12 !text-center !rounded-2xl">
             <Typography variant="h6" className="!text-slate-600 !mb-4">
               {searchQuery
@@ -426,7 +322,7 @@ const MyAuctionsPage: React.FC = () => {
           </Paper>
         ) : (
           <Grid container spacing={3}>
-            {filteredAuctions.map((auction) => (
+            {filteredAuctions?.map((auction) => (
               <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={auction.id}>
                 <Card className="!rounded-2xl !shadow-lg hover:!shadow-2xl !transition-all !duration-300 hover:!scale-105">
                   <Box className="!relative">
@@ -434,7 +330,7 @@ const MyAuctionsPage: React.FC = () => {
                       component="img"
                       height="200"
                       image={
-                        auction.primaryImageUrl ||
+                        auction.listing.primaryImageURL ||
                         "https://via.placeholder.com/800x600?text=No+Image"
                       }
                       alt={auction.listing.title}
@@ -480,7 +376,6 @@ const MyAuctionsPage: React.FC = () => {
                         {auction.listing.description}
                       </Typography>
                     )}
-                    {/* Pricing Info */}
                     <Box className="!mb-3 !space-y-2">
                       <Box className="!p-2 !bg-slate-50 !rounded-lg">
                         <Typography
@@ -531,7 +426,6 @@ const MyAuctionsPage: React.FC = () => {
                         )}
                     </Box>
 
-                    {/* Time Progress for Active Auctions */}
                     {auction.status === "active" && (
                       <Box className="!mb-3 !p-3 !bg-red-50 !rounded-xl !border !border-red-200">
                         <Box className="!flex !items-center !justify-between !mb-2">
@@ -590,7 +484,6 @@ const MyAuctionsPage: React.FC = () => {
                       </Box>
                     )}
 
-                    {/* Completed Auction Info */}
                     {auction.status === "completed" && (
                       <Box className="!mb-3 !p-3 !bg-slate-100 !rounded-xl">
                         <Box className="!flex !items-center !gap-2 !mb-1">
@@ -639,7 +532,6 @@ const MyAuctionsPage: React.FC = () => {
         )}
       </Container>
 
-      {/* Context Menu */}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}

@@ -20,9 +20,11 @@ import {
   Award,
   DollarSign,
   Zap,
+  ExternalLink,
 } from "lucide-react";
 import { AuctionResponse } from "src/types/auction.type";
 import { BidResponse } from "src/types/bid.type";
+import { useNavigate } from "react-router-dom";
 
 interface AuctionMainInfoProps {
   auction: AuctionResponse;
@@ -35,6 +37,7 @@ const AuctionMainInfo: React.FC<AuctionMainInfoProps> = ({
   bids,
   onPlaceBid,
 }) => {
+  const navigate = useNavigate();
   const [bidAmount, setBidAmount] = useState("");
   const [timeRemaining, setTimeRemaining] = useState("");
 
@@ -44,18 +47,6 @@ const AuctionMainInfo: React.FC<AuctionMainInfoProps> = ({
 
   const minBidIncrement = 100000;
   const minBidAmount = currentPrice + minBidIncrement;
-
-  const getAuctionStatus = (): "pending" | "active" | "completed" => {
-    const now = new Date().getTime();
-    const startTime = new Date(auction.startDate).getTime();
-    const endTime = new Date(auction.endDate).getTime();
-
-    if (now < startTime) return "pending";
-    if (now > endTime) return "completed";
-    return "active";
-  };
-
-  const auctionStatus = getAuctionStatus();
 
   useEffect(() => {
     const updateTimer = () => {
@@ -115,14 +106,22 @@ const AuctionMainInfo: React.FC<AuctionMainInfoProps> = ({
           <Typography variant="h6" className="!font-bold !mb-2">
             {auction.listing.title}
           </Typography>
+          <Button
+            size="small"
+            startIcon={<ExternalLink size={16} />}
+            onClick={() => navigate(`/listing/${auction.listing.listingId}`)}
+            className="!text-emerald-600 !font-semibold hover:!bg-emerald-50"
+          >
+            Xem chi tiết sản phẩm
+          </Button>
         </Box>
-        {auctionStatus === "active" ? (
+        {auction.status === "Active" ? (
           <Chip
             label="Đang diễn ra"
             className="!bg-gradient-to-r !from-emerald-500 !to-green-600 !text-white !font-semibold !text-base !px-4 !py-4"
             icon={<Zap size={18} className="!text-white" />}
           />
-        ) : auctionStatus === "pending" ? (
+        ) : auction.status === "Upcoming" ? (
           <Chip
             label="Sắp diễn ra"
             className="!bg-gradient-to-r !from-blue-500 !to-blue-600 !text-white !font-semibold !text-base !px-4 !py-6"
@@ -137,7 +136,7 @@ const AuctionMainInfo: React.FC<AuctionMainInfoProps> = ({
         )}
       </Box>
 
-      {auctionStatus === "active" && (
+      {auction.status === "Active" && (
         <Box className="!mb-6 !p-6 !bg-gradient-to-r !from-red-50 !via-orange-50 !to-red-50 !rounded-2xl !border-2 !border-red-300 !shadow-lg">
           <Box className="!flex !items-center !justify-between !mb-3">
             <Box className="!flex !items-center !gap-3">
@@ -236,7 +235,7 @@ const AuctionMainInfo: React.FC<AuctionMainInfoProps> = ({
         </Grid>
       </Grid>
 
-      {auctionStatus === "active" && (
+      {auction.status === "Active" && (
         <>
           <Box className="!mb-4 !p-4 !bg-slate-50 !rounded-xl !border-2 !border-slate-200">
             <Typography
@@ -270,12 +269,6 @@ const AuctionMainInfo: React.FC<AuctionMainInfoProps> = ({
                 className: "!text-2xl !font-bold",
               }}
             />
-            <Typography
-              variant="body2"
-              className="!text-slate-600 !mt-2 !font-semibold"
-            >
-              💡 Bước giá tối thiểu: {minBidIncrement.toLocaleString()}₫
-            </Typography>
           </Box>
 
           <Button
@@ -291,7 +284,7 @@ const AuctionMainInfo: React.FC<AuctionMainInfoProps> = ({
         </>
       )}
 
-      {auctionStatus === "pending" && (
+      {auction.status === "Upcoming" && (
         <Alert
           severity="info"
           className="!mt-4 !rounded-xl"
@@ -306,7 +299,7 @@ const AuctionMainInfo: React.FC<AuctionMainInfoProps> = ({
         </Alert>
       )}
 
-      {auctionStatus === "completed" && (
+      {auction.status === "Ended" && (
         <Alert
           severity="success"
           className="!mt-4 !rounded-xl"

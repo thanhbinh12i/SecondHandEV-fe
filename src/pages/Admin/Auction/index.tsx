@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -10,7 +11,6 @@ import {
   Alert,
   Card,
   CardContent,
-  Chip,
   CircularProgress,
   Tab,
   Tabs,
@@ -18,9 +18,10 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Pagination,
+  Chip,
 } from "@mui/material";
 import {
-  Plus,
   Gavel,
   Clock,
   CheckCircle,
@@ -32,6 +33,7 @@ import {
   User,
 } from "lucide-react";
 import { AuctionResponse } from "src/types/auction.type";
+import { useGetMyAuctions } from "src/queries/useAuction";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -50,130 +52,35 @@ function TabPanel(props: TabPanelProps) {
 
 const AuctionManagementPage: React.FC = () => {
   const navigate = useNavigate();
-  const [auctions, setAuctions] = useState<AuctionResponse[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [tabValue, setTabValue] = useState(0);
+  const [page, setPage] = useState(1);
   const [selectedAuction, setSelectedAuction] =
     useState<AuctionResponse | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
-  useEffect(() => {
-    const loadAuctions = async () => {
-      try {
-        setIsLoading(true);
+  const pageSize = 10;
 
-        const mockAuctions: AuctionResponse[] = [
-          {
-            id: 1,
-            listing: {
-              listingId: 101,
-              title: "Pin LFP 48V 200Ah Pin Xe Điện",
-              description:
-                "Pin LiFePO4 chất lượng cao, dung lượng 200Ah, điện áp 48V, tuổi thọ 5000+ chu kỳ, bảo hành 5 năm",
-              price: 50000000,
-              listingType: "auction",
-            },
-            startingPrice: 45000000,
-            startDate: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
-            endDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-            seller: {
-              memberId: 1,
-              displayName: "Nguyễn Văn A",
-              email: "nguyenvana@example.com",
-              phone: "0901234567",
-            },
-          },
-          {
-            id: 2,
-            listing: {
-              listingId: 102,
-              title: "Pin Lithium 72V 150Ah Xe Điện Cao Cấp",
-              description:
-                "Pin Lithium ion công suất cao, điện áp 72V, dung lượng 150Ah, hiệu suất 98%, tích hợp BMS thông minh",
-              price: 70000000,
-              listingType: "auction",
-            },
-            startingPrice: 65000000,
-            startDate: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-            endDate: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString(),
-            seller: {
-              memberId: 2,
-              displayName: "Trần Thị B",
-              email: "tranthib@example.com",
-              phone: "0912345678",
-            },
-          },
-          {
-            id: 3,
-            listing: {
-              listingId: 103,
-              title: "Pin LFP 48V 100Ah Đôi Bánh",
-              description:
-                "Pin LiFePO4 cho xe đôi bánh, 48V 100Ah, nhẹ, an toàn, thích hợp cho city bike",
-              price: 25000000,
-              listingType: "auction",
-            },
-            startingPrice: 22000000,
-            startDate: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
-            endDate: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-            seller: {
-              memberId: 3,
-              displayName: "Lê Văn C",
-              email: "levanc@example.com",
-              phone: "0923456789",
-            },
-          },
-          {
-            id: 4,
-            listing: {
-              listingId: 104,
-              title: "Pin Lithium 96V 200Ah Xe Điện 3 Bánh",
-              description:
-                "Pin lithium cao cấp 96V 200Ah, công suất lớn, cho xe 3 bánh chở hàng, quãng đường 300km",
-              price: 95000000,
-              listingType: "auction",
-            },
-            startingPrice: 90000000,
-            startDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-            endDate: new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString(),
-            seller: {
-              memberId: 4,
-              displayName: "Phạm Thị D",
-              email: "phamthid@example.com",
-              phone: "0934567890",
-            },
-          },
-        ];
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setAuctions(mockAuctions);
-      } catch (error) {
-        console.error("Error loading auctions:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const {
+    data: auctionData,
+    isLoading,
+    isError,
+  } = useGetMyAuctions({
+    page: page,
+    pageSize: pageSize,
+  });
 
-    loadAuctions();
-  }, []);
+  const auctions = auctionData?.data.data || [];
 
-  const getAuctionStatus = (
-    startDate: string,
-    endDate: string
-  ): {
-    status: "upcoming" | "active" | "ended";
-    label: string;
-    color: string;
-  } => {
-    const now = new Date();
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-
-    if (now < start) {
-      return { status: "upcoming", label: "Sắp diễn ra", color: "warning" };
-    } else if (now >= start && now < end) {
-      return { status: "active", label: "Đang diễn ra", color: "success" };
-    } else {
-      return { status: "ended", label: "Đã kết thúc", color: "error" };
+  const getStatusLabel = (status?: string) => {
+    switch (status) {
+      case "Upcoming":
+        return { label: "Sắp diễn ra", color: "warning" };
+      case "Active":
+        return { label: "Đang diễn ra", color: "success" };
+      case "Ended":
+        return { label: "Đã kết thúc", color: "error" };
+      default:
+        return { label: "Không xác định", color: "default" };
     }
   };
 
@@ -204,34 +111,34 @@ const AuctionManagementPage: React.FC = () => {
   };
 
   const formatCurrency = (value: number): string => {
-    return `${value.toLocaleString("vi-VN")} đ`;
+    return `${value.toLocaleString("vi-VN")} ₫`;
   };
 
-  const filterAuctions = (status?: "upcoming" | "active" | "ended") => {
-    let filtered = auctions;
-
-    if (status) {
-      filtered = filtered.filter((auction) => {
-        const auctionStatus = getAuctionStatus(
-          auction.startDate,
-          auction.endDate
-        );
-        return auctionStatus.status === status;
-      });
-    }
-
-    return filtered;
+  const filterAuctions = (status?: string) => {
+    if (!status) return auctions;
+    return auctions.filter((auction) => auction.status === status);
   };
 
-  const upcomingAuctions = filterAuctions("upcoming");
-  const activeAuctions = filterAuctions("active");
-  const endedAuctions = filterAuctions("ended");
+  const upcomingAuctions = filterAuctions("Upcoming");
+  const activeAuctions = filterAuctions("Active");
+  const endedAuctions = filterAuctions("Ended");
+
+  const totalPages = Math.ceil(auctions.length / pageSize);
+
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
+    setPage(value);
+  };
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+    setPage(1);
+  };
 
   const AuctionCard = ({ auction }: { auction: AuctionResponse }) => {
-    const { status, label, color } = getAuctionStatus(
-      auction.startDate,
-      auction.endDate
-    );
+    const { label, color } = getStatusLabel(auction.status);
     const timeRemaining = getTimeRemaining(auction.endDate);
 
     return (
@@ -240,33 +147,31 @@ const AuctionManagementPage: React.FC = () => {
           <Box className="!flex !justify-between !items-start !mb-3">
             <Box className="!flex-1">
               <Typography variant="h6" className="!font-bold !mb-1">
-                {auction.listing.title}
+                {auction.listing.title || "Sản phẩm đấu giá"}
               </Typography>
-              <Typography variant="body2" className="!text-slate-600 !mb-2">
-                {auction.listing.description}
+              <Typography
+                variant="body2"
+                className="!text-slate-600 !mb-2 !line-clamp-2"
+              >
+                {auction.listing.description || "Chưa có mô tả"}
               </Typography>
               <Box className="!flex !items-center !gap-1 !text-slate-500">
                 <User size={14} />
                 <Typography variant="caption">
-                  Người bán: {auction.seller.displayName}
+                  Người bán: {auction.seller.displayName || "Không rõ"}
                 </Typography>
               </Box>
             </Box>
-            <Box
-              className={`!px-3 !py-1 !rounded-full !text-xs !font-semibold ${
-                color === "warning"
-                  ? "!bg-yellow-100 !text-yellow-800"
-                  : color === "success"
-                  ? "!bg-green-100 !text-green-800"
-                  : "!bg-red-100 !text-red-800"
-              }`}
-            >
-              {label}
-            </Box>
+            <Chip
+              label={label}
+              color={color as any}
+              size="small"
+              className="!font-semibold"
+            />
           </Box>
 
           <Grid container spacing={2} className="!mb-3">
-            <Grid size={{ xs: 6, sm: 3 }}>
+            <Grid size={{ xs: 6, md: 3 }}>
               <Box>
                 <Typography variant="caption" className="!text-slate-600">
                   Giá khởi điểm
@@ -279,27 +184,32 @@ const AuctionManagementPage: React.FC = () => {
                 </Typography>
               </Box>
             </Grid>
-            <Grid size={{ xs: 6, sm: 3 }}>
+            <Grid size={{ xs: 6, md: 3 }}>
               <Box>
                 <Typography variant="caption" className="!text-slate-600">
-                  Bắt đầu
+                  Giá hiện tại
                 </Typography>
-                <Typography variant="body2" className="!font-semibold">
-                  {new Date(auction.startDate).toLocaleDateString("vi-VN")}
+                <Typography
+                  variant="body2"
+                  className="!font-bold !text-emerald-600"
+                >
+                  {auction.currentPrice
+                    ? formatCurrency(auction.currentPrice)
+                    : formatCurrency(auction.startingPrice)}
                 </Typography>
               </Box>
             </Grid>
-            <Grid size={{ xs: 6, sm: 3 }}>
+            <Grid size={{ xs: 6, md: 3 }}>
               <Box>
                 <Typography variant="caption" className="!text-slate-600">
-                  Kết thúc
+                  Số lượt đấu
                 </Typography>
                 <Typography variant="body2" className="!font-semibold">
-                  {new Date(auction.endDate).toLocaleDateString("vi-VN")}
+                  {auction.totalBids || 0} lượt
                 </Typography>
               </Box>
             </Grid>
-            <Grid size={{ xs: 6, sm: 3 }}>
+            <Grid size={{ xs: 6, md: 3 }}>
               <Box>
                 <Typography variant="caption" className="!text-slate-600">
                   Thời gian còn lại
@@ -322,6 +232,14 @@ const AuctionManagementPage: React.FC = () => {
               size="small"
               variant="outlined"
               startIcon={<Eye size={16} />}
+              onClick={() => navigate(`/auctions/${auction.id}`)}
+            >
+              Xem
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              startIcon={<Eye size={16} />}
               onClick={() => {
                 setSelectedAuction(auction);
                 setDetailDialogOpen(true);
@@ -329,12 +247,13 @@ const AuctionManagementPage: React.FC = () => {
             >
               Chi tiết
             </Button>
-            {status !== "active" && (
+            {auction.status === "Upcoming" && (
               <>
                 <Button
                   size="small"
                   variant="outlined"
                   startIcon={<Edit size={16} />}
+                  onClick={() => navigate(`/admin/auctions/edit/${auction.id}`)}
                 >
                   Sửa
                 </Button>
@@ -354,6 +273,23 @@ const AuctionManagementPage: React.FC = () => {
     );
   };
 
+  if (isError) {
+    return (
+      <Box className="!min-h-screen !bg-slate-50 !flex !items-center !justify-center">
+        <Container maxWidth="sm">
+          <Alert severity="error" icon={<AlertCircle size={24} />}>
+            <Typography variant="h6" className="!font-bold !mb-2">
+              Có lỗi xảy ra
+            </Typography>
+            <Typography variant="body2">
+              Không thể tải danh sách đấu giá. Vui lòng thử lại sau.
+            </Typography>
+          </Alert>
+        </Container>
+      </Box>
+    );
+  }
+
   return (
     <Box className="!min-h-screen !bg-slate-50">
       <Container maxWidth="xl" className="!py-6">
@@ -364,25 +300,22 @@ const AuctionManagementPage: React.FC = () => {
               Quản lý buổi đấu giá
             </Typography>
           </Box>
-          <Button
-            variant="contained"
-            startIcon={<Plus size={20} />}
-            onClick={() => navigate("/admin/auctions/create")}
-            className="!bg-gradient-to-r !from-blue-500 !to-blue-600"
-          >
-            Tạo buổi đấu giá
-          </Button>
         </Box>
 
         {isLoading ? (
           <Box className="!flex !justify-center !items-center !py-12">
-            <CircularProgress />
+            <Box className="!text-center">
+              <CircularProgress size={60} className="!text-blue-500" />
+              <Typography variant="body2" className="!mt-4 !text-slate-600">
+                Đang tải danh sách đấu giá...
+              </Typography>
+            </Box>
           </Box>
         ) : (
           <Paper className="!rounded-2xl">
             <Tabs
               value={tabValue}
-              onChange={(e, newValue) => setTabValue(newValue)}
+              onChange={handleTabChange}
               className="!border-b !border-slate-200"
             >
               <Tab
@@ -394,6 +327,7 @@ const AuctionManagementPage: React.FC = () => {
                       label={upcomingAuctions.length}
                       size="small"
                       className="!ml-1"
+                      color="warning"
                     />
                   </Box>
                 }
@@ -473,10 +407,24 @@ const AuctionManagementPage: React.FC = () => {
                 </Box>
               )}
             </TabPanel>
+
+            {/* Pagination */}
+            {auctions.length > 0 && (
+              <Box className="!flex !justify-center !py-4 !border-t !border-slate-200">
+                <Pagination
+                  count={totalPages}
+                  page={page}
+                  onChange={handlePageChange}
+                  color="primary"
+                  size="large"
+                />
+              </Box>
+            )}
           </Paper>
         )}
       </Container>
 
+      {/* Detail Dialog */}
       <Dialog
         open={detailDialogOpen}
         onClose={() => setDetailDialogOpen(false)}
@@ -496,7 +444,7 @@ const AuctionManagementPage: React.FC = () => {
                   Tên sản phẩm
                 </Typography>
                 <Typography variant="body2" className="!font-semibold">
-                  {selectedAuction.listing.title}
+                  {selectedAuction.listing.title || "Không có tiêu đề"}
                 </Typography>
               </Box>
 
@@ -505,7 +453,7 @@ const AuctionManagementPage: React.FC = () => {
                   Mô tả
                 </Typography>
                 <Typography variant="body2" className="!text-slate-700">
-                  {selectedAuction.listing.description}
+                  {selectedAuction.listing.description || "Chưa có mô tả"}
                 </Typography>
               </Box>
 
@@ -516,7 +464,7 @@ const AuctionManagementPage: React.FC = () => {
                 <Box className="!flex !items-center !gap-2 !mt-1">
                   <User size={16} className="!text-slate-500" />
                   <Typography variant="body2" className="!font-semibold">
-                    {selectedAuction.seller.displayName}
+                    {selectedAuction.seller.displayName || "Không rõ"}
                   </Typography>
                 </Box>
                 {selectedAuction.seller.email && (
@@ -551,6 +499,29 @@ const AuctionManagementPage: React.FC = () => {
 
               <Box>
                 <Typography variant="caption" className="!text-slate-600">
+                  Giá hiện tại
+                </Typography>
+                <Typography
+                  variant="body2"
+                  className="!font-bold !text-emerald-600"
+                >
+                  {selectedAuction.currentPrice
+                    ? formatCurrency(selectedAuction.currentPrice)
+                    : formatCurrency(selectedAuction.startingPrice)}
+                </Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="caption" className="!text-slate-600">
+                  Số lượt đấu giá
+                </Typography>
+                <Typography variant="body2" className="!font-semibold">
+                  {selectedAuction.totalBids || 0} lượt
+                </Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="caption" className="!text-slate-600">
                   Thời gian bắt đầu
                 </Typography>
                 <Typography variant="body2" className="!font-semibold">
@@ -572,40 +543,12 @@ const AuctionManagementPage: React.FC = () => {
                   Trạng thái
                 </Typography>
                 <Box className="!mt-1">
-                  {getAuctionStatus(
-                    selectedAuction.startDate,
-                    selectedAuction.endDate
-                  ).status === "upcoming" && (
-                    <Chip
-                      label="Sắp diễn ra"
-                      color="warning"
-                      size="small"
-                      className="!font-semibold"
-                    />
-                  )}
-                  {getAuctionStatus(
-                    selectedAuction.startDate,
-                    selectedAuction.endDate
-                  ).status === "active" && (
-                    <Chip
-                      label="Đang diễn ra"
-                      color="success"
-                      size="small"
-                      className="!font-semibold"
-                      icon={<Zap size={14} />}
-                    />
-                  )}
-                  {getAuctionStatus(
-                    selectedAuction.startDate,
-                    selectedAuction.endDate
-                  ).status === "ended" && (
-                    <Chip
-                      label="Đã kết thúc"
-                      color="error"
-                      size="small"
-                      className="!font-semibold"
-                    />
-                  )}
+                  <Chip
+                    label={getStatusLabel(selectedAuction.status).label}
+                    color={getStatusLabel(selectedAuction.status).color as any}
+                    size="small"
+                    className="!font-semibold"
+                  />
                 </Box>
               </Box>
 
@@ -628,6 +571,14 @@ const AuctionManagementPage: React.FC = () => {
         )}
         <DialogActions>
           <Button onClick={() => setDetailDialogOpen(false)}>Đóng</Button>
+          {selectedAuction && (
+            <Button
+              variant="contained"
+              onClick={() => navigate(`/auctions/${selectedAuction.id}`)}
+            >
+              Xem phiên đấu giá
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
     </Box>

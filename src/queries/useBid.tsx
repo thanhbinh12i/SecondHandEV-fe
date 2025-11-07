@@ -7,10 +7,17 @@ export const usePostBidMutation = () => {
   });
 };
 
-export const useGetBidList = () => {
+export const useGetBidList = ({
+  id,
+  enabled,
+}: {
+  id: number;
+  enabled: boolean;
+}) => {
   return useQuery({
-    queryKey: ["bid"],
-    queryFn: () => bidApiRequests.bidList,
+    queryKey: ["bid", id],
+    queryFn: () => bidApiRequests.bidList(id),
+    enabled,
   });
 };
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -35,233 +35,20 @@ import {
   Plus,
   Sparkles,
 } from "lucide-react";
-import { AuctionResponse } from "src/types/auction.type";
 import { useGetAuctionList } from "src/queries/useAuction";
-
-interface AuctionWithBids extends AuctionResponse {
-  currentPrice?: number;
-  totalBids?: number;
-}
 
 const AuctionsPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState(0);
-  const [auctions, setAuctions] = useState<AuctionWithBids[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  const { data } = useGetAuctionList();
+  const {
+    data: apiResponse,
+    isLoading,
+    isError,
+  } = useGetAuctionList({ page: 1, pageSize: 20 });
 
-  console.log(data);
-  const isError = false;
-
-  useEffect(() => {
-    const loadAuctions = async () => {
-      try {
-        setIsLoading(true);
-
-        const mockAuctionsData: AuctionWithBids[] = [
-          {
-            id: 1,
-            listing: {
-              listingId: 101,
-              title: "Pin Lithium 72V 40Ah - Chính hãng Samsung",
-              description: "Pin lithium chất lượng cao, bảo hành 24 tháng",
-              price: 20000000,
-              listingType: "auction",
-            },
-            startingPrice: 15000000,
-            currentPrice: 18500000,
-            totalBids: 12,
-            startDate: new Date(
-              Date.now() - 2 * 24 * 60 * 60 * 1000
-            ).toISOString(),
-            endDate: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(),
-            status: "active",
-            seller: {
-              memberId: 1,
-              displayName: "Nguyễn Văn A",
-              email: "nguyenvana@example.com",
-            },
-          },
-          {
-            id: 2,
-            listing: {
-              listingId: 102,
-              title: "Xe đạp điện Giant E+ Pro - Như mới 98%",
-              description: "Xe đạp điện cao cấp, còn bảo hành",
-              price: 35000000,
-              listingType: "auction",
-            },
-            startingPrice: 25000000,
-            currentPrice: 32000000,
-            totalBids: 25,
-            startDate: new Date(
-              Date.now() - 1 * 24 * 60 * 60 * 1000
-            ).toISOString(),
-            endDate: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
-            status: "active",
-            seller: {
-              memberId: 2,
-              displayName: "Trần Thị B",
-              email: "tranthib@example.com",
-            },
-          },
-          {
-            id: 3,
-            listing: {
-              listingId: 103,
-              title: "Bộ pin 48V 20Ah cho xe đạp điện - LG cells",
-              description: "Pin LG chính hãng, dung lượng cao",
-              price: 10000000,
-              listingType: "auction",
-            },
-            startingPrice: 8500000,
-            currentPrice: 9200000,
-            totalBids: 8,
-            startDate: new Date(
-              Date.now() - 3 * 24 * 60 * 60 * 1000
-            ).toISOString(),
-            endDate: new Date(Date.now() + 1 * 60 * 60 * 1000).toISOString(),
-            status: "active",
-            seller: {
-              memberId: 3,
-              displayName: "Lê Văn C",
-              email: "levanc@example.com",
-            },
-          },
-          {
-            id: 4,
-            listing: {
-              listingId: 104,
-              title: "Xe điện Yadea V7 Pro - Bản cao cấp 2024",
-              description: "Xe điện Yadea mới 100%",
-              price: 22000000,
-              listingType: "auction",
-            },
-            startingPrice: 18000000,
-            startDate: new Date(
-              Date.now() + 2 * 24 * 60 * 60 * 1000
-            ).toISOString(),
-            endDate: new Date(
-              Date.now() + 5 * 24 * 60 * 60 * 1000
-            ).toISOString(),
-            status: "upcoming",
-            seller: {
-              memberId: 4,
-              displayName: "Phạm Thị D",
-              email: "phamthid@example.com",
-            },
-          },
-          {
-            id: 5,
-            listing: {
-              listingId: 105,
-              title: "Pin Tesla Powerwall 60V 50Ah",
-              description: "Pin Tesla công nghệ cao",
-              price: 15000000,
-              listingType: "auction",
-            },
-            startingPrice: 12000000,
-            startDate: new Date(
-              Date.now() + 1 * 24 * 60 * 60 * 1000
-            ).toISOString(),
-            endDate: new Date(
-              Date.now() + 4 * 24 * 60 * 60 * 1000
-            ).toISOString(),
-            status: "upcoming",
-            seller: {
-              memberId: 5,
-              displayName: "Hoàng Văn E",
-              email: "hoangvane@example.com",
-            },
-          },
-          {
-            id: 6,
-            listing: {
-              listingId: 106,
-              title: "Xe điện Vinfast Klara S - Đã qua sử dụng 6 tháng",
-              description: "Xe Vinfast còn mới, bảo hành đầy đủ",
-              price: 30000000,
-              listingType: "auction",
-            },
-            startingPrice: 22000000,
-            currentPrice: 28500000,
-            totalBids: 18,
-            startDate: new Date(
-              Date.now() - 7 * 24 * 60 * 60 * 1000
-            ).toISOString(),
-            endDate: new Date(
-              Date.now() - 1 * 24 * 60 * 60 * 1000
-            ).toISOString(),
-            status: "ended",
-            seller: {
-              memberId: 6,
-              displayName: "Vũ Thị F",
-              email: "vuthif@example.com",
-            },
-          },
-          {
-            id: 7,
-            listing: {
-              listingId: 107,
-              title: "Pin Panasonic 36V 15Ah - Còn 90% dung lượng",
-              description: "Pin Panasonic chất lượng tốt",
-              price: 8000000,
-              listingType: "auction",
-            },
-            startingPrice: 6500000,
-            currentPrice: 7800000,
-            totalBids: 15,
-            startDate: new Date(
-              Date.now() - 10 * 24 * 60 * 60 * 1000
-            ).toISOString(),
-            endDate: new Date(
-              Date.now() - 3 * 24 * 60 * 60 * 1000
-            ).toISOString(),
-            status: "ended",
-            seller: {
-              memberId: 7,
-              displayName: "Đỗ Văn G",
-              email: "dovang@example.com",
-            },
-          },
-          {
-            id: 8,
-            listing: {
-              listingId: 108,
-              title: "Xe đạp điện Specialized Turbo Vado 5.0",
-              description: "Xe đạp điện cao cấp nhất",
-              price: 40000000,
-              listingType: "auction",
-            },
-            startingPrice: 32000000,
-            currentPrice: 35000000,
-            totalBids: 20,
-            startDate: new Date(
-              Date.now() - 4 * 24 * 60 * 60 * 1000
-            ).toISOString(),
-            endDate: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
-            status: "active",
-            seller: {
-              memberId: 8,
-              displayName: "Bùi Thị H",
-              email: "buithih@example.com",
-            },
-          },
-        ];
-
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setAuctions(mockAuctionsData);
-      } catch (error) {
-        console.error("Error loading auctions:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadAuctions();
-  }, []);
+  const auctions = apiResponse?.data.data || [];
 
   const getTimeRemaining = (endDate: string): string => {
     const now = new Date().getTime();
@@ -300,7 +87,7 @@ const AuctionsPage: React.FC = () => {
 
   const getStatusBadge = (status: string | undefined) => {
     switch (status) {
-      case "active":
+      case "Active":
         return (
           <Chip
             label="Đang diễn ra"
@@ -309,7 +96,7 @@ const AuctionsPage: React.FC = () => {
             icon={<Zap size={14} className="!text-white" />}
           />
         );
-      case "upcoming":
+      case "Upcoming":
         return (
           <Chip
             label="Sắp diễn ra"
@@ -318,7 +105,7 @@ const AuctionsPage: React.FC = () => {
             icon={<Clock size={14} className="!text-white" />}
           />
         );
-      case "ended":
+      case "Ended":
         return (
           <Chip
             label="Đã kết thúc"
@@ -330,7 +117,7 @@ const AuctionsPage: React.FC = () => {
     }
   };
 
-  const statusMap = ["active", "upcoming", "ended"] as const;
+  const statusMap = ["Active", "Upcoming", "Ended"] as const;
   const currentStatus = statusMap[activeTab];
 
   const filteredByTab = auctions.filter(
@@ -341,15 +128,9 @@ const AuctionsPage: React.FC = () => {
     auction.listing.title?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const activeCount = auctions.filter((a) => a.status === "active").length;
-  const upcomingCount = auctions.filter((a) => a.status === "upcoming").length;
-  const endedCount = auctions.filter((a) => a.status === "ended").length;
-
-  const mockImages = [
-    "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800",
-    "https://images.unsplash.com/photo-1571333250630-f0230c320b6d?w=800",
-    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800",
-  ];
+  const activeCount = auctions.filter((a) => a.status === "Active").length;
+  const upcomingCount = auctions.filter((a) => a.status === "Upcoming").length;
+  const endedCount = auctions.filter((a) => a.status === "Ended").length;
 
   return (
     <Box className="!min-h-screen !bg-gradient-to-br !from-slate-50 !via-blue-50/30 !to-emerald-50/30">
@@ -560,7 +341,7 @@ const AuctionsPage: React.FC = () => {
                   const status = auction.status;
 
                   return (
-                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={auction.id}>
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
                       <Card className="!rounded-2xl !shadow-lg hover:!shadow-2xl !transition-all !duration-300 !h-full !flex !flex-col">
                         <CardActionArea
                           onClick={() => navigate(`/auctions/${auction.id}`)}
@@ -569,7 +350,10 @@ const AuctionsPage: React.FC = () => {
                           <Box className="!relative">
                             <CardMedia
                               component="img"
-                              image={mockImages[index % mockImages.length]}
+                              image={
+                                auction.listing.primaryImageURL ??
+                                "https://images.unsplash.com/photo-1571333250630-f0230c320b6d?w=800"
+                              }
                               alt={auction.listing.title}
                               className="!h-64 !object-cover"
                             />
