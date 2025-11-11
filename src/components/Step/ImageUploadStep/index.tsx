@@ -10,10 +10,14 @@ import {
   Chip,
   IconButton,
   Button,
+  Alert,
 } from "@mui/material";
 import { Upload, X } from "lucide-react";
-import { convertFileToBase64, compressImage } from "src/utils/utils";
 import { PostListingFormData } from "src/types/form.type";
+
+const CLOUDINARY_CLOUD_NAME = "dbyupgagn";
+const CLOUDINARY_UPLOAD_PRESET = "secondhandev_upload";
+const CLOUDINARY_FOLDER = "listings";
 
 interface ImageUploadStepProps {
   previewImages: string[];
@@ -28,6 +32,36 @@ const ImageUploadStep: React.FC<ImageUploadStepProps> = ({
   setFormData,
 }) => {
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string>("");
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+
+  const uploadToCloudinary = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+    formData.append("folder", CLOUDINARY_FOLDER);
+
+    try {
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || "Upload failed");
+      }
+
+      const data = await response.json();
+      return data.secure_url;
+    } catch (error) {
+      console.error("Cloudinary upload error:", error);
+      throw error;
+    }
+  };
 
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -36,30 +70,47 @@ const ImageUploadStep: React.FC<ImageUploadStepProps> = ({
     if (!files || files.length === 0) return;
 
     setUploading(true);
-    const newImages: string[] = [];
+    setUploadError("");
+    setUploadProgress(0);
+
+    const newCloudinaryUrls: string[] = [];
+    const newPreviewUrls: string[] = [];
+    const totalFiles = files.length;
 
     try {
-      for (const file of Array.from(files)) {
-        const compressedFile = await compressImage(file);
-        if (compressedFile) {
-          const base64String = await convertFileToBase64(compressedFile);
-          newImages.push(base64String);
-        } else {
-          const base64String = await convertFileToBase64(file);
-          newImages.push(base64String);
+      for (let i = 0; i < totalFiles; i++) {
+        const file = files[i];
+
+        if (!file.type.startsWith("image/")) {
+          throw new Error(`${file.name} không phải là file ảnh hợp lệ`);
         }
+
+        if (file.size > 10 * 1024 * 1024) {
+          throw new Error(`${file.name} vượt quá giới hạn 10MB`);
+        }
+
+        const cloudinaryUrl = await uploadToCloudinary(file);
+        newCloudinaryUrls.push(cloudinaryUrl);
+
+        newPreviewUrls.push(cloudinaryUrl);
+
+        setUploadProgress(Math.round(((i + 1) / totalFiles) * 100));
       }
-      setPreviewImages((prev) => [...prev, ...newImages]);
+
+      setPreviewImages((prev) => [...prev, ...newPreviewUrls]);
       setFormData((prev: any) => ({
         ...prev,
-        imageUrls: [...(prev.imageUrls || []), ...newImages],
-        primaryImageUrl: prev.primaryImageUrl || newImages[0],
+        imageUrls: [...(prev.imageUrls || []), ...newCloudinaryUrls],
+        primaryImageUrl: prev.primaryImageUrl || newCloudinaryUrls[0],
       }));
-    } catch (error) {
-      console.error("Error processing images:", error);
-      alert("Có lỗi khi tải ảnh lên. Vui lòng thử lại.");
+    } catch (error: any) {
+      console.error("Error uploading images:", error);
+      setUploadError(
+        error.message || "Có lỗi khi tải ảnh lên. Vui lòng thử lại."
+      );
     } finally {
       setUploading(false);
+      setUploadProgress(0);
       event.target.value = "";
     }
   };
@@ -94,6 +145,18 @@ const ImageUploadStep: React.FC<ImageUploadStepProps> = ({
         </Typography>
       </Grid>
 
+      {uploadError && (
+        <Grid size={{ xs: 12 }}>
+          <Alert
+            severity="error"
+            onClose={() => setUploadError("")}
+            className="mb-4"
+          >
+            {uploadError}
+          </Alert>
+        </Grid>
+      )}
+
       <Grid size={{ xs: 12 }}>
         <Paper
           className="border-2 border-dashed border-slate-300 hover:border-emerald-500 transition-colors cursor-pointer"
@@ -106,6 +169,7 @@ const ImageUploadStep: React.FC<ImageUploadStepProps> = ({
             onChange={handleImageUpload}
             style={{ display: "none" }}
             id="image-upload"
+            disabled={uploading}
           />
           <label htmlFor="image-upload" className="cursor-pointer">
             <div className="flex flex-col items-center gap-3">
@@ -117,10 +181,12 @@ const ImageUploadStep: React.FC<ImageUploadStepProps> = ({
                   variant="body1"
                   className="font-semibold text-slate-700"
                 >
-                  Nhấn để tải ảnh lên
+                  {uploading ? "Đang tải lên..." : "Nhấn để tải ảnh lên"}
                 </Typography>
                 <Typography variant="body2" className="text-slate-500">
-                  hoặc kéo thả ảnh vào đây
+                  {uploading
+                    ? `${uploadProgress}% hoàn thành`
+                    : "hoặc kéo thả ảnh vào đây"}
                 </Typography>
               </div>
               <Typography variant="caption" className="text-slate-400">
@@ -133,15 +199,22 @@ const ImageUploadStep: React.FC<ImageUploadStepProps> = ({
 
       {uploading && (
         <Grid size={{ xs: 12 }}>
-          <LinearProgress className="rounded-full" />
+          <LinearProgress
+            variant="determinate"
+            value={uploadProgress}
+            className="rounded-full"
+          />
           <Typography variant="caption" className="text-slate-600 mt-2">
-            Đang tải ảnh lên...
+            Đang tải {uploadProgress}%...
           </Typography>
         </Grid>
       )}
 
       {previewImages.length > 0 && (
         <Grid size={{ xs: 12 }}>
+          <Typography variant="body2" className="text-slate-600 mb-2">
+            Đã tải lên {previewImages.length} ảnh
+          </Typography>
           <Grid container spacing={2}>
             {previewImages.map((img, index) => (
               <Grid size={{ xs: 6, sm: 4, md: 3 }} key={index}>

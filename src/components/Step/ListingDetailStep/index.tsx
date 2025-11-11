@@ -391,7 +391,7 @@ const ListingDetailStep: React.FC<ListingDetailStepProps> = ({
             label="Loại tin"
             onChange={(e) => onFieldChange("listingType", e.target.value)}
           >
-            <MenuItem value="fixed">Mua ngay (3% phí giao dịch)</MenuItem>
+            <MenuItem value="sale">Mua ngay (3% phí giao dịch)</MenuItem>
             <MenuItem value="auction">Đấu giá (5% phí giao dịch)</MenuItem>
           </Select>
         </FormControl>
