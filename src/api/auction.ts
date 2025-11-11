@@ -13,6 +13,8 @@ const auctionApiRequests = {
   myAuctions: (params?: { page?: number; pageSize?: number }) =>
     http.get<AuctionListApiResponse>("auction/my", { params }),
   auctionById: (id: number) => http.get<AuctionApiResponse>(`auction/${id}`),
+  getAuctionByListingId: (listingId: number) =>
+    http.get(`auction/listing/${listingId}`),
 };
 
 export default auctionApiRequests;

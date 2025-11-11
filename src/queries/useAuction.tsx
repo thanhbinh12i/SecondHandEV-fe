@@ -40,3 +40,17 @@ export const useGetAuctionById = ({
     enabled,
   });
 };
+
+export const useGetAuctionByListingId = ({
+  listingId,
+  enabled = true,
+}: {
+  listingId: number;
+  enabled?: boolean;
+}) => {
+  return useQuery({
+    queryKey: ["auction-by-listing", listingId],
+    queryFn: () => auctionApiRequests.getAuctionByListingId(listingId),
+    enabled,
+  });
+};

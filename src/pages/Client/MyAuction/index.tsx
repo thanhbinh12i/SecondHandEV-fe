@@ -60,13 +60,13 @@ const MyAuctionsPage: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "active":
+      case "Active":
         return "!bg-emerald-100 !text-emerald-700";
-      case "upcoming":
+      case "Upcoming":
         return "!bg-blue-100 !text-blue-700";
-      case "completed":
+      case "Ended":
         return "!bg-slate-100 !text-slate-700";
-      case "cancelled":
+      case "Cancelled":
         return "!bg-red-100 !text-red-700";
       default:
         return "!bg-slate-100 !text-slate-700";
@@ -75,13 +75,13 @@ const MyAuctionsPage: React.FC = () => {
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case "active":
+      case "Active":
         return "Đang diễn ra";
-      case "upcoming":
+      case "Upcoming":
         return "Sắp diễn ra";
-      case "completed":
+      case "Ended":
         return "Đã kết thúc";
-      case "cancelled":
+      case "Cancelled":
         return "Đã hủy";
       default:
         return status;
@@ -219,7 +219,7 @@ const MyAuctionsPage: React.FC = () => {
                     Đang diễn ra
                   </Typography>
                   <Typography variant="h3" className="!font-bold">
-                    {auctions?.filter((a) => a.status === "active").length}
+                    {auctions?.filter((a) => a.status === "Active").length}
                   </Typography>
                 </Box>
                 <Zap size={48} className="!opacity-80" />
@@ -234,7 +234,7 @@ const MyAuctionsPage: React.FC = () => {
                     Sắp diễn ra
                   </Typography>
                   <Typography variant="h3" className="!font-bold">
-                    {auctions?.filter((a) => a.status === "upcoming").length}
+                    {auctions?.filter((a) => a.status === "Upcoming").length}
                   </Typography>
                 </Box>
                 <Clock size={48} className="!opacity-80" />
@@ -249,7 +249,7 @@ const MyAuctionsPage: React.FC = () => {
                     Đã kết thúc
                   </Typography>
                   <Typography variant="h3" className="!font-bold">
-                    {auctions?.filter((a) => a.status === "completed").length}
+                    {auctions?.filter((a) => a.status === "Ended").length}
                   </Typography>
                 </Box>
                 <Award size={48} className="!opacity-80" />
