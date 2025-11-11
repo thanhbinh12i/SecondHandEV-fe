@@ -20,7 +20,6 @@ import {
   ShoppingCart,
   Settings,
   BarChart3,
-  FileText,
   ChevronDown,
   ChevronRight,
   Menu,
@@ -71,37 +70,17 @@ const AdminSidebar: React.FC = () => {
       path: "/admin/batteries",
     },
     {
+      id: "auctions",
+      label: "Đấu giá",
+      icon: <BarChart3 size={20} />,
+      path: "/admin/auctions",
+    },
+    {
       id: "orders",
       label: "Đơn hàng",
       icon: <ShoppingCart size={20} />,
       path: "/admin/orders",
       badge: 23,
-    },
-    {
-      id: "reports",
-      label: "Báo cáo thống kê",
-      icon: <BarChart3 size={20} />,
-      path: "/admin/reports",
-      children: [
-        {
-          id: "revenue",
-          label: "Doanh thu",
-          icon: <BarChart3 size={18} />,
-          path: "/admin/reports/revenue",
-        },
-        {
-          id: "transactions",
-          label: "Giao dịch",
-          icon: <FileText size={18} />,
-          path: "/admin/reports/transactions",
-        },
-      ],
-    },
-    {
-      id: "settings",
-      label: "Cài đặt",
-      icon: <Settings size={20} />,
-      path: "/admin/settings",
     },
   ];
 

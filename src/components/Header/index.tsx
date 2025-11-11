@@ -27,6 +27,7 @@ const Header: React.FC = () => {
   const menuItems = [
     { label: "Mua xe", path: "/e-bikes" },
     { label: "Mua pin", path: "/batteries" },
+    { label: "Đấu giá", path: "/auctions" },
     { label: "Về chúng tôi", path: "/" },
     { label: "Liên hệ", path: "/" },
   ];
@@ -170,7 +171,6 @@ const Header: React.FC = () => {
                 )}
               </Box>
 
-              {/* Mobile Menu Button */}
               <IconButton
                 className="!block md:!hidden !text-slate-700 hover:!rotate-90 hover:!text-emerald-600 !transition-all !duration-300"
                 onClick={() => setMobileOpen(true)}
