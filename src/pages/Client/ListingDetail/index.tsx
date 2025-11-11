@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -37,6 +38,11 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useGetListingById } from "src/queries/useListing";
+import {
+  useCheckFavorite,
+  useFavoriteMutation,
+  useDeleteFavoriteMutation,
+} from "src/queries/useFavorite";
 
 const ListingDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -54,7 +60,42 @@ const ListingDetailPage: React.FC = () => {
     enabled: !!id,
   });
 
+  const { data: favoriteData, refetch: refetchFavorite } = useCheckFavorite({
+    id: Number(id),
+    enabled: !!id,
+  });
+
+  const favoriteMutation = useFavoriteMutation();
+  const deleteFavoriteMutation = useDeleteFavoriteMutation();
+
   const listing = data?.data;
+  const isFavorited = favoriteData?.data?.isFavorited;
+  const handleFavorite = async () => {
+    try {
+      if (isFavorited) {
+        await deleteFavoriteMutation.mutateAsync(Number(id));
+        setSnackbar({
+          open: true,
+          message: "Đã xóa khỏi danh sách yêu thích!",
+          severity: "error",
+        });
+      } else {
+        await favoriteMutation.mutateAsync(Number(id));
+        setSnackbar({
+          open: true,
+          message: "Đã thêm vào danh sách yêu thích!",
+          severity: "success",
+        });
+      }
+      refetchFavorite();
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Có lỗi xảy ra. Vui lòng thử lại!",
+        severity: "error",
+      });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -123,14 +164,6 @@ const ListingDetailPage: React.FC = () => {
     setSnackbar({
       open: true,
       message: "Đã gửi yêu cầu liên hệ đến người bán!",
-      severity: "success",
-    });
-  };
-
-  const handleFavorite = () => {
-    setSnackbar({
-      open: true,
-      message: "Đã thêm vào danh sách yêu thích!",
       severity: "success",
     });
   };
@@ -348,11 +381,22 @@ const ListingDetailPage: React.FC = () => {
                 <Box className="!flex !gap-2">
                   <Button
                     fullWidth
-                    variant="outlined"
-                    startIcon={<Heart size={20} />}
+                    variant={isFavorited ? "contained" : "outlined"}
+                    startIcon={
+                      <Heart size={20} fill={isFavorited ? "white" : "none"} />
+                    }
                     onClick={handleFavorite}
+                    disabled={
+                      favoriteMutation.isPending ||
+                      deleteFavoriteMutation.isPending
+                    }
+                    className={
+                      isFavorited
+                        ? "!bg-red-500 !text-white hover:!bg-red-600 !border-red-500"
+                        : ""
+                    }
                   >
-                    Yêu thích
+                    {isFavorited ? "Đã yêu thích" : "Yêu thích"}
                   </Button>
                   <Button
                     fullWidth

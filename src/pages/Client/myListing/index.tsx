@@ -30,7 +30,6 @@ import {
   Edit,
   Trash2,
   Eye,
-  EyeOff,
   Calendar,
   Plus,
   Gavel,
@@ -219,11 +218,6 @@ const MyListingsPage: React.FC = () => {
     }
   };
 
-  const handleToggleStatus = () => {
-    console.log("Toggle status:", selectedListing?.listingId);
-    handleMenuClose();
-  };
-
   const handleCreateAuction = (listing: ListingDto) => {
     navigate(`/auctions/create?id=${listing.listingId}`);
   };
@@ -240,15 +234,12 @@ const MyListingsPage: React.FC = () => {
       await convertToSaleMutation.mutateAsync({
         listingId: selectedListing.listingId,
         price: Number(convertPrice),
+        commissionPrice: Number(convertPrice) * 0.05,
       });
-
       await refetchListings();
-
       setConvertDialogOpen(false);
       setConvertPrice("");
-
       setSuccessDialog(true);
-
       setSelectedListing(null);
     } catch (error) {
       console.error("Error converting to sale:", error);
@@ -514,19 +505,6 @@ const MyListingsPage: React.FC = () => {
         <MenuItem onClick={handleEdit}>
           <Edit size={18} className="!mr-2" />
           Chỉnh sửa
-        </MenuItem>
-        <MenuItem onClick={handleToggleStatus}>
-          {selectedListing?.listingStatus === "active" ? (
-            <>
-              <EyeOff size={18} className="!mr-2" />
-              Ẩn tin
-            </>
-          ) : (
-            <>
-              <Eye size={18} className="!mr-2" />
-              Hiển thị
-            </>
-          )}
         </MenuItem>
         {selectedListing?.listingType === "auction" &&
           selectedListing?.listingStatus === "active" && (

@@ -7,6 +7,7 @@ import {
   UserCircle,
   Package,
   Gavel,
+  Heart,
 } from "lucide-react";
 import {
   Box,
@@ -84,6 +85,15 @@ const UserDropdown: React.FC = () => {
       onClick: () => {
         handleClose();
         navigate("/my-auctions");
+      },
+      badge: 3,
+    },
+    {
+      icon: <Heart className="w-5 h-5" />,
+      label: "Sản phẩm yếu thích",
+      onClick: () => {
+        handleClose();
+        navigate("/my-favorites");
       },
       badge: 3,
     },

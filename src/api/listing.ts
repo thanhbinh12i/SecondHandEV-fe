@@ -2,7 +2,6 @@ import {
   ConvertToSaleRequest,
   CreateBatteryListingRequest,
   CreateEbikeListingRequest,
-  ListingCreateRequest,
   ListingDto,
   ListingResponseDto,
   ListingSearchRequest,
@@ -12,8 +11,6 @@ import {
 import http from "src/utils/http";
 
 const listingApiRequests = {
-  postListing: (body: ListingCreateRequest) =>
-    http.post<{ listingId: number }>("Listings", body),
   listing: (params?: ListingSearchRequest) => {
     return http.get<ListingResponseDto>("Listings/search", { params });
   },
@@ -33,6 +30,7 @@ const listingApiRequests = {
     http.put(`/listings/${body.listingId}`, {
       listingType: "sale",
       price: body.price,
+      commissionPrice: body.commissionPrice,
       auctionStartingPrice: null,
       auctionStartDate: null,
       auctionEndDate: null,

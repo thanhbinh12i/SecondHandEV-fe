@@ -135,6 +135,9 @@ const CreateListingPage: React.FC = () => {
       return;
     }
 
+    const commissionPrice =
+      formData.listingType === "sale" ? formData.price * 0.03 : 0;
+
     try {
       if (formData.categoryId === 1) {
         const requestData = {
@@ -142,6 +145,7 @@ const CreateListingPage: React.FC = () => {
           description: formData.description,
           year: formData.year,
           price: formData.price,
+          commissionPrice: commissionPrice,
           listingType: formData.listingType,
           listingStatus: formData.listingStatus,
           primaryImageUrl: formData.primaryImageUrl,
@@ -161,6 +165,7 @@ const CreateListingPage: React.FC = () => {
           description: formData.description,
           year: formData.year,
           price: formData.price,
+          commissionPrice: commissionPrice,
           listingType: formData.listingType,
           listingStatus: formData.listingStatus,
           primaryImageUrl: formData.primaryImageUrl,
