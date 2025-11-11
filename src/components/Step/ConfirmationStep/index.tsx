@@ -122,9 +122,7 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
                 Loại tin:
               </Typography>
               <Chip
-                label={
-                  formData.listingType === "fixed" ? "Mua ngay" : "Đấu giá"
-                }
+                label={formData.listingType === "sale" ? "Mua ngay" : "Đấu giá"}
                 size="small"
                 className="bg-blue-100 text-blue-700"
               />
