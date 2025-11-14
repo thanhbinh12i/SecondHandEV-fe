@@ -1,21 +1,9 @@
-export interface ListingCreateRequest {
-  categoryId: number;
-  title: string;
-  description?: string;
-  year?: number;
-  price: number;
-  listingType?: string;
-  listingStatus?: string;
-  primaryImageUrl?: string;
-  imageUrls?: string[];
-  brand?: string;
-  model?: string;
-}
 export interface ListingUpdateRequest {
   title?: string;
   description?: string;
   year?: number;
   price: number;
+  commissionPrice?: number;
   listingType?: "sale" | "auction";
   listingStatus?: string;
   primaryImageUrl?: string;
@@ -47,6 +35,7 @@ export interface ListingUpdateRequest {
 export interface ConvertToSaleRequest {
   listingId: number;
   price: number;
+  commissionPrice: number;
 }
 export interface BatteryDetailDto {
   brand?: string;
@@ -89,6 +78,7 @@ export interface ListingDto {
   description?: string;
   year?: number;
   price?: number;
+  commissionPrice?: number;
   listingType?: string;
   listingStatus?: string;
   createdAt?: string;
@@ -130,6 +120,7 @@ export interface CreateBatteryListingRequest {
   description?: string;
   year?: number;
   price: number;
+  commissionPrice?: number;
   listingType?: string;
   listingStatus?: string;
   primaryImageUrl?: string;
@@ -148,6 +139,7 @@ export interface CreateEbikeListingRequest {
   description?: string;
   year?: number;
   price: number;
+  commissionPrice?: number;
   listingType?: string;
   listingStatus?: string;
   primaryImageUrl?: string;
