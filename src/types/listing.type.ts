@@ -2,7 +2,7 @@ export interface ListingUpdateRequest {
   title?: string;
   description?: string;
   year?: number;
-  price: number;
+  price?: number;
   commissionPrice?: number;
   listingType?: "sale" | "auction";
   listingStatus?: string;

@@ -66,7 +66,7 @@ const UserDropdown: React.FC = () => {
       label: "Đơn hàng",
       onClick: () => {
         handleClose();
-        //   navigate("/orders");
+        navigate("/my-orders");
       },
       badge: 3,
     },

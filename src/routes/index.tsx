@@ -22,6 +22,7 @@ import MyAuctionsPage from "src/pages/Client/MyAuction";
 import OrderPage from "src/pages/Client/OrderPage";
 import PaymentResult from "src/pages/Client/PaymentResult";
 import MyFavoritesPage from "src/pages/Client/MyFavorite";
+import MyOrders from "src/pages/Client/MyOrder";
 
 const RouteElements: React.FC = () => {
   const routeElements = useRoutes([
@@ -84,6 +85,10 @@ const RouteElements: React.FC = () => {
         {
           path: "my-favorites",
           element: <MyFavoritesPage />,
+        },
+        {
+          path: "my-orders",
+          element: <MyOrders />,
         },
       ],
     },

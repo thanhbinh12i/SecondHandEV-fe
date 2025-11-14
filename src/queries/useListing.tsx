@@ -6,12 +6,6 @@ import {
   UpdateListingStatusRequest,
 } from "src/types/listing.type";
 
-export const usePostListingMutation = () => {
-  return useMutation({
-    mutationFn: listingApiRequests.postListing,
-  });
-};
-
 export const useGetListing = (params?: ListingSearchRequest) => {
   return useQuery({
     queryKey: ["listings", params],
