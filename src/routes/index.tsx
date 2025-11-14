@@ -19,6 +19,8 @@ import AuctionsPage from "src/pages/Client/AuctionPage";
 import AuctionDetailPage from "src/pages/Client/AuctionDetail";
 import CreateAuctionPage from "src/pages/Client/CreateAution";
 import MyAuctionsPage from "src/pages/Client/MyAuction";
+import OrderPage from "src/pages/Client/OrderPage";
+import PaymentResult from "src/pages/Client/PaymentResult";
 
 const RouteElements: React.FC = () => {
   const routeElements = useRoutes([
@@ -69,6 +71,14 @@ const RouteElements: React.FC = () => {
         {
           path: "my-auctions",
           element: <MyAuctionsPage />,
+        },
+        {
+          path: "order/:id",
+          element: <OrderPage />,
+        },
+        {
+          path: "payment-result",
+          element: <PaymentResult />,
         },
       ],
     },

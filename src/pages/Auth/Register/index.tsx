@@ -16,6 +16,7 @@ import {
   Battery,
   Shield,
   CheckCircle,
+  ArrowLeft,
 } from "lucide-react";
 import {
   Box,
@@ -66,7 +67,7 @@ const RegisterPage: React.FC = () => {
     fullName: "",
     address: "",
     dateOfBirth: "",
-    role: "USER",
+    role: "User",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -150,11 +151,6 @@ const RegisterPage: React.FC = () => {
     <ThemeProvider theme={theme}>
       <style>
         {`
-          @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-          }
 
           @keyframes float {
             0%, 100% { transform: translate(0, 0) rotate(0deg); }
@@ -174,355 +170,337 @@ const RegisterPage: React.FC = () => {
         `}
       </style>
 
-      <Box
-        className="!min-h-screen !flex !items-center !py-8"
-        sx={{
-          background:
-            "linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%)",
-          backgroundSize: "400% 400%",
-          animation: "gradientShift 15s ease infinite",
-        }}
-      >
-        <Container maxWidth="lg">
-          <Paper
-            elevation={24}
-            className="!flex !rounded-3xl !overflow-hidden !min-h-[700px] !bg-white/98 !backdrop-blur-lg"
-          >
-            <Box
-              className="!flex-1 !bg-gradient-to-br !from-emerald-500 !to-blue-600 !p-12 !hidden md:!flex !flex-col !justify-center !text-white !relative !overflow-hidden"
-              sx={{
-                "&::before": {
-                  content: '""',
-                  position: "absolute",
-                  top: "-50%",
-                  right: "-50%",
-                  width: "200%",
-                  height: "200%",
-                  background:
-                    "radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)",
-                  animation: "float 20s ease-in-out infinite",
-                },
-              }}
-            >
-              <Box className="!relative !z-10">
-                <Box className="!flex !items-center !mb-8">
-                  <Box className="!bg-white/20 !p-4 !rounded-2xl !backdrop-blur-lg">
-                    <Zap size={40} />
-                  </Box>
-                  <Typography variant="h4" className="!ml-4 !font-bold">
-                    SecondHandEV
-                  </Typography>
+      <Box className="!min-h-screen">
+        <Paper
+          elevation={24}
+          className="!flex !overflow-hidden !min-h-screen !bg-white/98 !backdrop-blur-lg"
+        >
+          <Box className="!flex-1 !bg-gradient-to-br !from-emerald-500 !to-blue-600 !p-12 !hidden md:!flex !flex-col !justify-center !text-white !relative !overflow-hidden">
+            <Box className="!relative !z-10">
+              <Button
+                startIcon={<ArrowLeft size={20} />}
+                onClick={() => navigate(-1)}
+                className="!text-slate-100 hover:!bg-slate-500 !mb-4"
+              >
+                Quay lại
+              </Button>
+              <Box className="!flex !items-center !mb-8">
+                <Box className="!bg-white/20 !p-4 !rounded-2xl !backdrop-blur-lg">
+                  <Zap size={40} />
                 </Box>
-
-                <Typography variant="h5" className="!mb-6 !font-semibold">
-                  Nền tảng giao dịch xe điện & pin hàng đầu
-                </Typography>
-
-                <Typography
-                  variant="body1"
-                  className="!mb-8 !opacity-90 !leading-relaxed"
-                >
-                  Tham gia cùng hàng ngàn người dùng đã tin tưởng EVMarket để
-                  mua bán xe điện và pin một cách an toàn, nhanh chóng.
-                </Typography>
-
-                <Box className="!mt-12">
-                  {features.map((feature, index) => (
-                    <Box
-                      key={index}
-                      className="!flex !items-center !mb-6"
-                      sx={{
-                        animation: `slideInLeft 0.6s ease-out ${
-                          index * 0.1
-                        }s both`,
-                      }}
-                    >
-                      <Box className="!bg-white/20 !p-3 !rounded-xl !flex !mr-4">
-                        <feature.icon size={24} />
-                      </Box>
-                      <Typography className="!text-base">
-                        {feature.text}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
-
-                <Box className="!mt-12 !p-6 !bg-white/10 !rounded-xl !backdrop-blur-lg !border !border-white/20">
-                  <Typography variant="h6" className="!mb-2 !font-bold">
-                    2,500+ xe điện
-                  </Typography>
-                  <Typography variant="body2" className="!opacity-90">
-                    Được giao dịch thành công mỗi tháng
-                  </Typography>
-                </Box>
-              </Box>
-            </Box>
-
-            <Box className="!flex-1 !p-6 md:!p-8 !flex !flex-col !justify-center !max-h-screen !overflow-y-auto">
-              <Box className="!flex md:!hidden !items-center !justify-center !mb-6">
-                <Box className="!bg-gradient-to-br !from-emerald-500 !to-blue-600 !p-3 !rounded-xl">
-                  <Zap className="!text-white" size={32} />
-                </Box>
-                <Typography
-                  variant="h5"
-                  className="!ml-4 !font-bold !bg-gradient-to-r !from-emerald-500 !to-blue-600 !bg-clip-text !text-transparent"
-                >
+                <Typography variant="h4" className="!ml-4 !font-bold">
                   SecondHandEV
                 </Typography>
               </Box>
 
-              <Typography
-                variant="h4"
-                className="!mb-2 !font-bold !text-slate-900 !text-center"
-              >
-                Tạo tài khoản mới
+              <Typography variant="h5" className="!mb-6 !font-semibold">
+                Nền tảng giao dịch xe điện & pin hàng đầu
               </Typography>
 
               <Typography
-                variant="body2"
-                className="!mb-6 !text-slate-600 !text-center"
+                variant="body1"
+                className="!mb-8 !opacity-90 !leading-relaxed"
               >
-                Đăng ký để bắt đầu giao dịch
+                Tham gia cùng hàng ngàn người dùng đã tin tưởng SecondHandEV để
+                mua bán xe điện và pin một cách an toàn, nhanh chóng.
               </Typography>
 
-              {error && (
-                <Alert
-                  severity="error"
-                  className="!mb-4"
-                  onClose={() => setError("")}
-                >
-                  {error}
-                </Alert>
-              )}
+              <Box className="!mt-12">
+                {features.map((feature, index) => (
+                  <Box
+                    key={index}
+                    className="!flex !items-center !mb-6"
+                    sx={{
+                      animation: `slideInLeft 0.6s ease-out ${
+                        index * 0.1
+                      }s both`,
+                    }}
+                  >
+                    <Box className="!bg-white/20 !p-3 !rounded-xl !flex !mr-4">
+                      <feature.icon size={24} />
+                    </Box>
+                    <Typography className="!text-base">
+                      {feature.text}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
 
-              {success && (
-                <Alert
-                  severity="success"
-                  className="!mb-4"
-                  onClose={() => setSuccess("")}
-                >
-                  {success}
-                </Alert>
-              )}
-
-              <Box component="form" onSubmit={handleSubmit}>
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 12 }}>
-                    <TextField
-                      fullWidth
-                      required
-                      label="Email"
-                      name="email"
-                      type="email"
-                      value={registerData.email}
-                      onChange={handleChange}
-                      placeholder="example@email.com"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <Mail size={20} className="!text-slate-500" />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-
-                  <Grid size={{ xs: 12 }}>
-                    <TextField
-                      fullWidth
-                      required
-                      label="Tên hiển thị"
-                      name="displayName"
-                      value={registerData.displayName}
-                      onChange={handleChange}
-                      placeholder="VD: iEm Bình Nè"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <User size={20} className="!text-slate-500" />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-
-                  <Grid size={{ xs: 12 }}>
-                    <TextField
-                      fullWidth
-                      label="Họ và tên"
-                      name="fullName"
-                      value={registerData.fullName}
-                      onChange={handleChange}
-                      placeholder="VD: Nguyễn Văn A"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <User size={20} className="!text-slate-500" />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-
-                  <Grid size={{ xs: 12 }}>
-                    <TextField
-                      fullWidth
-                      label="Số điện thoại"
-                      name="phone"
-                      value={registerData.phone}
-                      onChange={handleChange}
-                      placeholder="0901234567"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <Phone size={20} className="!text-slate-500" />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-
-                  <Grid size={{ xs: 12 }}>
-                    <TextField
-                      fullWidth
-                      label="Địa chỉ"
-                      name="address"
-                      value={registerData.address}
-                      onChange={handleChange}
-                      placeholder="VD: 123 Đường ABC, Quận XYZ"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <MapPin size={20} className="!text-slate-500" />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-
-                  <Grid size={{ xs: 12 }}>
-                    <TextField
-                      fullWidth
-                      label="Ngày sinh"
-                      name="dateOfBirth"
-                      type="date"
-                      value={registerData.dateOfBirth}
-                      onChange={handleChange}
-                      InputLabelProps={{ shrink: true }}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <Calendar size={20} className="!text-slate-500" />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-
-                  <Grid size={{ xs: 12 }}>
-                    <TextField
-                      fullWidth
-                      required
-                      label="Mật khẩu"
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      value={registerData.password}
-                      onChange={handleChange}
-                      placeholder="Tối thiểu 6 ký tự"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <Lock size={20} className="!text-slate-500" />
-                          </InputAdornment>
-                        ),
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton
-                              onClick={() => setShowPassword(!showPassword)}
-                              edge="end"
-                            >
-                              {showPassword ? (
-                                <EyeOff size={20} />
-                              ) : (
-                                <Eye size={20} />
-                              )}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-
-                  <Grid size={{ xs: 12 }}>
-                    <TextField
-                      fullWidth
-                      required
-                      label="Xác nhận mật khẩu"
-                      name="confirmPassword"
-                      type={showConfirmPassword ? "text" : "password"}
-                      value={registerData.confirmPassword}
-                      onChange={handleChange}
-                      placeholder="Nhập lại mật khẩu"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <Lock size={20} className="!text-slate-500" />
-                          </InputAdornment>
-                        ),
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton
-                              onClick={() =>
-                                setShowConfirmPassword(!showConfirmPassword)
-                              }
-                              edge="end"
-                            >
-                              {showConfirmPassword ? (
-                                <EyeOff size={20} />
-                              ) : (
-                                <Eye size={20} />
-                              )}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                </Grid>
-
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  size="large"
-                  disabled={registerMutation.isPending}
-                  endIcon={<ArrowRight size={20} />}
-                  className="!mt-6 !bg-gradient-to-r !from-emerald-500 !to-blue-600 !py-3 !text-base !font-semibold !normal-case !shadow-xl hover:!shadow-2xl hover:!-translate-y-0.5 !transition-all !duration-300"
-                >
-                  {registerMutation.isPending ? "Đang đăng ký..." : "Đăng ký"}
-                </Button>
-
-                <Divider className="!my-6">
-                  <Typography variant="body2" className="!text-slate-500">
-                    HOẶC
-                  </Typography>
-                </Divider>
-
-                <Box className="!text-center">
-                  <Typography variant="body2" className="!text-slate-600">
-                    Đã có tài khoản?{" "}
-                    <MuiLink
-                      href="/auth/login"
-                      className="!text-emerald-600 !font-semibold !no-underline hover:!underline"
-                    >
-                      Đăng nhập
-                    </MuiLink>
-                  </Typography>
-                </Box>
+              <Box className="!mt-12 !p-6 !bg-white/10 !rounded-xl !backdrop-blur-lg !border !border-white/20">
+                <Typography variant="h6" className="!mb-2 !font-bold">
+                  2,500+ xe, pin xe điện
+                </Typography>
+                <Typography variant="body2" className="!opacity-90">
+                  Được giao dịch thành công mỗi tháng
+                </Typography>
               </Box>
             </Box>
-          </Paper>
-        </Container>
+          </Box>
+
+          <Box className="!flex-1 !p-6 md:!p-8 !flex !flex-col !justify-center !max-h-screen !overflow-y-auto">
+            <Box className="!flex md:!hidden !items-center !justify-center !mb-6">
+              <Box className="!bg-gradient-to-br !from-emerald-500 !to-blue-600 !p-3 !rounded-xl">
+                <Zap className="!text-white" size={32} />
+              </Box>
+              <Typography
+                variant="h5"
+                className="!ml-4 !font-bold !bg-gradient-to-r !from-emerald-500 !to-blue-600 !bg-clip-text !text-transparent"
+              >
+                SecondHandEV
+              </Typography>
+            </Box>
+
+            <Typography
+              variant="h4"
+              className="!mb-2 !font-bold !text-slate-900 !text-center"
+            >
+              Tạo tài khoản mới
+            </Typography>
+
+            <Typography
+              variant="body2"
+              className="!mb-6 !text-slate-600 !text-center"
+            >
+              Đăng ký để bắt đầu giao dịch
+            </Typography>
+
+            {error && (
+              <Alert
+                severity="error"
+                className="!mb-4"
+                onClose={() => setError("")}
+              >
+                {error}
+              </Alert>
+            )}
+
+            {success && (
+              <Alert
+                severity="success"
+                className="!mb-4"
+                onClose={() => setSuccess("")}
+              >
+                {success}
+              </Alert>
+            )}
+
+            <Box component="form" onSubmit={handleSubmit}>
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12 }}>
+                  <TextField
+                    fullWidth
+                    required
+                    label="Email"
+                    name="email"
+                    type="email"
+                    value={registerData.email}
+                    onChange={handleChange}
+                    placeholder="example@email.com"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Mail size={20} className="!text-slate-500" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12 }}>
+                  <TextField
+                    fullWidth
+                    required
+                    label="Tên hiển thị"
+                    name="displayName"
+                    value={registerData.displayName}
+                    onChange={handleChange}
+                    placeholder="VD: iEm Bình Nè"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <User size={20} className="!text-slate-500" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12 }}>
+                  <TextField
+                    fullWidth
+                    label="Họ và tên"
+                    name="fullName"
+                    value={registerData.fullName}
+                    onChange={handleChange}
+                    placeholder="VD: Nguyễn Văn A"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <User size={20} className="!text-slate-500" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12 }}>
+                  <TextField
+                    fullWidth
+                    label="Số điện thoại"
+                    name="phone"
+                    value={registerData.phone}
+                    onChange={handleChange}
+                    placeholder="0901234567"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Phone size={20} className="!text-slate-500" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12 }}>
+                  <TextField
+                    fullWidth
+                    label="Địa chỉ"
+                    name="address"
+                    value={registerData.address}
+                    onChange={handleChange}
+                    placeholder="VD: 123 Đường ABC, Quận XYZ"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <MapPin size={20} className="!text-slate-500" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12 }}>
+                  <TextField
+                    fullWidth
+                    label="Ngày sinh"
+                    name="dateOfBirth"
+                    type="date"
+                    value={registerData.dateOfBirth}
+                    onChange={handleChange}
+                    InputLabelProps={{ shrink: true }}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Calendar size={20} className="!text-slate-500" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12 }}>
+                  <TextField
+                    fullWidth
+                    required
+                    label="Mật khẩu"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    value={registerData.password}
+                    onChange={handleChange}
+                    placeholder="Tối thiểu 6 ký tự"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Lock size={20} className="!text-slate-500" />
+                        </InputAdornment>
+                      ),
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => setShowPassword(!showPassword)}
+                            edge="end"
+                          >
+                            {showPassword ? (
+                              <EyeOff size={20} />
+                            ) : (
+                              <Eye size={20} />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12 }}>
+                  <TextField
+                    fullWidth
+                    required
+                    label="Xác nhận mật khẩu"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={registerData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder="Nhập lại mật khẩu"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Lock size={20} className="!text-slate-500" />
+                        </InputAdornment>
+                      ),
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() =>
+                              setShowConfirmPassword(!showConfirmPassword)
+                            }
+                            edge="end"
+                          >
+                            {showConfirmPassword ? (
+                              <EyeOff size={20} />
+                            ) : (
+                              <Eye size={20} />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+              </Grid>
+
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                size="large"
+                disabled={registerMutation.isPending}
+                endIcon={<ArrowRight size={20} />}
+                className="!mt-6 !bg-gradient-to-r !from-emerald-500 !to-blue-600 !py-3 !text-base !font-semibold !normal-case !shadow-xl hover:!shadow-2xl hover:!-translate-y-0.5 !transition-all !duration-300"
+              >
+                {registerMutation.isPending ? "Đang đăng ký..." : "Đăng ký"}
+              </Button>
+
+              <Divider className="!my-6">
+                <Typography variant="body2" className="!text-slate-500">
+                  HOẶC
+                </Typography>
+              </Divider>
+
+              <Box className="!text-center">
+                <Typography variant="body2" className="!text-slate-600">
+                  Đã có tài khoản?{" "}
+                  <MuiLink
+                    href="/auth/login"
+                    className="!text-emerald-600 !font-semibold !no-underline hover:!underline"
+                  >
+                    Đăng nhập
+                  </MuiLink>
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+        </Paper>
       </Box>
     </ThemeProvider>
   );
