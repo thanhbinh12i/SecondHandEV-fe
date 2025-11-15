@@ -43,7 +43,10 @@ import {
   Bike,
 } from "lucide-react";
 import { ListingDto } from "src/types/listing.type";
-import { useGetListing } from "src/queries/useListing";
+import {
+  useDeleteListingMutation,
+  useGetListing,
+} from "src/queries/useListing";
 import { useUpdateStatusMutation } from "src/queries/useListing";
 
 const EBikeAllPage: React.FC = () => {
@@ -56,6 +59,7 @@ const EBikeAllPage: React.FC = () => {
     null
   );
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -64,6 +68,7 @@ const EBikeAllPage: React.FC = () => {
 
   const { data } = useGetListing({ categoryId: 2 });
   const updateStatusMutation = useUpdateStatusMutation();
+  const deleteListingMutation = useDeleteListingMutation();
 
   const DEFAULT_IMAGE =
     "https://images.unsplash.com/photo-1571333250630-f0230c320b6d?w=800&h=600&q=80";
@@ -170,6 +175,33 @@ const EBikeAllPage: React.FC = () => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleDelete = () => {
+    setDeleteDialogOpen(true);
+    handleMenuClose();
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedListing?.listingId) return;
+
+    try {
+      await deleteListingMutation.mutateAsync(selectedListing.listingId);
+
+      setSnackbar({
+        open: true,
+        message: "Đã xóa tin đăng thành công!",
+        severity: "success",
+      });
+      setDeleteDialogOpen(false);
+      setSelectedListing(null);
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Có lỗi xảy ra khi xóa tin đăng!",
+        severity: "error",
+      });
+    }
   };
 
   const handleViewDetail = () => {
@@ -416,11 +448,49 @@ const EBikeAllPage: React.FC = () => {
             <Eye size={18} className="!mr-2" />
             Xem chi tiết
           </MenuItem>
-          <MenuItem onClick={handleMenuClose} className="!text-red-600">
+          {selectedListing?.listingStatus === "pending" && (
+            <>
+              <MenuItem onClick={handleApprove} className="!text-emerald-600">
+                <CheckCircle size={18} className="!mr-2" />
+                Duyệt tin
+              </MenuItem>
+              <MenuItem onClick={handleReject} className="!text-red-600">
+                <AlertTriangle size={18} className="!mr-2" />
+                Từ chối
+              </MenuItem>
+            </>
+          )}
+          <MenuItem onClick={handleDelete} className="!text-red-600">
             <Trash2 size={18} className="!mr-2" />
             Xóa
           </MenuItem>
         </Menu>
+
+        <Dialog
+          open={deleteDialogOpen}
+          onClose={() => setDeleteDialogOpen(false)}
+          maxWidth="xs"
+          fullWidth
+        >
+          <DialogTitle className="!font-bold">Xác nhận xóa</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Bạn có chắc chắn muốn xóa tin đăng
+              <strong> {selectedListing?.title}</strong>?
+            </Typography>
+          </DialogContent>
+          <DialogActions className="!p-3">
+            <Button onClick={() => setDeleteDialogOpen(false)}>Hủy</Button>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={confirmDelete}
+              disabled={deleteListingMutation.isPending}
+            >
+              {deleteListingMutation.isPending ? "Đang xóa..." : "Xóa"}
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         <Dialog
           open={detailDialogOpen}

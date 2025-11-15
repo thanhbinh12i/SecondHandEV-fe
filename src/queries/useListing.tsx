@@ -2,14 +2,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import listingApiRequests from "src/api/listing";
 import {
   ListingSearchRequest,
+  ListingUpdateRequest,
   UpdateListingStatusRequest,
 } from "src/types/listing.type";
-
-export const usePostListingMutation = () => {
-  return useMutation({
-    mutationFn: listingApiRequests.postListing,
-  });
-};
 
 export const useGetListing = (params?: ListingSearchRequest) => {
   return useQuery({
@@ -30,9 +25,21 @@ export const usePostEbikeMutation = () => {
   });
 };
 
+export const useDeleteListingMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: listingApiRequests.deleteListing,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["listings"],
+      });
+    },
+  });
+};
+
 export const useGetMyListing = () => {
   return useQuery({
-    queryKey: ["listings"],
+    queryKey: ["my-listings"],
     queryFn: listingApiRequests.myListing,
   });
 };
@@ -63,6 +70,28 @@ export const useUpdateStatusMutation = () => {
     }) => listingApiRequests.updateStatus(id, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["listings"] });
+    },
+  });
+};
+
+export const useUpdateListingMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, body }: { id: number; body: ListingUpdateRequest }) =>
+      listingApiRequests.updateListing(id, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["listings"] });
+    },
+  });
+};
+
+export const useConvertToSaleMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: listingApiRequests.convertToSale,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my-listings"] });
     },
   });
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -22,6 +22,8 @@ import {
   TextField,
   InputAdornment,
   CircularProgress,
+  Alert,
+  Snackbar,
 } from "@mui/material";
 import {
   Search,
@@ -29,13 +31,78 @@ import {
   Edit,
   Trash2,
   Eye,
-  EyeOff,
   Calendar,
   Plus,
+  Gavel,
+  ShoppingCart,
+  AlertTriangle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ListingDto } from "src/types/listing.type";
-import { useGetMyListing } from "src/queries/useListing";
+import {
+  useDeleteListingMutation,
+  useGetMyListing,
+} from "src/queries/useListing";
+import { useConvertToSaleMutation } from "src/queries/useListing";
+import { useGetAuctionByListingId } from "src/queries/useAuction";
+
+const ListingAuctionButton: React.FC<{ listing: ListingDto }> = ({
+  listing,
+}) => {
+  const navigate = useNavigate();
+
+  const { data: auctionData, isLoading } = useGetAuctionByListingId({
+    listingId: listing.listingId,
+    enabled:
+      listing.listingType === "auction" && listing.listingStatus === "active",
+  });
+
+  const auction = auctionData?.data.data;
+
+  if (listing.listingType !== "auction" || listing.listingStatus !== "active") {
+    return null;
+  }
+
+  if (isLoading) {
+    return (
+      <Button
+        fullWidth
+        variant="contained"
+        disabled
+        className="!bg-slate-300 !rounded-xl"
+      >
+        <CircularProgress size={20} className="!mr-2" />
+        Đang tải...
+      </Button>
+    );
+  }
+
+  if (auction) {
+    return (
+      <Button
+        fullWidth
+        variant="contained"
+        startIcon={<Eye size={18} />}
+        onClick={() => navigate(`/auctions/${auction.id}`)}
+        className="!bg-gradient-to-r !from-blue-500 !to-indigo-600 !font-semibold !rounded-xl !shadow-lg hover:!shadow-xl"
+      >
+        Xem buổi đấu giá
+      </Button>
+    );
+  }
+
+  return (
+    <Button
+      fullWidth
+      variant="contained"
+      startIcon={<Gavel size={18} />}
+      onClick={() => navigate(`/auctions/create?id=${listing.listingId}`)}
+      className="!bg-gradient-to-r !from-purple-500 !to-pink-600 !font-semibold !rounded-xl !shadow-lg hover:!shadow-xl"
+    >
+      Tạo buổi đấu giá
+    </Button>
+  );
+};
 
 const MyListingsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -46,11 +113,42 @@ const MyListingsPage: React.FC = () => {
     null
   );
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const { data } = useGetMyListing();
+  const [convertDialogOpen, setConvertDialogOpen] = useState(false);
+  const [convertPrice, setConvertPrice] = useState("");
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success" as "success" | "error",
+  });
 
-  const isLoading = false;
+  const { data, isLoading, refetch: refetchListings } = useGetMyListing();
+  const convertToSaleMutation = useConvertToSaleMutation();
+  const deleteListingMutation = useDeleteListingMutation();
+
+  const { data: auctionData, isLoading: isAuctionLoading } =
+    useGetAuctionByListingId({
+      listingId: selectedListing?.listingId || 0,
+      enabled: !!selectedListing && selectedListing.listingType === "auction",
+    });
+
+  const auction = auctionData?.data.data;
+  const hasAuction = !!auction;
 
   const listings = data?.data.items || [];
+
+  useEffect(() => {
+    if (convertDialogOpen && auction) {
+      if (auction.status === "Ended") {
+        setConvertPrice(
+          auction.currentPrice?.toString() ||
+            selectedListing?.price?.toString() ||
+            ""
+        );
+      } else {
+        setConvertPrice(selectedListing?.price?.toString() || "");
+      }
+    }
+  }, [convertDialogOpen, auction, selectedListing]);
 
   const getStatusColor = (status?: string) => {
     switch (status) {
@@ -79,17 +177,6 @@ const MyListingsPage: React.FC = () => {
         return "Từ chối";
       default:
         return status || "Không xác định";
-    }
-  };
-
-  const getListingTypeLabel = (type?: string) => {
-    switch (type) {
-      case "fixed":
-        return "Giá cố định";
-      case "auction":
-        return "Đấu giá";
-      default:
-        return type || "";
     }
   };
 
@@ -131,18 +218,67 @@ const MyListingsPage: React.FC = () => {
   };
 
   const confirmDelete = async () => {
+    if (!selectedListing?.listingId) return;
+
     try {
-      console.log("Delete listing:", selectedListing?.listingId);
+      await deleteListingMutation.mutateAsync(selectedListing.listingId);
+
+      await refetchListings();
+
+      setSnackbar({
+        open: true,
+        message: "Đã xóa tin đăng thành công!",
+        severity: "success",
+      });
       setDeleteDialogOpen(false);
       setSelectedListing(null);
     } catch (error) {
       console.error("Error deleting listing:", error);
+      setSnackbar({
+        open: true,
+        message: "Có lỗi xảy ra khi xóa tin đăng!",
+        severity: "error",
+      });
     }
   };
 
-  const handleToggleStatus = () => {
-    console.log("Toggle status:", selectedListing?.listingId);
+  const handleCreateAuction = (listing: ListingDto) => {
+    navigate(`/auctions/create?id=${listing.listingId}`);
+  };
+
+  const handleOpenConvertDialog = () => {
+    setConvertDialogOpen(true);
     handleMenuClose();
+  };
+
+  const handleConvertToSale = async () => {
+    if (!selectedListing) return;
+
+    if (auction.status !== "Ended" || auction.status !== "Cancelled") return;
+
+    try {
+      await convertToSaleMutation.mutateAsync({
+        listingId: selectedListing.listingId,
+        price: Number(convertPrice),
+        commissionPrice: Number(convertPrice) * 0.05,
+      });
+      await refetchListings();
+      setConvertDialogOpen(false);
+      setConvertPrice("");
+      setSnackbar({
+        open: true,
+        message: "Chuyển đổi thành công!!",
+        severity: "success",
+      });
+      setSelectedListing(null);
+    } catch (error) {
+      console.error("Error converting to sale:", error);
+      setSnackbar({
+        open: true,
+        message: "Có lỗi xảy ra!",
+        severity: "error",
+      });
+    }
   };
 
   const formatDate = (dateString?: string) => {
@@ -153,6 +289,10 @@ const MyListingsPage: React.FC = () => {
       month: "2-digit",
       day: "2-digit",
     });
+  };
+
+  const isAuctionActive = () => {
+    return auction && auction.status === "Active";
   };
 
   if (isLoading) {
@@ -166,7 +306,6 @@ const MyListingsPage: React.FC = () => {
   return (
     <Box className="!min-h-screen !bg-gradient-to-br !from-slate-50 !to-slate-100 !py-8">
       <Container maxWidth="xl">
-        {/* Header */}
         <Box className="!mb-8">
           <Typography variant="h4" className="!font-bold !text-slate-900 !mb-2">
             Tin đăng của tôi
@@ -176,7 +315,6 @@ const MyListingsPage: React.FC = () => {
           </Typography>
         </Box>
 
-        {/* Stats Cards */}
         <Grid container spacing={3} className="!mb-8">
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Paper className="!p-6 !bg-gradient-to-br !from-emerald-500 !to-emerald-600 !text-white">
@@ -220,7 +358,6 @@ const MyListingsPage: React.FC = () => {
           </Grid>
         </Grid>
 
-        {/* Filter Section */}
         <Paper className="!p-4 !mb-6">
           <Box className="!flex !flex-col md:!flex-row !gap-4 !justify-between !items-center">
             <TextField
@@ -248,7 +385,6 @@ const MyListingsPage: React.FC = () => {
           </Box>
         </Paper>
 
-        {/* Tabs */}
         <Paper className="!mb-6">
           <Tabs
             value={tabValue}
@@ -268,7 +404,6 @@ const MyListingsPage: React.FC = () => {
           </Tabs>
         </Paper>
 
-        {/* Listings Grid */}
         {filteredListings.length === 0 ? (
           <Paper className="!p-12 !text-center">
             <Typography variant="h6" className="!text-slate-600 !mb-4">
@@ -292,7 +427,10 @@ const MyListingsPage: React.FC = () => {
                 size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
                 key={listing.listingId}
               >
-                <Card className="!rounded-2xl !shadow-lg hover:!shadow-2xl !transition-all !duration-300 hover:!scale-105">
+                <Card
+                  sx={{ height: 450 }}
+                  className="!rounded-2xl !shadow-lg hover:!shadow-2xl !transition-all !duration-300 hover:!scale-105"
+                >
                   <Box className="!relative">
                     <CardMedia
                       component="img"
@@ -311,6 +449,14 @@ const MyListingsPage: React.FC = () => {
                         listing.listingStatus
                       )} !font-semibold`}
                     />
+                    {listing.listingType === "auction" && (
+                      <Chip
+                        icon={<Gavel size={14} />}
+                        label="Đấu giá"
+                        size="small"
+                        className="!absolute !top-3 !left-24 !bg-purple-100 !text-purple-700 !font-semibold"
+                      />
+                    )}
                     <IconButton
                       size="small"
                       onClick={(e) => handleMenuOpen(e, listing)}
@@ -321,17 +467,14 @@ const MyListingsPage: React.FC = () => {
                   </Box>
 
                   <CardContent className="!p-4">
-                    <Typography
-                      variant="h6"
-                      className="!font-bold !text-slate-900 !mb-2 !line-clamp-2"
-                    >
+                    <Typography className="!h-5 !font-bold !text-slate-900 !mb-2 !line-clamp-2">
                       {listing.title}
                     </Typography>
 
                     {listing.description && (
                       <Typography
                         variant="body2"
-                        className="!text-slate-600 !mb-3 !line-clamp-2"
+                        className="!h-10 !text-slate-600 !mb-3 !line-clamp-2"
                       >
                         {listing.description}
                       </Typography>
@@ -362,26 +505,23 @@ const MyListingsPage: React.FC = () => {
                       )}
                     </Box>
 
-                    {listing.listingType && (
-                      <Box className="!mb-3">
-                        <Chip
-                          label={getListingTypeLabel(listing.listingType)}
-                          size="small"
-                          className="!bg-emerald-100 !text-emerald-700"
-                        />
+                    <Box className="!pt-3 !border-t !border-slate-200">
+                      <Box className="!flex !justify-between !items-center !mb-3">
+                        <Typography
+                          variant="h6"
+                          className="!h-10 !font-bold !text-emerald-600"
+                        >
+                          {listing.price?.toLocaleString() || 0} đ
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          className="!text-slate-500"
+                        >
+                          {formatDate(listing.createdAt)}
+                        </Typography>
                       </Box>
-                    )}
 
-                    <Box className="!flex !justify-between !items-center !pt-3 !border-t !border-slate-200">
-                      <Typography
-                        variant="h6"
-                        className="!font-bold !text-emerald-600"
-                      >
-                        {listing.price?.toLocaleString() || 0} đ
-                      </Typography>
-                      <Typography variant="caption" className="!text-slate-500">
-                        {formatDate(listing.createdAt)}
-                      </Typography>
+                      <ListingAuctionButton listing={listing} />
                     </Box>
                   </CardContent>
                 </Card>
@@ -391,7 +531,6 @@ const MyListingsPage: React.FC = () => {
         )}
       </Container>
 
-      {/* Context Menu */}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -401,26 +540,51 @@ const MyListingsPage: React.FC = () => {
           <Edit size={18} className="!mr-2" />
           Chỉnh sửa
         </MenuItem>
-        <MenuItem onClick={handleToggleStatus}>
-          {selectedListing?.listingStatus === "active" ? (
+        {selectedListing?.listingType === "auction" &&
+          selectedListing?.listingStatus === "active" && (
             <>
-              <EyeOff size={18} className="!mr-2" />
-              Ẩn tin
-            </>
-          ) : (
-            <>
-              <Eye size={18} className="!mr-2" />
-              Hiển thị
+              {hasAuction ? (
+                <MenuItem
+                  onClick={() => {
+                    handleMenuClose();
+                    if (auction) {
+                      navigate(`/auction/${auction.id}`);
+                    }
+                  }}
+                  className="!text-blue-600"
+                >
+                  <Eye size={18} className="!mr-2" />
+                  Xem buổi đấu giá
+                </MenuItem>
+              ) : (
+                <MenuItem
+                  onClick={() => {
+                    handleMenuClose();
+                    if (selectedListing) {
+                      handleCreateAuction(selectedListing);
+                    }
+                  }}
+                  className="!text-purple-600"
+                >
+                  <Gavel size={18} className="!mr-2" />
+                  Tạo đấu giá
+                </MenuItem>
+              )}
+              <MenuItem
+                onClick={handleOpenConvertDialog}
+                className="!text-blue-600"
+              >
+                <ShoppingCart size={18} className="!mr-2" />
+                Chuyển sang bán thường
+              </MenuItem>
             </>
           )}
-        </MenuItem>
         <MenuItem onClick={handleDelete} className="!text-red-600">
           <Trash2 size={18} className="!mr-2" />
           Xóa tin
         </MenuItem>
       </Menu>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
@@ -439,6 +603,125 @@ const MyListingsPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Dialog
+        open={convertDialogOpen}
+        onClose={() => setConvertDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle className="!font-bold !flex !items-center !gap-2">
+          <ShoppingCart size={24} className="!text-blue-600" />
+          Chuyển sang bán thường
+        </DialogTitle>
+        <DialogContent>
+          {isAuctionLoading ? (
+            <Box className="!py-8 !text-center">
+              <CircularProgress size={40} />
+              <Typography className="!mt-4 !text-slate-600">
+                Đang kiểm tra trạng thái đấu giá...
+              </Typography>
+            </Box>
+          ) : isAuctionActive() ? (
+            <Alert severity="error" icon={<AlertTriangle />} className="!mb-4">
+              <Typography className="!font-bold !mb-2">
+                Không thể chuyển đổi!
+              </Typography>
+              <Typography variant="body2">
+                Phiên đấu giá đang diễn ra (Status:{" "}
+                <strong>{auction?.status}</strong>). Bạn chỉ có thể chuyển sang
+                bán thường khi đấu giá đã kết thúc.
+              </Typography>
+            </Alert>
+          ) : (
+            <>
+              <Typography className="!mb-4 !text-slate-600">
+                Chuyển tin đăng "<strong>{selectedListing?.title}</strong>" từ{" "}
+                <Chip
+                  label="Đấu giá"
+                  size="small"
+                  className="!bg-purple-100 !text-purple-700"
+                />{" "}
+                sang{" "}
+                <Chip
+                  label="Bán thường"
+                  size="small"
+                  className="!bg-blue-100 !text-blue-700"
+                />
+              </Typography>
+
+              {auction?.status === "Ended" && (
+                <Alert severity="info" className="!mb-4">
+                  <Typography variant="body2" className="!font-semibold !mb-1">
+                    📊 Thông tin đấu giá
+                  </Typography>
+                  <Typography variant="body2">
+                    • Giá khởi điểm:{" "}
+                    <strong>{auction.startingPrice?.toLocaleString()}đ</strong>
+                  </Typography>
+                  <Typography variant="body2">
+                    • Giá cao nhất:{" "}
+                    <strong className="!text-emerald-600">
+                      {auction.currentPrice?.toLocaleString()}đ
+                    </strong>
+                  </Typography>
+                  <Typography variant="body2">
+                    • Tổng lượt đấu: <strong>{auction.totalBids}</strong>
+                  </Typography>
+                </Alert>
+              )}
+
+              <TextField
+                fullWidth
+                label="Giá bán"
+                type="number"
+                value={convertPrice}
+                onChange={(e) => setConvertPrice(e.target.value)}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">đ</InputAdornment>
+                  ),
+                }}
+                helperText={
+                  auction?.status === "Ended"
+                    ? `Giá được tự động điền = giá đấu giá cao nhất (${auction.currentPrice?.toLocaleString()}đ)`
+                    : "Nhập giá bán mong muốn"
+                }
+              />
+            </>
+          )}
+        </DialogContent>
+        <DialogActions className="!p-4">
+          <Button onClick={() => setConvertDialogOpen(false)}>Hủy</Button>
+          <Button
+            variant="contained"
+            onClick={handleConvertToSale}
+            disabled={
+              !convertPrice ||
+              Number(convertPrice) <= 0 ||
+              convertToSaleMutation.isPending ||
+              isAuctionActive()
+            }
+            className="!bg-blue-600"
+          >
+            {convertToSaleMutation.isPending ? (
+              <CircularProgress size={20} />
+            ) : (
+              <span className="!text-white">Xác nhận chuyển đổi</span>
+            )}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert severity={snackbar.severity} variant="filled">
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

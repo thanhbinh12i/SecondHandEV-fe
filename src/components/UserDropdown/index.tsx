@@ -5,6 +5,9 @@ import {
   ShoppingBag,
   ChevronDown,
   UserCircle,
+  Package,
+  Gavel,
+  Heart,
 } from "lucide-react";
 import {
   Box,
@@ -63,9 +66,32 @@ const UserDropdown: React.FC = () => {
       label: "Đơn hàng",
       onClick: () => {
         handleClose();
-        //   navigate("/orders");
+        navigate("/my-orders");
       },
-      badge: 3,
+    },
+    {
+      icon: <Package className="w-5 h-5" />,
+      label: "Tin đăng của tôi",
+      onClick: () => {
+        handleClose();
+        navigate("/my-listings");
+      },
+    },
+    {
+      icon: <Gavel className="w-5 h-5" />,
+      label: "Đấu giá của tôi",
+      onClick: () => {
+        handleClose();
+        navigate("/my-auctions");
+      },
+    },
+    {
+      icon: <Heart className="w-5 h-5" />,
+      label: "Sản phẩm yếu thích",
+      onClick: () => {
+        handleClose();
+        navigate("/my-favorites");
+      },
     },
     { divider: true },
     {
@@ -264,22 +290,6 @@ const UserDropdown: React.FC = () => {
               <ListItemText>
                 <span className="text-sm font-medium">{item.label}</span>
               </ListItemText>
-              {item.badge && (
-                <Badge
-                  badgeContent={item.badge}
-                  sx={{
-                    "& .MuiBadge-badge": {
-                      backgroundColor: "#10b981",
-                      color: "white",
-                      fontSize: "0.65rem",
-                      fontWeight: 700,
-                      minWidth: 20,
-                      height: 20,
-                      borderRadius: "10px",
-                    },
-                  }}
-                />
-              )}
             </MenuItem>
           );
         })}

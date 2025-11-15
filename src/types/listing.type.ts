@@ -1,30 +1,42 @@
-export interface ListingCreateRequest {
-  categoryId: number;
-  title: string;
-  description?: string;
-  year?: number;
-  price: number;
-  listingType?: string;
-  listingStatus?: string;
-  primaryImageUrl?: string;
-  imageUrls?: string[];
-  brand?: string;
-  model?: string;
-}
-
 export interface ListingUpdateRequest {
   title?: string;
   description?: string;
   year?: number;
-  price: number;
-  listingType?: string;
+  price?: number;
+  commissionPrice?: number;
+  listingType?: "sale" | "auction";
   listingStatus?: string;
   primaryImageUrl?: string;
   imageUrls?: string[];
   brand?: string;
   model?: string;
+  condition?: string;
+  weightKg?: number;
+
+  // Battery-only
+  voltage?: number;
+  capacityWh?: number;
+  ageYears?: number;
+
+  // Ebike-only
+  motorPowerW?: number;
+  batteryVoltage?: number;
+  rangeKm?: number;
+  frameSize?: string;
+  mileageKm?: number;
+  yearOfManufacture?: number;
+
+  // Auction parameters (when listingType = "auction")
+  auctionStartingPrice?: number;
+  auctionStartDate?: string;
+  auctionEndDate?: string;
 }
 
+export interface ConvertToSaleRequest {
+  listingId: number;
+  price: number;
+  commissionPrice: number;
+}
 export interface BatteryDetailDto {
   brand?: string;
   model?: string;
@@ -66,6 +78,7 @@ export interface ListingDto {
   description?: string;
   year?: number;
   price?: number;
+  commissionPrice?: number;
   listingType?: string;
   listingStatus?: string;
   createdAt?: string;
@@ -107,6 +120,7 @@ export interface CreateBatteryListingRequest {
   description?: string;
   year?: number;
   price: number;
+  commissionPrice?: number;
   listingType?: string;
   listingStatus?: string;
   primaryImageUrl?: string;
@@ -125,6 +139,7 @@ export interface CreateEbikeListingRequest {
   description?: string;
   year?: number;
   price: number;
+  commissionPrice?: number;
   listingType?: string;
   listingStatus?: string;
   primaryImageUrl?: string;
@@ -144,4 +159,23 @@ export interface CreateEbikeListingRequest {
 export interface UpdateListingStatusRequest {
   status: string;
   reason?: string;
+}
+
+export interface ListingAIInfo {
+  categoryId: number;
+  title: string;
+  description: string;
+  brand: string;
+  model: string;
+  year: number;
+  condition: string;
+  voltage?: number;
+  weightKg?: number;
+  capacityWh?: number;
+  ageYears?: number;
+  motorPowerW?: number;
+  batteryVoltage?: number;
+  rangeKm?: number;
+  mileageKm?: number;
+  frameSize?: string;
 }

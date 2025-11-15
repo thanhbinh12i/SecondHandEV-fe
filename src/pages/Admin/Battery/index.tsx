@@ -43,7 +43,10 @@ import {
   Battery,
 } from "lucide-react";
 import { ListingDto } from "src/types/listing.type";
-import { useGetListing } from "src/queries/useListing";
+import {
+  useDeleteListingMutation,
+  useGetListing,
+} from "src/queries/useListing";
 import { useUpdateStatusMutation } from "src/queries/useListing";
 
 const BatteryAllPage: React.FC = () => {
@@ -56,14 +59,16 @@ const BatteryAllPage: React.FC = () => {
     null
   );
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success" as "success" | "error",
   });
 
-  const { data } = useGetListing({ categoryId: 1 }); // categoryId 1 for batteries
+  const { data } = useGetListing({ categoryId: 1 });
   const updateStatusMutation = useUpdateStatusMutation();
+  const deleteListingMutation = useDeleteListingMutation();
 
   const DEFAULT_IMAGE =
     "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=800&h=600&q=80";
@@ -166,6 +171,33 @@ const BatteryAllPage: React.FC = () => {
   ) => {
     setAnchorEl(event.currentTarget);
     setSelectedListing(listing);
+  };
+
+  const handleDelete = () => {
+    setDeleteDialogOpen(true);
+    handleMenuClose();
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedListing?.listingId) return;
+
+    try {
+      await deleteListingMutation.mutateAsync(selectedListing.listingId);
+
+      setSnackbar({
+        open: true,
+        message: "Đã xóa tin đăng thành công!",
+        severity: "success",
+      });
+      setDeleteDialogOpen(false);
+      setSelectedListing(null);
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Có lỗi xảy ra khi xóa tin đăng!",
+        severity: "error",
+      });
+    }
   };
 
   const handleMenuClose = () => {
@@ -428,11 +460,37 @@ const BatteryAllPage: React.FC = () => {
               </MenuItem>
             </>
           )}
-          <MenuItem onClick={handleMenuClose} className="!text-red-600">
+          <MenuItem onClick={handleDelete} className="!text-red-600">
             <Trash2 size={18} className="!mr-2" />
             Xóa
           </MenuItem>
         </Menu>
+
+        <Dialog
+          open={deleteDialogOpen}
+          onClose={() => setDeleteDialogOpen(false)}
+          maxWidth="xs"
+          fullWidth
+        >
+          <DialogTitle className="!font-bold">Xác nhận xóa</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Bạn có chắc chắn muốn xóa tin đăng
+              <strong> {selectedListing?.title}</strong>?
+            </Typography>
+          </DialogContent>
+          <DialogActions className="!p-3">
+            <Button onClick={() => setDeleteDialogOpen(false)}>Hủy</Button>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={confirmDelete}
+              disabled={deleteListingMutation.isPending}
+            >
+              {deleteListingMutation.isPending ? "Đang xóa..." : "Xóa"}
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         <Dialog
           open={detailDialogOpen}
@@ -465,7 +523,6 @@ const BatteryAllPage: React.FC = () => {
                   </Typography>
                 </Grid>
 
-                {/* Battery Specs */}
                 {selectedListing.battery && (
                   <Grid size={{ xs: 12 }}>
                     <Paper className="!p-4 !bg-slate-50">

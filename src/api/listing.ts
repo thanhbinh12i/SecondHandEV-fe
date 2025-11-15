@@ -1,17 +1,16 @@
 import {
+  ConvertToSaleRequest,
   CreateBatteryListingRequest,
   CreateEbikeListingRequest,
-  ListingCreateRequest,
   ListingDto,
   ListingResponseDto,
   ListingSearchRequest,
+  ListingUpdateRequest,
   UpdateListingStatusRequest,
 } from "src/types/listing.type";
 import http from "src/utils/http";
 
 const listingApiRequests = {
-  postListing: (body: ListingCreateRequest) =>
-    http.post<{ listingId: number }>("Listings", body),
   listing: (params?: ListingSearchRequest) => {
     return http.get<ListingResponseDto>("Listings/search", { params });
   },
@@ -25,6 +24,18 @@ const listingApiRequests = {
   listingById: (id: number) => http.get<ListingDto>(`Listings/${id}`),
   updateStatus: (id: number, body: UpdateListingStatusRequest) =>
     http.put(`Listings/${id}/status`, body),
+  updateListing: (id: number, body: ListingUpdateRequest) =>
+    http.put(`Listings/${id}`, body),
+  deleteListing: (id: number) => http.delete(`Listings/${id}`),
+  convertToSale: (body: ConvertToSaleRequest) =>
+    http.put(`/listings/${body.listingId}`, {
+      listingType: "sale",
+      price: body.price,
+      commissionPrice: body.commissionPrice,
+      auctionStartingPrice: null,
+      auctionStartDate: null,
+      auctionEndDate: null,
+    }),
 };
 
 export default listingApiRequests;

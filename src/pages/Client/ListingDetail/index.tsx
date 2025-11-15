@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -23,7 +24,6 @@ import {
   ArrowLeft,
   Heart,
   Share2,
-  MessageCircle,
   MapPin,
   Calendar,
   Zap,
@@ -35,8 +35,14 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  ShoppingCart,
 } from "lucide-react";
 import { useGetListingById } from "src/queries/useListing";
+import {
+  useCheckFavorite,
+  useFavoriteMutation,
+  useDeleteFavoriteMutation,
+} from "src/queries/useFavorite";
 
 const ListingDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -54,7 +60,42 @@ const ListingDetailPage: React.FC = () => {
     enabled: !!id,
   });
 
+  const { data: favoriteData, refetch: refetchFavorite } = useCheckFavorite({
+    id: Number(id),
+    enabled: !!id,
+  });
+
+  const favoriteMutation = useFavoriteMutation();
+  const deleteFavoriteMutation = useDeleteFavoriteMutation();
+
   const listing = data?.data;
+  const isFavorited = favoriteData?.data?.isFavorited;
+  const handleFavorite = async () => {
+    try {
+      if (isFavorited) {
+        await deleteFavoriteMutation.mutateAsync(Number(id));
+        setSnackbar({
+          open: true,
+          message: "Đã xóa khỏi danh sách yêu thích!",
+          severity: "error",
+        });
+      } else {
+        await favoriteMutation.mutateAsync(Number(id));
+        setSnackbar({
+          open: true,
+          message: "Đã thêm vào danh sách yêu thích!",
+          severity: "success",
+        });
+      }
+      refetchFavorite();
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Có lỗi xảy ra. Vui lòng thử lại!",
+        severity: "error",
+      });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -95,6 +136,7 @@ const ListingDetailPage: React.FC = () => {
 
   const isBattery = listing.categoryId === 1;
   const isEBike = listing.categoryId === 2;
+  const isFixedPrice = listing.listingType === "sale";
 
   const imageUrls =
     listing.imageUrls && listing.imageUrls.length > 0
@@ -119,18 +161,14 @@ const ListingDetailPage: React.FC = () => {
     }
   };
 
+  const handleBuyNow = () => {
+    navigate(`/order/${id}`);
+  };
+
   const handleContact = () => {
     setSnackbar({
       open: true,
       message: "Đã gửi yêu cầu liên hệ đến người bán!",
-      severity: "success",
-    });
-  };
-
-  const handleFavorite = () => {
-    setSnackbar({
-      open: true,
-      message: "Đã thêm vào danh sách yêu thích!",
       severity: "success",
     });
   };
@@ -320,7 +358,7 @@ const ListingDetailPage: React.FC = () => {
                   <Typography variant="body2" className="!text-slate-600">
                     Loại tin:{" "}
                     <strong>
-                      {listing.listingType === "fixed" ? "Mua ngay" : "Đấu giá"}
+                      {listing.listingType === "sale" ? "Mua ngay" : "Đấu giá"}
                     </strong>
                   </Typography>
                 </Box>
@@ -335,31 +373,55 @@ const ListingDetailPage: React.FC = () => {
               <Divider className="!my-4" />
 
               <Box className="!space-y-2">
-                <Button
-                  fullWidth
-                  variant="contained"
-                  size="large"
-                  startIcon={<MessageCircle size={20} />}
-                  className="!bg-gradient-to-r !from-emerald-500 !to-green-600 !text-white !py-3"
-                  onClick={handleContact}
-                >
-                  Liên hệ người bán
-                </Button>
+                {isFixedPrice ? (
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    size="large"
+                    startIcon={<ShoppingCart size={20} />}
+                    className="!bg-gradient-to-r !from-emerald-500 !to-green-600 !text-white !py-3"
+                    onClick={handleBuyNow}
+                  >
+                    Mua ngay
+                  </Button>
+                ) : (
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    size="large"
+                    startIcon={<Share2 size={20} />}
+                    className="!bg-gradient-to-r !from-emerald-500 !to-green-600 !text-white !py-3"
+                    onClick={() => navigate(`/auctions`)}
+                  >
+                    Đấu giá
+                  </Button>
+                )}
                 <Box className="!flex !gap-2">
                   <Button
                     fullWidth
-                    variant="outlined"
-                    startIcon={<Heart size={20} />}
+                    variant={isFavorited ? "contained" : "outlined"}
+                    startIcon={
+                      <Heart size={20} fill={isFavorited ? "white" : "none"} />
+                    }
                     onClick={handleFavorite}
+                    disabled={
+                      favoriteMutation.isPending ||
+                      deleteFavoriteMutation.isPending
+                    }
+                    className={
+                      isFavorited
+                        ? "!bg-red-500 !text-white hover:!bg-red-600 !border-red-500"
+                        : ""
+                    }
                   >
-                    Yêu thích
+                    {isFavorited ? "Đã yêu thích" : "Yêu thích"}
                   </Button>
                   <Button
                     fullWidth
                     variant="outlined"
                     startIcon={<Share2 size={20} />}
                   >
-                    Chia sẻ
+                    Liên hệ người bán
                   </Button>
                 </Box>
               </Box>
