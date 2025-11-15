@@ -25,6 +25,18 @@ export const usePostEbikeMutation = () => {
   });
 };
 
+export const useDeleteListingMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: listingApiRequests.deleteListing,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["listings"],
+      });
+    },
+  });
+};
+
 export const useGetMyListing = () => {
   return useQuery({
     queryKey: ["my-listings"],

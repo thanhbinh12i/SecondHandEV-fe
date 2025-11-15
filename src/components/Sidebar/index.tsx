@@ -17,7 +17,6 @@ import {
   Users,
   Car,
   Battery,
-  ShoppingCart,
   Settings,
   BarChart3,
   ChevronDown,
@@ -74,13 +73,6 @@ const AdminSidebar: React.FC = () => {
       label: "Đấu giá",
       icon: <BarChart3 size={20} />,
       path: "/admin/auctions",
-    },
-    {
-      id: "orders",
-      label: "Đơn hàng",
-      icon: <ShoppingCart size={20} />,
-      path: "/admin/orders",
-      badge: 23,
     },
   ];
 

@@ -77,9 +77,6 @@ const LoginPage: React.FC = () => {
         localStorage.setItem("token", result.data.token ?? "");
         setIsAuthenticated(true);
         setProfile(result?.data?.member ?? null);
-        setTimeout(() => {
-          navigate("/");
-        }, 1500);
       } else {
         setError("Tài khoản và mật khẩu không đúng!");
       }

@@ -33,7 +33,7 @@ import {
   User,
 } from "lucide-react";
 import { AuctionResponse } from "src/types/auction.type";
-import { useGetMyAuctions } from "src/queries/useAuction";
+import { useGetAuctionList } from "src/queries/useAuction";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -64,7 +64,7 @@ const AuctionManagementPage: React.FC = () => {
     data: auctionData,
     isLoading,
     isError,
-  } = useGetMyAuctions({
+  } = useGetAuctionList({
     page: page,
     pageSize: pageSize,
   });

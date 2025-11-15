@@ -26,6 +26,7 @@ const listingApiRequests = {
     http.put(`Listings/${id}/status`, body),
   updateListing: (id: number, body: ListingUpdateRequest) =>
     http.put(`Listings/${id}`, body),
+  deleteListing: (id: number) => http.delete(`Listings/${id}`),
   convertToSale: (body: ConvertToSaleRequest) =>
     http.put(`/listings/${body.listingId}`, {
       listingType: "sale",
