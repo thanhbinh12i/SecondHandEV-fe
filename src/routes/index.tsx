@@ -23,6 +23,8 @@ import OrderPage from "src/pages/Client/OrderPage";
 import PaymentResult from "src/pages/Client/PaymentResult";
 import MyFavoritesPage from "src/pages/Client/MyFavorite";
 import MyOrders from "src/pages/Client/MyOrder";
+import PublicRoute from "./PublicRoute";
+import ProtectedRoute from "./ProtectedRoute";
 
 const RouteElements: React.FC = () => {
   const routeElements = useRoutes([
@@ -37,10 +39,6 @@ const RouteElements: React.FC = () => {
         {
           path: "post",
           element: <CreateListingPage />,
-        },
-        {
-          path: "my-listings",
-          element: <MyListingsPage />,
         },
         {
           path: "batteries",
@@ -63,38 +61,51 @@ const RouteElements: React.FC = () => {
           element: <AuctionDetailPage />,
         },
         {
-          path: "auctions/create/:id",
-          element: <CreateAuctionPage />,
-        },
-        {
-          path: "auctions/create",
-          element: <CreateAuctionPage />,
-        },
-        {
-          path: "my-auctions",
-          element: <MyAuctionsPage />,
-        },
-        {
-          path: "order/:id",
-          element: <OrderPage />,
-        },
-        {
-          path: "payment-result",
-          element: <PaymentResult />,
-        },
-        {
-          path: "my-favorites",
-          element: <MyFavoritesPage />,
-        },
-        {
-          path: "my-orders",
-          element: <MyOrders />,
+          element: <ProtectedRoute allowedRoles={["User"]} />,
+          children: [
+            {
+              path: "auctions/create/:id",
+              element: <CreateAuctionPage />,
+            },
+            {
+              path: "auctions/create",
+              element: <CreateAuctionPage />,
+            },
+            {
+              path: "my-auctions",
+              element: <MyAuctionsPage />,
+            },
+            {
+              path: "order/:id",
+              element: <OrderPage />,
+            },
+            {
+              path: "payment-result",
+              element: <PaymentResult />,
+            },
+            {
+              path: "my-listings",
+              element: <MyListingsPage />,
+            },
+            {
+              path: "my-favorites",
+              element: <MyFavoritesPage />,
+            },
+            {
+              path: "my-orders",
+              element: <MyOrders />,
+            },
+          ],
         },
       ],
     },
     {
       path: "auth",
-      element: <AuthLayout />,
+      element: (
+        <PublicRoute>
+          <AuthLayout />
+        </PublicRoute>
+      ),
       children: [
         {
           path: "login",
@@ -108,27 +119,32 @@ const RouteElements: React.FC = () => {
     },
     {
       path: "admin",
-      element: <AdminLayout />,
+      element: <ProtectedRoute allowedRoles={["Admin"]} />,
       children: [
         {
-          path: "dashboard",
-          element: <Dashboard />,
-        },
-        {
-          path: "users",
-          element: <UserManagement />,
-        },
-        {
-          path: "e-bikes",
-          element: <EBikeAllPage />,
-        },
-        {
-          path: "batteries",
-          element: <BatteryAllPage />,
-        },
-        {
-          path: "auctions",
-          element: <AuctionManagementPage />,
+          element: <AdminLayout />,
+          children: [
+            {
+              path: "dashboard",
+              element: <Dashboard />,
+            },
+            {
+              path: "users",
+              element: <UserManagement />,
+            },
+            {
+              path: "e-bikes",
+              element: <EBikeAllPage />,
+            },
+            {
+              path: "batteries",
+              element: <BatteryAllPage />,
+            },
+            {
+              path: "auctions",
+              element: <AuctionManagementPage />,
+            },
+          ],
         },
       ],
     },
