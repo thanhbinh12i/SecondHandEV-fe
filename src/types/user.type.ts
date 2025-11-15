@@ -8,6 +8,7 @@ export interface MemberDto {
   fullName?: string;
   address?: string;
   dateOfBirth?: string;
+  role: string;
   bio?: string;
 }
 

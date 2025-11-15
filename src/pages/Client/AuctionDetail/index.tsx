@@ -61,8 +61,8 @@ const AuctionDetailPage: React.FC = () => {
 
   const { data: bidData, refetch: refetchBids } = useGetBidList({
     id: Number(id),
-    enabled: !!id && auction?.status === "Active",
-    refetchInterval: auction?.status === "Active" ? 5000 : false,
+    enabled: !!id,
+    refetchInterval: 10000,
     refetchIntervalInBackground: false,
   });
 

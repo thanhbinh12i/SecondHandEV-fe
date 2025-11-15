@@ -391,7 +391,7 @@ const ListingDetailPage: React.FC = () => {
                     size="large"
                     startIcon={<Share2 size={20} />}
                     className="!bg-gradient-to-r !from-emerald-500 !to-green-600 !text-white !py-3"
-                    onClick={handleContact}
+                    onClick={() => navigate(`/auctions`)}
                   >
                     Đấu giá
                   </Button>
@@ -421,7 +421,7 @@ const ListingDetailPage: React.FC = () => {
                     variant="outlined"
                     startIcon={<Share2 size={20} />}
                   >
-                    Chia sẻ
+                    Liên hệ người bán
                   </Button>
                 </Box>
               </Box>

@@ -23,6 +23,7 @@ import {
   InputAdornment,
   CircularProgress,
   Alert,
+  Snackbar,
 } from "@mui/material";
 import {
   Search,
@@ -38,7 +39,10 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ListingDto } from "src/types/listing.type";
-import { useGetMyListing } from "src/queries/useListing";
+import {
+  useDeleteListingMutation,
+  useGetMyListing,
+} from "src/queries/useListing";
 import { useConvertToSaleMutation } from "src/queries/useListing";
 import { useGetAuctionByListingId } from "src/queries/useAuction";
 
@@ -111,10 +115,15 @@ const MyListingsPage: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [convertDialogOpen, setConvertDialogOpen] = useState(false);
   const [convertPrice, setConvertPrice] = useState("");
-  const [successDialog, setSuccessDialog] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success" as "success" | "error",
+  });
 
   const { data, isLoading, refetch: refetchListings } = useGetMyListing();
   const convertToSaleMutation = useConvertToSaleMutation();
+  const deleteListingMutation = useDeleteListingMutation();
 
   const { data: auctionData, isLoading: isAuctionLoading } =
     useGetAuctionByListingId({
@@ -209,12 +218,27 @@ const MyListingsPage: React.FC = () => {
   };
 
   const confirmDelete = async () => {
+    if (!selectedListing?.listingId) return;
+
     try {
-      console.log("Delete listing:", selectedListing?.listingId);
+      await deleteListingMutation.mutateAsync(selectedListing.listingId);
+
+      await refetchListings();
+
+      setSnackbar({
+        open: true,
+        message: "Đã xóa tin đăng thành công!",
+        severity: "success",
+      });
       setDeleteDialogOpen(false);
       setSelectedListing(null);
     } catch (error) {
       console.error("Error deleting listing:", error);
+      setSnackbar({
+        open: true,
+        message: "Có lỗi xảy ra khi xóa tin đăng!",
+        severity: "error",
+      });
     }
   };
 
@@ -230,6 +254,8 @@ const MyListingsPage: React.FC = () => {
   const handleConvertToSale = async () => {
     if (!selectedListing) return;
 
+    if (auction.status !== "Ended" || auction.status !== "Cancelled") return;
+
     try {
       await convertToSaleMutation.mutateAsync({
         listingId: selectedListing.listingId,
@@ -239,11 +265,19 @@ const MyListingsPage: React.FC = () => {
       await refetchListings();
       setConvertDialogOpen(false);
       setConvertPrice("");
-      setSuccessDialog(true);
+      setSnackbar({
+        open: true,
+        message: "Chuyển đổi thành công!!",
+        severity: "success",
+      });
       setSelectedListing(null);
     } catch (error) {
       console.error("Error converting to sale:", error);
-      alert("Có lỗi xảy ra khi chuyển đổi. Vui lòng thử lại!");
+      setSnackbar({
+        open: true,
+        message: "Có lỗi xảy ra!",
+        severity: "error",
+      });
     }
   };
 
@@ -678,40 +712,16 @@ const MyListingsPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
-      <Dialog
-        open={successDialog}
-        onClose={() => setSuccessDialog(false)}
-        maxWidth="xs"
-        fullWidth
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        <DialogContent className="!pt-8 !pb-6">
-          <Box className="!text-center">
-            <Box className="!mb-4 !flex !justify-center">
-              <Box className="!w-20 !h-20 !rounded-full !bg-emerald-100 !flex !items-center !justify-center">
-                <ShoppingCart size={40} className="!text-emerald-600" />
-              </Box>
-            </Box>
-            <Typography
-              variant="h5"
-              className="!font-bold !mb-2 !text-slate-900"
-            >
-              Chuyển đổi thành công!
-            </Typography>
-            <Typography className="!text-slate-600 !mb-4">
-              Tin đăng đã được chuyển sang <strong>Bán thường</strong>
-            </Typography>
-            <Button
-              fullWidth
-              variant="contained"
-              onClick={() => setSuccessDialog(false)}
-              className="!bg-gradient-to-r !from-emerald-500 !to-blue-600 !rounded-xl !py-3"
-            >
-              Đóng
-            </Button>
-          </Box>
-        </DialogContent>
-      </Dialog>
+        <Alert severity={snackbar.severity} variant="filled">
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

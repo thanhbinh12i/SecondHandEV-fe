@@ -549,9 +549,9 @@ const AuctionsPage: React.FC = () => {
                                   : "!bg-gradient-to-r !from-slate-400 !to-slate-500"
                               }`}
                             >
-                              {status === "active"
+                              {status === "Active"
                                 ? "Tham gia đấu giá"
-                                : status === "upcoming"
+                                : status === "Upcoming"
                                 ? "Xem chi tiết"
                                 : "Xem kết quả"}
                             </Button>

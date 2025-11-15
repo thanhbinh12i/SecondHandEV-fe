@@ -4,18 +4,13 @@ import {
   Container,
   Typography,
   Button,
-  TextField,
-  InputAdornment,
   Grid,
   Card,
   CardMedia,
   CardContent,
   Chip,
-  Tab,
-  Tabs,
 } from "@mui/material";
 import {
-  Search,
   Zap,
   Shield,
   TrendingUp,
@@ -31,8 +26,6 @@ import {
 } from "lucide-react";
 
 const HomePage: React.FC = () => {
-  const [searchType, setSearchType] = useState(0);
-  const [searchQuery, setSearchQuery] = useState("");
   const [visibleSections, setVisibleSections] = useState<
     Record<string, boolean>
   >({});
@@ -234,7 +227,7 @@ const HomePage: React.FC = () => {
         `}
       </style>
 
-      <Box className="!relative !overflow-hidden !pt-10 !pb-20">
+      <Box className="!relative !overflow-hidden !pt-20 !pb-20">
         <Container maxWidth="lg">
           <Box
             className="!text-center !mb-12"
@@ -256,128 +249,7 @@ const HomePage: React.FC = () => {
               công nghệ AI định giá thông minh
             </Typography>
           </Box>
-
-          <Box
-            className="!max-w-4xl !mx-auto"
-            sx={{ animation: "fadeInUp 0.8s ease-out 0.2s both" }}
-          >
-            <Card className="!rounded-2xl !shadow-2xl !border !border-slate-200">
-              <CardContent className="!p-6">
-                <Tabs
-                  value={searchType}
-                  onChange={(_, newValue) => setSearchType(newValue)}
-                  className="!mb-6"
-                  sx={{
-                    "& .MuiTab-root": {
-                      flex: 1,
-                      borderRadius: "12px",
-                      fontWeight: 600,
-                      textTransform: "none",
-                      fontSize: "1rem",
-                    },
-                    "& .Mui-selected": {
-                      background: "linear-gradient(to right, #10b981, #3b82f6)",
-                      color: "white !important",
-                    },
-                  }}
-                >
-                  <Tab
-                    icon={<Car size={20} />}
-                    iconPosition="start"
-                    label="Tìm xe điện"
-                  />
-                  <Tab
-                    icon={<Battery size={20} />}
-                    iconPosition="start"
-                    label="Tìm pin"
-                  />
-                </Tabs>
-
-                <Box className="!flex !gap-3">
-                  <TextField
-                    fullWidth
-                    placeholder={
-                      searchType === 0
-                        ? "Tìm theo hãng, model, năm..."
-                        : "Tìm theo dung lượng, loại pin..."
-                    }
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Search size={24} className="!text-slate-400" />
-                        </InputAdornment>
-                      ),
-                    }}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: "12px",
-                        "& fieldset": {
-                          borderColor: "#cbd5e1",
-                        },
-                        "&:hover fieldset": {
-                          borderColor: "#10b981",
-                        },
-                        "&.Mui-focused fieldset": {
-                          borderColor: "#10b981",
-                        },
-                      },
-                    }}
-                  />
-                  <Button
-                    variant="contained"
-                    className="!px-8 !rounded-xl !whitespace-nowrap"
-                    sx={{
-                      background: "linear-gradient(to right, #10b981, #3b82f6)",
-                      textTransform: "none",
-                      fontWeight: 600,
-                      fontSize: "1rem",
-                      "&:hover": {
-                        transform: "scale(1.05)",
-                        boxShadow: "0 10px 25px rgba(16, 185, 129, 0.3)",
-                      },
-                      transition: "all 0.3s",
-                    }}
-                  >
-                    Tìm kiếm
-                  </Button>
-                </Box>
-
-                <Box className="!flex !flex-wrap !gap-2 !mt-4">
-                  <Typography className="!text-sm !text-slate-800 !font-bold !pt-1">
-                    Phổ biến:
-                  </Typography>
-                  {[
-                    "Tesla Model 3",
-                    "VinFast VF8",
-                    "Pin LFP 60kWh",
-                    "Hyundai Kona",
-                  ].map((tag) => (
-                    <Chip
-                      key={tag}
-                      label={tag}
-                      size="small"
-                      className="hover:!bg-emerald-100 hover:!text-emerald-700 !cursor-pointer"
-                      sx={{
-                        transition: "all 0.3s",
-                        "&:hover": {
-                          transform: "scale(1.1)",
-                        },
-                      }}
-                    />
-                  ))}
-                </Box>
-              </CardContent>
-            </Card>
-          </Box>
         </Container>
-
-        <Box className="!absolute !top-20 !left-10 !w-72 !h-72 !bg-emerald-300 !rounded-full !mix-blend-multiply !blur-3xl !opacity-20 !animate-pulse" />
-        <Box
-          className="!absolute !bottom-20 !right-10 !w-72 !h-72 !bg-blue-300 !rounded-full !mix-blend-multiply !blur-3xl !opacity-20 !animate-pulse"
-          sx={{ animationDelay: "1s" }}
-        />
       </Box>
 
       <Box

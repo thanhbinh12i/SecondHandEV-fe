@@ -60,7 +60,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, isSeller }) => {
               <Box>
                 <Typography
                   variant="h6"
-                  className="font-bold text-gray-800 mb-1"
+                  className="!font-bold text-gray-800 mb-1"
                 >
                   {order.listing.title}
                 </Typography>
@@ -93,23 +93,21 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, isSeller }) => {
               >
                 {isSeller ? (
                   <>
-                    <User size={16} className="text-emerald-600" />
-                    Người mua
+                    <User size={16} className="text-emerald-600 " />
+                    <p className="text-emerald-600 font-bold">
+                      Người mua: {contactPerson.displayName}
+                    </p>
                   </>
                 ) : (
                   <>
                     <Store size={16} className="text-blue-600" />
-                    Người bán
+                    <p className="text-blue-600 font-bold">
+                      Người bán: {contactPerson.displayName}
+                    </p>
                   </>
                 )}
               </Typography>
               <Box className="space-y-1">
-                <Typography
-                  variant="body2"
-                  className="text-gray-700 font-medium"
-                >
-                  {contactPerson.displayName}
-                </Typography>
                 <Typography
                   variant="body2"
                   className="text-gray-600 flex items-center gap-1"

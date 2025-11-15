@@ -65,9 +65,8 @@ const MyOrders: React.FC = () => {
   const sellerOrders = sellerOrdersData?.data?.data || [];
 
   return (
-    <Box className="min-h-screen bg-gradient-to-br from-emerald-50 to-blue-50 py-8">
+    <Box className="min-h-screen !bg-gradient-to-br !from-emerald-100  !to-blue-200 py-8">
       <Container maxWidth="lg">
-        {/* Header */}
         <Box className="mb-6">
           <Typography variant="h4" className="font-bold text-gray-800 mb-2">
             Đơn hàng của tôi
@@ -77,7 +76,6 @@ const MyOrders: React.FC = () => {
           </Typography>
         </Box>
 
-        {/* Tabs */}
         <Card className="mb-4">
           <Tabs
             value={tabValue}
@@ -102,7 +100,6 @@ const MyOrders: React.FC = () => {
           </Tabs>
         </Card>
 
-        {/* Buyer Orders Tab */}
         <TabPanel value={tabValue} index={0}>
           {buyerLoading ? (
             <Box className="flex justify-center py-12">
@@ -121,7 +118,6 @@ const MyOrders: React.FC = () => {
           )}
         </TabPanel>
 
-        {/* Seller Orders Tab */}
         <TabPanel value={tabValue} index={1}>
           {sellerLoading ? (
             <Box className="flex justify-center py-12">

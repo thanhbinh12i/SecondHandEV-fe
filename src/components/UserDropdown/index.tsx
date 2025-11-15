@@ -68,7 +68,6 @@ const UserDropdown: React.FC = () => {
         handleClose();
         navigate("/my-orders");
       },
-      badge: 3,
     },
     {
       icon: <Package className="w-5 h-5" />,
@@ -77,7 +76,6 @@ const UserDropdown: React.FC = () => {
         handleClose();
         navigate("/my-listings");
       },
-      badge: 12,
     },
     {
       icon: <Gavel className="w-5 h-5" />,
@@ -86,7 +84,6 @@ const UserDropdown: React.FC = () => {
         handleClose();
         navigate("/my-auctions");
       },
-      badge: 3,
     },
     {
       icon: <Heart className="w-5 h-5" />,
@@ -95,7 +92,6 @@ const UserDropdown: React.FC = () => {
         handleClose();
         navigate("/my-favorites");
       },
-      badge: 3,
     },
     { divider: true },
     {
@@ -294,22 +290,6 @@ const UserDropdown: React.FC = () => {
               <ListItemText>
                 <span className="text-sm font-medium">{item.label}</span>
               </ListItemText>
-              {item.badge && (
-                <Badge
-                  badgeContent={item.badge}
-                  sx={{
-                    "& .MuiBadge-badge": {
-                      backgroundColor: "#10b981",
-                      color: "white",
-                      fontSize: "0.65rem",
-                      fontWeight: 700,
-                      minWidth: 20,
-                      height: 20,
-                      borderRadius: "10px",
-                    },
-                  }}
-                />
-              )}
             </MenuItem>
           );
         })}
