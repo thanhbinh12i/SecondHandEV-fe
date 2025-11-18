@@ -10,6 +10,7 @@ export interface Listing {
   title: string;
   description: string;
   price: number;
+  commissionPrice: number;
   listingType: string;
 }
 

@@ -25,6 +25,7 @@ import MyFavoritesPage from "src/pages/Client/MyFavorite";
 import MyOrders from "src/pages/Client/MyOrder";
 import PublicRoute from "./PublicRoute";
 import ProtectedRoute from "./ProtectedRoute";
+import EditListingPage from "src/pages/Client/EditListing";
 
 const RouteElements: React.FC = () => {
   const routeElements = useRoutes([
@@ -86,6 +87,10 @@ const RouteElements: React.FC = () => {
             {
               path: "my-listings",
               element: <MyListingsPage />,
+            },
+            {
+              path: "listing/edit/:id",
+              element: <EditListingPage />,
             },
             {
               path: "my-favorites",

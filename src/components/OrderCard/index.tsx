@@ -8,7 +8,15 @@ import {
   Typography,
   Divider,
 } from "@mui/material";
-import { User, Store, Phone, Mail, Calendar, Package } from "lucide-react";
+import {
+  User,
+  Store,
+  Phone,
+  Mail,
+  Calendar,
+  Package,
+  DollarSign,
+} from "lucide-react";
 import { Order } from "src/types/order.type";
 
 interface OrderCardProps {
@@ -50,6 +58,9 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, isSeller }) => {
   };
 
   const contactPerson = isSeller ? order.buyer : order.seller;
+  const netAmount = isSeller
+    ? order.orderAmount - (order.listing.commissionPrice || 0)
+    : order.orderAmount;
 
   return (
     <Card className="mb-4 hover:shadow-lg transition-shadow duration-300">
@@ -139,12 +150,42 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, isSeller }) => {
                   {formatPrice(order.orderAmount)}
                 </Typography>
               </Box>
+              {isSeller && order.listing.commissionPrice !== undefined && (
+                <>
+                  <Box className="bg-orange-50 p-2 rounded mb-2">
+                    <Typography
+                      variant="body2"
+                      className="text-gray-600 flex items-center gap-1 mb-1"
+                    >
+                      <DollarSign size={14} className="text-orange-600" />
+                      <span className="font-semibold">Phí hoa hồng:</span>
+                    </Typography>
+                    <Typography
+                      variant="h6"
+                      className="font-bold text-orange-600"
+                    >
+                      {formatPrice(order.listing.commissionPrice)}
+                    </Typography>
+                  </Box>
 
+                  <Box className="bg-emerald-50 p-2 rounded">
+                    <Typography
+                      variant="body2"
+                      className="text-gray-600 mb-1 font-semibold"
+                    >
+                      Số tiền nhận được:
+                    </Typography>
+                    <Typography
+                      variant="h6"
+                      className="font-bold text-emerald-700"
+                    >
+                      {formatPrice(netAmount)}
+                    </Typography>
+                  </Box>
+                </>
+              )}
               <Box>
-                <Typography
-                  variant="h6"
-                  className="text-gray-500 flex items-center gap-1 mb-2"
-                >
+                <Typography className="text-gray-500 flex items-center gap-1 mb-2 !mt-2">
                   <Calendar size={20} />
                   {formatDate(order.createdAt)}
                 </Typography>
