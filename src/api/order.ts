@@ -7,6 +7,8 @@ import {
 import http from "src/utils/http";
 
 const paymentApiRequests = {
+  orderList: (params?: OrderQueryParams) =>
+    http.get<OrdersResponse>(`/order`, { params }),
   createPayOS: (id: number) =>
     http.post(`payos/create-payment-link`, "Thanh toán", {
       params: { listingId: id },

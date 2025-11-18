@@ -38,7 +38,6 @@ const BatteryListingsPage: React.FC = () => {
   const [priceRange, setPriceRange] = useState<number[]>([0, 200_000_000]);
   const [page, setPage] = useState(1);
 
-  // Pin = categoryId = 1, chỉ lấy listingStatus = active
   const { data, isLoading } = useGetListing({
     categoryId: 1,
     listingStatus: "active",
@@ -51,14 +50,11 @@ const BatteryListingsPage: React.FC = () => {
 
   const listings: ListingDto[] = data?.data.items ?? [];
 
-  // Lấy brand từ data (nếu muốn cố định, có thể thay bằng mảng cứng)
   const brands = [
     ...new Set(listings.map((l) => l.brand).filter(Boolean)),
   ].sort() as string[];
 
-  // ========== FILTER ==========
   const filteredListings = listings.filter((listing) => {
-    // search theo title / description / brand / model
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const matchesSearch =
@@ -70,17 +66,14 @@ const BatteryListingsPage: React.FC = () => {
       if (!matchesSearch) return false;
     }
 
-    // filter hãng
     if (brandFilter !== "all" && listing.brand !== brandFilter) return false;
 
-    // filter khoảng giá
     const price = listing.price ?? 0;
     if (price < priceRange[0] || price > priceRange[1]) return false;
 
     return true;
   });
 
-  // ========== SORT ==========
   const sortedListings = [...filteredListings].sort((a, b) => {
     switch (sortBy) {
       case "price_asc":
@@ -92,20 +85,19 @@ const BatteryListingsPage: React.FC = () => {
       default: {
         const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
         const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-        return dateB - dateA; // mới nhất trước
+        return dateB - dateA;
       }
     }
   });
 
-  // ========== PAGINATION ==========
   const totalResults = sortedListings.length;
-  const totalPages = totalResults === 0 ? 1 : Math.ceil(totalResults / PAGE_SIZE);
+  const totalPages =
+    totalResults === 0 ? 1 : Math.ceil(totalResults / PAGE_SIZE);
   const paginatedListings = sortedListings.slice(
     (page - 1) * PAGE_SIZE,
     page * PAGE_SIZE
   );
 
-  // Khi đổi filter/search/sort thì quay về trang 1
   useEffect(() => {
     setPage(1);
   }, [searchQuery, brandFilter, priceRange, sortBy]);
@@ -158,7 +150,6 @@ const BatteryListingsPage: React.FC = () => {
         </Box>
 
         <Grid container spacing={4}>
-          {/* Sidebar filter */}
           <Grid size={{ xs: 12, md: 3 }}>
             <Paper className="!p-6 !rounded-3xl !shadow-xl !sticky !top-24">
               <Typography
@@ -168,7 +159,6 @@ const BatteryListingsPage: React.FC = () => {
                 Bộ lọc
               </Typography>
 
-              {/* Search */}
               <TextField
                 fullWidth
                 placeholder="Tìm kiếm..."
@@ -185,7 +175,6 @@ const BatteryListingsPage: React.FC = () => {
                 }}
               />
 
-              {/* Brand */}
               <FormControl fullWidth size="small" className="!mb-6">
                 <InputLabel>Hãng</InputLabel>
                 <Select
@@ -202,7 +191,6 @@ const BatteryListingsPage: React.FC = () => {
                 </Select>
               </FormControl>
 
-              {/* Price range */}
               <Box className="!mb-6">
                 <Typography
                   variant="body2"
@@ -234,15 +222,12 @@ const BatteryListingsPage: React.FC = () => {
                 </Box>
               </Box>
 
-              {/* Sort */}
               <FormControl fullWidth size="small">
                 <InputLabel>Sắp xếp</InputLabel>
                 <Select
                   value={sortBy}
                   label="Sắp xếp"
-                  onChange={(e) =>
-                    setSortBy(e.target.value as SortOption)
-                  }
+                  onChange={(e) => setSortBy(e.target.value as SortOption)}
                 >
                   <MenuItem value="newest">Mới nhất</MenuItem>
                   <MenuItem value="price_asc">Giá tăng dần</MenuItem>
@@ -262,7 +247,6 @@ const BatteryListingsPage: React.FC = () => {
             </Paper>
           </Grid>
 
-          {/* List */}
           <Grid size={{ xs: 12, md: 9 }}>
             <Box className="!flex !justify-between !items-center !mb-6">
               <Typography variant="body1" className="!text-slate-600">

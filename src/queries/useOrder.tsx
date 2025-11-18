@@ -51,3 +51,10 @@ export const useGetOrderById = ({
     enabled,
   });
 };
+
+export const useGetOrderList = (params?: OrderQueryParams) => {
+  return useQuery({
+    queryKey: ["orders", params],
+    queryFn: () => paymentApiRequests.orderList(params),
+  });
+};

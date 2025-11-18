@@ -354,6 +354,7 @@ const EBikeAllPage: React.FC = () => {
                   <TableCell className="!font-semibold">Giá</TableCell>
                   <TableCell className="!font-semibold">Ngày đăng</TableCell>
                   <TableCell className="!font-semibold">Trạng thái</TableCell>
+                  <TableCell className="!font-semibold">Loại</TableCell>
                   <TableCell className="!font-semibold" align="center">
                     Hành động
                   </TableCell>
@@ -408,6 +409,13 @@ const EBikeAllPage: React.FC = () => {
                         className={`${getStatusColor(
                           listing.listingStatus
                         )} !font-semibold`}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={listing.listingType}
+                        size="small"
+                        className={`!font-semibold`}
                       />
                     </TableCell>
                     <TableCell align="center">

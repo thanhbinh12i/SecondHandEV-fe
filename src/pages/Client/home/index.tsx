@@ -193,7 +193,6 @@ const HomePage: React.FC = () => {
         `}
       </style>
 
-      {/* HERO */}
       <Box className="!relative !overflow-hidden !pt-20 !pb-20">
         <Container maxWidth="lg">
           <Box
@@ -219,7 +218,6 @@ const HomePage: React.FC = () => {
         </Container>
       </Box>
 
-      {/* STATS */}
       <Box
         id="stats"
         data-animate
@@ -258,7 +256,6 @@ const HomePage: React.FC = () => {
         </Container>
       </Box>
 
-      {/* FEATURED LISTINGS */}
       <Box id="listings" data-animate className="!py-20">
         <Container maxWidth="lg">
           <Box
@@ -406,8 +403,7 @@ const HomePage: React.FC = () => {
                           fontWeight: 600,
                           "&:hover": {
                             transform: "scale(1.05)",
-                            boxShadow:
-                              "0 10px 25px rgba(16, 185, 129, 0.3)",
+                            boxShadow: "0 10px 25px rgba(16, 185, 129, 0.3)",
                           },
                           transition: "all 0.3s",
                         }}
@@ -423,7 +419,6 @@ const HomePage: React.FC = () => {
         </Container>
       </Box>
 
-      {/* FEATURES */}
       <Box
         id="features"
         data-animate
@@ -478,7 +473,6 @@ const HomePage: React.FC = () => {
         </Container>
       </Box>
 
-      {/* CTA */}
       <Box
         id="cta"
         data-animate
@@ -541,7 +535,6 @@ const HomePage: React.FC = () => {
         </Container>
       </Box>
 
-      {/* Snackbar */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}
