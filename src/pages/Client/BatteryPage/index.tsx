@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -25,26 +25,90 @@ import { useNavigate } from "react-router-dom";
 import { ListingDto } from "src/types/listing.type";
 import { useGetListing } from "src/queries/useListing";
 
+const PAGE_SIZE = 12;
+
+type SortOption = "newest" | "price_asc" | "price_desc" | "popular";
+
 const BatteryListingsPage: React.FC = () => {
   const navigate = useNavigate();
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState("newest");
+  const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [brandFilter, setBrandFilter] = useState("all");
-  const [priceRange, setPriceRange] = useState<number[]>([0, 1000000000]);
+  const [priceRange, setPriceRange] = useState<number[]>([0, 200_000_000]);
   const [page, setPage] = useState(1);
-  const { data, isLoading } = useGetListing({ categoryId: 2 });
+
+  // Pin = categoryId = 1, chỉ lấy listingStatus = active
+  const { data, isLoading } = useGetListing({
+    categoryId: 1,
+    listingStatus: "active",
+    page: 1,
+    pageSize: 200,
+  });
 
   const DEFAULT_IMAGE =
     "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800&h=600&q=80";
 
-  const listings = data?.data.items;
-  const activeListings = listings?.filter(
-    (listing) => listing.listingStatus === "active"
-  );
-  const totalPages = Math.ceil((activeListings?.length ?? 0) / 12);
-  const paginatedListings = activeListings?.slice((page - 1) * 12, page * 12);
+  const listings: ListingDto[] = data?.data.items ?? [];
 
-  const brands = ["VinFast", "Samsung", "LG", "Panasonic", "BYD", "Tesla"];
+  // Lấy brand từ data (nếu muốn cố định, có thể thay bằng mảng cứng)
+  const brands = [
+    ...new Set(listings.map((l) => l.brand).filter(Boolean)),
+  ].sort() as string[];
+
+  // ========== FILTER ==========
+  const filteredListings = listings.filter((listing) => {
+    // search theo title / description / brand / model
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const matchesSearch =
+        listing.title.toLowerCase().includes(q) ||
+        listing.description?.toLowerCase().includes(q) ||
+        listing.brand?.toLowerCase().includes(q) ||
+        listing.model?.toLowerCase().includes(q);
+
+      if (!matchesSearch) return false;
+    }
+
+    // filter hãng
+    if (brandFilter !== "all" && listing.brand !== brandFilter) return false;
+
+    // filter khoảng giá
+    const price = listing.price ?? 0;
+    if (price < priceRange[0] || price > priceRange[1]) return false;
+
+    return true;
+  });
+
+  // ========== SORT ==========
+  const sortedListings = [...filteredListings].sort((a, b) => {
+    switch (sortBy) {
+      case "price_asc":
+        return (a.price ?? 0) - (b.price ?? 0);
+      case "price_desc":
+        return (b.price ?? 0) - (a.price ?? 0);
+      case "popular":
+      case "newest":
+      default: {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA; // mới nhất trước
+      }
+    }
+  });
+
+  // ========== PAGINATION ==========
+  const totalResults = sortedListings.length;
+  const totalPages = totalResults === 0 ? 1 : Math.ceil(totalResults / PAGE_SIZE);
+  const paginatedListings = sortedListings.slice(
+    (page - 1) * PAGE_SIZE,
+    page * PAGE_SIZE
+  );
+
+  // Khi đổi filter/search/sort thì quay về trang 1
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery, brandFilter, priceRange, sortBy]);
 
   const getImageUrl = (listing: ListingDto): string => {
     return listing.primaryImageUrl || listing.imageUrls[0] || DEFAULT_IMAGE;
@@ -63,6 +127,14 @@ const BatteryListingsPage: React.FC = () => {
 
   const handleCardClick = (listingId: number) => {
     navigate(`/listing/${listingId}`);
+  };
+
+  const handleResetFilters = () => {
+    setSearchQuery("");
+    setBrandFilter("all");
+    setPriceRange([0, 200_000_000]);
+    setSortBy("newest");
+    setPage(1);
   };
 
   if (isLoading) {
@@ -86,6 +158,7 @@ const BatteryListingsPage: React.FC = () => {
         </Box>
 
         <Grid container spacing={4}>
+          {/* Sidebar filter */}
           <Grid size={{ xs: 12, md: 3 }}>
             <Paper className="!p-6 !rounded-3xl !shadow-xl !sticky !top-24">
               <Typography
@@ -95,6 +168,7 @@ const BatteryListingsPage: React.FC = () => {
                 Bộ lọc
               </Typography>
 
+              {/* Search */}
               <TextField
                 fullWidth
                 placeholder="Tìm kiếm..."
@@ -111,6 +185,7 @@ const BatteryListingsPage: React.FC = () => {
                 }}
               />
 
+              {/* Brand */}
               <FormControl fullWidth size="small" className="!mb-6">
                 <InputLabel>Hãng</InputLabel>
                 <Select
@@ -127,6 +202,7 @@ const BatteryListingsPage: React.FC = () => {
                 </Select>
               </FormControl>
 
+              {/* Price range */}
               <Box className="!mb-6">
                 <Typography
                   variant="body2"
@@ -141,29 +217,32 @@ const BatteryListingsPage: React.FC = () => {
                   }
                   valueLabelDisplay="auto"
                   min={0}
-                  max={200000000}
-                  step={1000000}
+                  max={200_000_000}
+                  step={1_000_000}
                   valueLabelFormat={(value) =>
-                    `${(value / 1000000).toFixed(0)}M`
+                    `${(value / 1_000_000).toFixed(0)}M`
                   }
                   className="!text-emerald-600"
                 />
                 <Box className="!flex !justify-between !mt-2">
                   <Typography variant="caption" className="!text-slate-600">
-                    {(priceRange[0] / 1000000).toFixed(0)}M đ
+                    {(priceRange[0] / 1_000_000).toFixed(0)}M đ
                   </Typography>
                   <Typography variant="caption" className="!text-slate-600">
-                    {(priceRange[1] / 1000000).toFixed(0)}M đ
+                    {(priceRange[1] / 1_000_000).toFixed(0)}M đ
                   </Typography>
                 </Box>
               </Box>
 
+              {/* Sort */}
               <FormControl fullWidth size="small">
                 <InputLabel>Sắp xếp</InputLabel>
                 <Select
                   value={sortBy}
                   label="Sắp xếp"
-                  onChange={(e) => setSortBy(e.target.value)}
+                  onChange={(e) =>
+                    setSortBy(e.target.value as SortOption)
+                  }
                 >
                   <MenuItem value="newest">Mới nhất</MenuItem>
                   <MenuItem value="price_asc">Giá tăng dần</MenuItem>
@@ -175,6 +254,7 @@ const BatteryListingsPage: React.FC = () => {
               <Button
                 fullWidth
                 variant="outlined"
+                onClick={handleResetFilters}
                 className="!mt-6 !border-emerald-500 !text-emerald-600 !rounded-xl"
               >
                 Đặt lại bộ lọc
@@ -182,16 +262,16 @@ const BatteryListingsPage: React.FC = () => {
             </Paper>
           </Grid>
 
+          {/* List */}
           <Grid size={{ xs: 12, md: 9 }}>
             <Box className="!flex !justify-between !items-center !mb-6">
               <Typography variant="body1" className="!text-slate-600">
-                Hiển thị {paginatedListings?.length} / {activeListings?.length}{" "}
-                kết quả
+                Hiển thị {paginatedListings.length} / {totalResults} kết quả
               </Typography>
             </Box>
 
             <Grid container spacing={3}>
-              {paginatedListings?.map((listing) => (
+              {paginatedListings.map((listing) => (
                 <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={listing.listingId}>
                   <Card
                     onClick={() => handleCardClick(listing.listingId)}
