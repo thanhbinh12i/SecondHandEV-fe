@@ -9,6 +9,8 @@ import {
   CardMedia,
   CardContent,
   Chip,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import {
   Zap,
@@ -24,11 +26,15 @@ import {
   Calendar,
   Gauge,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const HomePage: React.FC = () => {
   const [visibleSections, setVisibleSections] = useState<
     Record<string, boolean>
   >({});
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const observerOptions = {
@@ -54,10 +60,23 @@ const HomePage: React.FC = () => {
     return () => observer.disconnect();
   }, []);
 
+  const handleRegisterClick = () => {
+    const isLoggedIn = !!localStorage.getItem("access_token");
+
+    if (isLoggedIn) {
+      setSnackbarMessage(
+        "Bạn đã đăng ký và đang đăng nhập. Hãy khám phá các tin đăng ngay nhé!"
+      );
+      setSnackbarOpen(true);
+    } else {
+      navigate("/auth/register");
+    }
+  };
+
   const featuredListings = [
     {
       id: 1,
-      type: "ev",
+      type: "ev" as const,
       title: "Tesla Model 3 Long Range",
       year: 2022,
       price: "850,000,000",
@@ -71,7 +90,7 @@ const HomePage: React.FC = () => {
     },
     {
       id: 2,
-      type: "battery",
+      type: "battery" as const,
       title: "Pin LFP 60kWh - VinFast VF8",
       capacity: "60kWh",
       health: 92,
@@ -84,7 +103,7 @@ const HomePage: React.FC = () => {
     },
     {
       id: 3,
-      type: "ev",
+      type: "ev" as const,
       title: "VinFast VF e34",
       year: 2023,
       price: "450,000,000",
@@ -97,7 +116,7 @@ const HomePage: React.FC = () => {
     },
     {
       id: 4,
-      type: "ev",
+      type: "ev" as const,
       title: "Hyundai Kona Electric",
       year: 2021,
       price: "620,000,000",
@@ -146,87 +165,35 @@ const HomePage: React.FC = () => {
       <style>
         {`
           @keyframes fadeInDown {
-            from {
-              opacity: 0;
-              transform: translateY(-20px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
           }
-
           @keyframes fadeInUp {
-            from {
-              opacity: 0;
-              transform: translateY(30px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
           }
-
           @keyframes fadeInLeft {
-            from {
-              opacity: 0;
-              transform: translateX(-30px);
-            }
-            to {
-              opacity: 1;
-              transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
           }
-
           @keyframes fadeInRight {
-            from {
-              opacity: 0;
-              transform: translateX(30px);
-            }
-            to {
-              opacity: 1;
-              transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
           }
-
           @keyframes scaleIn {
-            from {
-              opacity: 0;
-              transform: scale(0.9);
-            }
-            to {
-              opacity: 1;
-              transform: scale(1);
-            }
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
           }
-
-          .animate-on-scroll {
-            opacity: 0;
-            transition: all 0.6s ease-out;
-          }
-
-          .animate-on-scroll.visible {
-            opacity: 1;
-          }
-
-          .slide-up.visible {
-            animation: fadeInUp 0.8s ease-out forwards;
-          }
-
-          .slide-left.visible {
-            animation: fadeInLeft 0.8s ease-out forwards;
-          }
-
-          .slide-right.visible {
-            animation: fadeInRight 0.8s ease-out forwards;
-          }
-
-          .scale-in.visible {
-            animation: scaleIn 0.8s ease-out forwards;
-          }
+          .animate-on-scroll { opacity: 0; transition: all 0.6s ease-out; }
+          .animate-on-scroll.visible { opacity: 1; }
+          .slide-up.visible { animation: fadeInUp 0.8s ease-out forwards; }
+          .slide-left.visible { animation: fadeInLeft 0.8s ease-out forwards; }
+          .slide-right.visible { animation: fadeInRight 0.8s ease-out forwards; }
+          .scale-in.visible { animation: scaleIn 0.8s ease-out forwards; }
         `}
       </style>
 
+      {/* HERO */}
       <Box className="!relative !overflow-hidden !pt-20 !pb-20">
         <Container maxWidth="lg">
           <Box
@@ -252,6 +219,7 @@ const HomePage: React.FC = () => {
         </Container>
       </Box>
 
+      {/* STATS */}
       <Box
         id="stats"
         data-animate
@@ -290,6 +258,7 @@ const HomePage: React.FC = () => {
         </Container>
       </Box>
 
+      {/* FEATURED LISTINGS */}
       <Box id="listings" data-animate className="!py-20">
         <Container maxWidth="lg">
           <Box
@@ -310,6 +279,7 @@ const HomePage: React.FC = () => {
             </Box>
             <Button
               endIcon={<ChevronRight size={20} />}
+              onClick={() => navigate("/e-bikes")}
               className="!px-6 !py-3 !border !border-slate-300 !rounded-xl hover:!border-emerald-500 hover:!text-emerald-600"
               sx={{
                 textTransform: "none",
@@ -436,7 +406,8 @@ const HomePage: React.FC = () => {
                           fontWeight: 600,
                           "&:hover": {
                             transform: "scale(1.05)",
-                            boxShadow: "0 10px 25px rgba(16, 185, 129, 0.3)",
+                            boxShadow:
+                              "0 10px 25px rgba(16, 185, 129, 0.3)",
                           },
                           transition: "all 0.3s",
                         }}
@@ -452,6 +423,7 @@ const HomePage: React.FC = () => {
         </Container>
       </Box>
 
+      {/* FEATURES */}
       <Box
         id="features"
         data-animate
@@ -506,6 +478,7 @@ const HomePage: React.FC = () => {
         </Container>
       </Box>
 
+      {/* CTA */}
       <Box
         id="cta"
         data-animate
@@ -524,6 +497,7 @@ const HomePage: React.FC = () => {
             <Box className="!flex !flex-col sm:!flex-row !gap-4 !justify-center">
               <Button
                 variant="contained"
+                onClick={handleRegisterClick}
                 className="!px-8 !py-4 !rounded-xl"
                 sx={{
                   background: "white",
@@ -566,6 +540,22 @@ const HomePage: React.FC = () => {
           </Box>
         </Container>
       </Box>
+
+      {/* Snackbar */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity="info"
+          variant="filled"
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
