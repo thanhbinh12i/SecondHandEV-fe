@@ -63,7 +63,7 @@ const UserDropdown: React.FC = () => {
       label: "Hồ sơ của tôi",
       onClick: () => {
         handleClose();
-        //   navigate("/profile");
+        navigate("/profile");
       },
     },
     ...(profile?.role === "Admin"

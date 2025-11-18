@@ -31,18 +31,19 @@ const EBikeListingsPage: React.FC = () => {
   const navigate = useNavigate();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<"newest" | "price_asc" | "price_desc" | "popular" | "year_desc">("newest");
+  const [sortBy, setSortBy] = useState<
+    "newest" | "price_asc" | "price_desc" | "popular" | "year_desc"
+  >("newest");
   const [brandFilter, setBrandFilter] = useState("all");
   const [yearFilter, setYearFilter] = useState<string | number>("all");
   const [priceRange, setPriceRange] = useState<number[]>([0, 100_000_000]);
   const [page, setPage] = useState(1);
 
-  // Lấy tất cả xe điện (categoryId = 2), chỉ lấy tin active để đỡ phải filter lại
   const { data, isLoading } = useGetListing({
     categoryId: 2,
     listingStatus: "active",
     page: 1,
-    pageSize: 200, // lấy tối đa 200 tin, sau đó filter/sort/paginate ở FE
+    pageSize: 200,
   });
 
   const DEFAULT_IMAGE =
@@ -50,15 +51,14 @@ const EBikeListingsPage: React.FC = () => {
 
   const listings: ListingDto[] = data?.data.items ?? [];
 
-  // Lấy danh sách hãng & năm (dùng để fill dropdown)
-  const brands = [...new Set(listings.map((l) => l.brand).filter(Boolean))].sort() as string[];
+  const brands = [
+    ...new Set(listings.map((l) => l.brand).filter(Boolean)),
+  ].sort() as string[];
   const years = [...new Set(listings.map((l) => l.year).filter(Boolean))].sort(
     (a, b) => (b ?? 0) - (a ?? 0)
   ) as number[];
 
-  // ====== FILTER ======
   const filteredListings = listings.filter((listing) => {
-    // search theo title / desc / brand / model
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const matchesSearch =
@@ -70,23 +70,19 @@ const EBikeListingsPage: React.FC = () => {
       if (!matchesSearch) return false;
     }
 
-    // filter hãng
     if (brandFilter !== "all" && listing.brand !== brandFilter) return false;
 
-    // filter năm
     if (yearFilter !== "all") {
       const yearNumber = Number(yearFilter);
       if (!listing.year || listing.year !== yearNumber) return false;
     }
 
-    // filter khoảng giá
     const price = listing.price ?? 0;
     if (price < priceRange[0] || price > priceRange[1]) return false;
 
     return true;
   });
 
-  // ====== SORT ======
   const sortedListings = [...filteredListings].sort((a, b) => {
     switch (sortBy) {
       case "price_asc":
@@ -96,7 +92,6 @@ const EBikeListingsPage: React.FC = () => {
       case "year_desc":
         return (b.year ?? 0) - (a.year ?? 0);
       case "popular":
-        // chưa có trường "popular" nên tạm sort như newest
       case "newest":
       default: {
         const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
@@ -106,15 +101,14 @@ const EBikeListingsPage: React.FC = () => {
     }
   });
 
-  // ====== PAGINATION ======
   const totalResults = sortedListings.length;
-  const totalPages = totalResults === 0 ? 1 : Math.ceil(totalResults / PAGE_SIZE);
+  const totalPages =
+    totalResults === 0 ? 1 : Math.ceil(totalResults / PAGE_SIZE);
   const paginatedListings = sortedListings.slice(
     (page - 1) * PAGE_SIZE,
     page * PAGE_SIZE
   );
 
-  // Khi đổi filter/search/sort -> về trang 1
   useEffect(() => {
     setPage(1);
   }, [searchQuery, brandFilter, yearFilter, priceRange, sortBy]);
@@ -168,7 +162,6 @@ const EBikeListingsPage: React.FC = () => {
         </Box>
 
         <Grid container spacing={4}>
-          {/* Sidebar filter */}
           <Grid size={{ xs: 12, md: 3 }}>
             <Paper className="!p-6 !rounded-3xl !shadow-xl !sticky !top-24">
               <Box className="!flex !items-center !gap-3 !mb-6">
@@ -178,7 +171,6 @@ const EBikeListingsPage: React.FC = () => {
                 </Typography>
               </Box>
 
-              {/* Search */}
               <TextField
                 fullWidth
                 placeholder="Tìm kiếm xe..."
@@ -195,7 +187,6 @@ const EBikeListingsPage: React.FC = () => {
                 }}
               />
 
-              {/* Brand filter */}
               <FormControl fullWidth size="small" className="!mb-6">
                 <InputLabel>Hãng xe</InputLabel>
                 <Select
@@ -212,7 +203,6 @@ const EBikeListingsPage: React.FC = () => {
                 </Select>
               </FormControl>
 
-              {/* Year filter */}
               <FormControl fullWidth size="small" className="!mb-6">
                 <InputLabel>Năm sản xuất</InputLabel>
                 <Select
@@ -229,7 +219,6 @@ const EBikeListingsPage: React.FC = () => {
                 </Select>
               </FormControl>
 
-              {/* Price range */}
               <Box className="!mb-6">
                 <Typography
                   variant="body2"
@@ -261,15 +250,12 @@ const EBikeListingsPage: React.FC = () => {
                 </Box>
               </Box>
 
-              {/* Sort */}
               <FormControl fullWidth size="small" className="!mb-4">
                 <InputLabel>Sắp xếp</InputLabel>
                 <Select
                   value={sortBy}
                   label="Sắp xếp"
-                  onChange={(e) =>
-                    setSortBy(e.target.value as typeof sortBy)
-                  }
+                  onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
                 >
                   <MenuItem value="newest">Mới nhất</MenuItem>
                   <MenuItem value="price_asc">Giá tăng dần</MenuItem>
@@ -290,7 +276,6 @@ const EBikeListingsPage: React.FC = () => {
             </Paper>
           </Grid>
 
-          {/* List */}
           <Grid size={{ xs: 12, md: 9 }}>
             <Box className="!flex !justify-between !items-center !mb-6">
               <Typography variant="body1" className="!text-slate-600">

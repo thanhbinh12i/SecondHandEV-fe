@@ -26,6 +26,7 @@ import MyOrders from "src/pages/Client/MyOrder";
 import PublicRoute from "./PublicRoute";
 import ProtectedRoute from "./ProtectedRoute";
 import EditListingPage from "src/pages/Client/EditListing";
+import ProfilePage from "src/pages/Client/Profile";
 
 const RouteElements: React.FC = () => {
   const routeElements = useRoutes([
@@ -99,6 +100,10 @@ const RouteElements: React.FC = () => {
             {
               path: "my-orders",
               element: <MyOrders />,
+            },
+            {
+              path: "profile",
+              element: <ProfilePage />,
             },
           ],
         },
