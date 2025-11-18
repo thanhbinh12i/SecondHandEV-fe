@@ -329,10 +329,7 @@ const MyAuctionsPage: React.FC = () => {
                     <CardMedia
                       component="img"
                       height="200"
-                      image={
-                        auction.listing.primaryImageURL ||
-                        "https://via.placeholder.com/800x600?text=No+Image"
-                      }
+                      image={auction.listing.primaryImageURL}
                       alt={auction.listing.title}
                       className="!h-48 !object-cover"
                     />
@@ -363,19 +360,10 @@ const MyAuctionsPage: React.FC = () => {
                   <CardContent className="!p-4">
                     <Typography
                       variant="h6"
-                      className="!font-bold !text-slate-900 !mb-2 !line-clamp-2"
+                      className="!h-18 !font-bold !text-slate-900 !mb-2 !line-clamp-2"
                     >
                       {auction.listing.title}
                     </Typography>
-
-                    {auction.listing.description && (
-                      <Typography
-                        variant="body2"
-                        className="!text-slate-600 !mb-3 !line-clamp-2"
-                      >
-                        {auction.listing.description}
-                      </Typography>
-                    )}
                     <Box className="!mb-3 !space-y-2">
                       <Box className="!p-2 !bg-slate-50 !rounded-lg">
                         <Typography

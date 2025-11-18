@@ -48,8 +48,13 @@ const UserDropdown: React.FC = () => {
   };
 
   const getInitials = (name?: string) => {
-    if (!name) return "U";
-    return name.charAt(0).toUpperCase();
+    if (!name) return "?";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   const menuItems = [
@@ -61,6 +66,18 @@ const UserDropdown: React.FC = () => {
         //   navigate("/profile");
       },
     },
+    ...(profile?.role === "Admin"
+      ? [
+          {
+            icon: <ShoppingBag className="w-5 h-5" />,
+            label: "Trang quản lý",
+            onClick: () => {
+              handleClose();
+              navigate("/admin/dashboard");
+            },
+          },
+        ]
+      : []),
     {
       icon: <ShoppingBag className="w-5 h-5" />,
       label: "Đơn hàng",

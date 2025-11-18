@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  Grid,
-  Typography,
-  Paper,
-  Alert,
-  Chip,
-  Card,
-  CardMedia,
-} from "@mui/material";
+import { Grid, Typography, Paper, Alert, Card, CardMedia } from "@mui/material";
 import { PostListingFormData } from "src/types/form.type";
 
 interface ConfirmationStepProps {
@@ -37,7 +29,7 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
       <Grid size={{ xs: 12, md: 6 }}>
         <Paper className="p-4">
           <Typography
-            variant="subtitle2"
+            variant="h6"
             className="text-slate-600 mb-3 font-semibold"
           >
             Thông tin chung
@@ -106,36 +98,13 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
             variant="subtitle2"
             className="text-slate-600 mb-3 font-semibold"
           >
-            Giá & Trạng thái
+            Giá
           </Typography>
           <div className="space-y-2">
             <div className="flex justify-between">
-              <Typography variant="body2" className="text-slate-600">
-                Giá bán:
-              </Typography>
               <Typography variant="h6" className="font-bold text-emerald-600">
                 {formData.price?.toLocaleString()} VND
               </Typography>
-            </div>
-            <div className="flex justify-between">
-              <Typography variant="body2" className="text-slate-600">
-                Loại tin:
-              </Typography>
-              <Chip
-                label={formData.listingType === "sale" ? "Mua ngay" : "Đấu giá"}
-                size="small"
-                className="bg-blue-100 text-blue-700"
-              />
-            </div>
-            <div className="flex justify-between">
-              <Typography variant="body2" className="text-slate-600">
-                Trạng thái:
-              </Typography>
-              <Chip
-                label={formData.listingStatus}
-                size="small"
-                className="bg-emerald-100 text-emerald-700"
-              />
             </div>
             <div className="flex justify-between">
               <Typography variant="body2" className="text-slate-600">
@@ -153,7 +122,7 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
         <Grid size={{ xs: 12 }}>
           <Paper className="p-4">
             <Typography
-              variant="subtitle2"
+              variant="h6"
               className="text-slate-600 mb-3 font-semibold"
             >
               Thông số kỹ thuật Pin
@@ -208,7 +177,7 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
         <Grid size={{ xs: 12 }}>
           <Paper className="p-4">
             <Typography
-              variant="subtitle2"
+              variant="h6"
               className="text-slate-600 mb-3 font-semibold"
             >
               Thông số kỹ thuật Xe điện

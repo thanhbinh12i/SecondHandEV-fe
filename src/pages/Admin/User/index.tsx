@@ -23,12 +23,8 @@ import {
   DialogActions,
   Typography,
   Grid,
-  FormControl,
-  InputLabel,
-  Select,
-  SelectChangeEvent,
 } from "@mui/material";
-import { Search, MoreVertical, Trash2, Eye, Filter } from "lucide-react";
+import { Search, MoreVertical, Trash2, Eye } from "lucide-react";
 import { useGetUserList } from "src/queries/useUser";
 import { AdminMemberDto } from "src/types/user.type";
 
@@ -36,11 +32,7 @@ const UserManagement: React.FC = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState("");
-  const [isActive, setIsActive] = useState<string>("");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [filterAnchorEl, setFilterAnchorEl] = useState<null | HTMLElement>(
-    null
-  );
   const [selectedUser, setSelectedUser] = useState<AdminMemberDto | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
 
@@ -48,7 +40,6 @@ const UserManagement: React.FC = () => {
     page,
     pageSize,
     search,
-    isActive: isActive === "" ? undefined : isActive === "true",
   });
 
   const userList = data?.data.users || [];
@@ -68,19 +59,6 @@ const UserManagement: React.FC = () => {
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
     setPage(1);
-  };
-
-  const handleIsActiveChange = (event: SelectChangeEvent<string>) => {
-    setIsActive(event.target.value);
-    setPage(1);
-  };
-
-  const handleFilterOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setFilterAnchorEl(event.currentTarget);
-  };
-
-  const handleFilterClose = () => {
-    setFilterAnchorEl(null);
   };
 
   const handleMenuOpen = (
@@ -190,16 +168,6 @@ const UserManagement: React.FC = () => {
               ),
             }}
           />
-          <div className="flex gap-2">
-            <Button
-              variant="outlined"
-              startIcon={<Filter size={18} />}
-              className="text-slate-700 border-slate-300"
-              onClick={handleFilterOpen}
-            >
-              Lọc
-            </Button>
-          </div>
         </div>
       </Paper>
 
@@ -326,36 +294,6 @@ const UserManagement: React.FC = () => {
           <Trash2 size={18} className="mr-2" />
           Xóa
         </MenuItem>
-      </Menu>
-
-      <Menu
-        anchorEl={filterAnchorEl}
-        open={Boolean(filterAnchorEl)}
-        onClose={handleFilterClose}
-        PaperProps={{
-          style: { minWidth: "200px", padding: "8px" },
-        }}
-      >
-        <div className="px-3 py-2">
-          <Typography variant="subtitle2" className="font-semibold mb-3">
-            Bộ lọc
-          </Typography>
-          <FormControl fullWidth size="small">
-            <InputLabel>Trạng thái</InputLabel>
-            <Select
-              value={isActive}
-              onChange={(e) => {
-                handleIsActiveChange(e);
-                handleFilterClose();
-              }}
-              label="Trạng thái"
-            >
-              <MenuItem value="">Tất cả</MenuItem>
-              <MenuItem value="true">Hoạt động</MenuItem>
-              <MenuItem value="false">Tạm khóa</MenuItem>
-            </Select>
-          </FormControl>
-        </div>
       </Menu>
 
       <Dialog

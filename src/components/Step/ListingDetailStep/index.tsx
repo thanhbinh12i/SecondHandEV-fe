@@ -26,8 +26,7 @@ const ListingDetailStep: React.FC<ListingDetailStepProps> = ({
   formData,
   onFieldChange,
 }) => {
-  const conditions = ["Mới", "Như mới", "Đã sử dụng", "Cần sửa chữa"];
-  const frameSizes = ["XS", "S", "M", "L", "XL"];
+  const frameSizes = ["Small", "Medium", "Large"];
 
   const listingInfo: ListingAIInfo = {
     categoryId: categoryId,
@@ -338,18 +337,14 @@ const ListingDetailStep: React.FC<ListingDetailStepProps> = ({
 
       <Grid size={{ xs: 12, md: 6 }}>
         <FormControl fullWidth required>
-          <InputLabel>Tình trạng *</InputLabel>
-          <Select
-            value={formData.condition || ""}
+          <TextField
+            fullWidth
+            required
             label="Tình trạng *"
+            value={formData.condition}
             onChange={(e) => onFieldChange("condition", e.target.value)}
-          >
-            {conditions.map((cond) => (
-              <MenuItem key={cond} value={cond}>
-                {cond}
-              </MenuItem>
-            ))}
-          </Select>
+            placeholder="VD: 100%, 90%..."
+          />
         </FormControl>
       </Grid>
 
