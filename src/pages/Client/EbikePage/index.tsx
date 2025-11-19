@@ -46,9 +46,6 @@ const EBikeListingsPage: React.FC = () => {
     pageSize: 200,
   });
 
-  const DEFAULT_IMAGE =
-    "https://images.unsplash.com/photo-1571333250630-f0230c320b6d?w=800&h=600&q=80";
-
   const listings: ListingDto[] = data?.data.items ?? [];
 
   const brands = [
@@ -114,7 +111,7 @@ const EBikeListingsPage: React.FC = () => {
   }, [searchQuery, brandFilter, yearFilter, priceRange, sortBy]);
 
   const getImageUrl = (listing: ListingDto): string => {
-    return listing.primaryImageUrl || listing.imageUrls[0] || DEFAULT_IMAGE;
+    return listing.primaryImageUrl || listing.imageUrls[0];
   };
 
   const getListingTypeLabel = (type?: string) => {
@@ -317,20 +314,10 @@ const EBikeListingsPage: React.FC = () => {
                     <CardContent className="!p-5">
                       <Typography
                         variant="h6"
-                        className="!font-bold !text-slate-900 !mb-3 !line-clamp-2 !min-h-[3.5rem]"
+                        className="!h-18 !font-bold !text-slate-900 !mb-3 !line-clamp-2 !min-h-[3.5rem]"
                       >
                         {listing.title}
                       </Typography>
-
-                      {listing.description && (
-                        <Typography
-                          variant="body2"
-                          className="!text-slate-600 !mb-4 !line-clamp-2 !min-h-[2.5rem]"
-                        >
-                          {listing.description}
-                        </Typography>
-                      )}
-
                       <Box className="!flex !flex-wrap !gap-2 !mb-4">
                         {listing.brand && (
                           <Chip
@@ -346,6 +333,13 @@ const EBikeListingsPage: React.FC = () => {
                             label={listing.year}
                             size="small"
                             className="!bg-blue-100 !text-blue-700 !font-medium"
+                          />
+                        )}
+                        {listing.model && (
+                          <Chip
+                            label={listing.model}
+                            size="small"
+                            className="!bg-purple-100 !text-purple-700"
                           />
                         )}
                       </Box>

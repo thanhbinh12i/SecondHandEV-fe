@@ -254,7 +254,7 @@ const MyListingsPage: React.FC = () => {
   const handleConvertToSale = async () => {
     if (!selectedListing) return;
 
-    if (auction.status !== "Ended" || auction.status !== "Cancelled") return;
+    if (auction.status !== "Ended") return;
 
     try {
       await convertToSaleMutation.mutateAsync({
@@ -435,10 +435,7 @@ const MyListingsPage: React.FC = () => {
                     <CardMedia
                       component="img"
                       height="200"
-                      image={
-                        listing.primaryImageUrl ||
-                        "https://via.placeholder.com/800x600?text=No+Image"
-                      }
+                      image={listing.primaryImageUrl}
                       alt={listing.title}
                       className="!h-48 !object-cover"
                     />
