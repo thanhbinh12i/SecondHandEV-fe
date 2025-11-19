@@ -36,7 +36,6 @@ const emeraldBlue = "rgb(20, 184, 166)";
 
 const RevenueChart = ({ orders }: { orders: any[] }) => {
   const [value, setValue] = useState(0);
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   const handleChange = (event: any, newValue: any) => {
@@ -44,7 +43,6 @@ const RevenueChart = ({ orders }: { orders: any[] }) => {
   };
 
   const availableOptions = useMemo(() => {
-    const months = new Set<number>();
     const years = new Set<number>();
 
     orders.forEach((order) => {
@@ -57,12 +55,10 @@ const RevenueChart = ({ orders }: { orders: any[] }) => {
       const daysUntilMonday = dayOfWeek === 0 ? 1 : 8 - dayOfWeek;
       firstMonday.setDate(jan1.getDate() + daysUntilMonday);
 
-      months.add(date.getMonth());
       years.add(date.getFullYear());
     });
 
     return {
-      months: Array.from(months).sort((a, b) => a - b),
       years: Array.from(years).sort((a, b) => a - b),
     };
   }, [orders]);
@@ -111,38 +107,6 @@ const RevenueChart = ({ orders }: { orders: any[] }) => {
           }
           break;
 
-        case "Month":
-          const year = new Date().getFullYear();
-          const lastDayOfMonth = new Date(year, selectedMonth + 1, 0);
-
-          const weeksInMonth = Math.ceil(lastDayOfMonth.getDate() / 7);
-
-          for (let week = 1; week <= weeksInMonth; week++) {
-            dataMap.set(week, 0);
-          }
-
-          orders.forEach((order) => {
-            const date = new Date(order.createdAt);
-            if (
-              date.getMonth() === selectedMonth &&
-              date.getFullYear() === year
-            ) {
-              const weekInMonth = Math.ceil(date.getDate() / 7);
-              dataMap.set(
-                weekInMonth,
-                dataMap.get(weekInMonth) + order.listing.commissionPrice
-              );
-            }
-          });
-
-          for (let week = 1; week <= weeksInMonth; week++) {
-            result.push({
-              date: `Tuần ${week}`,
-              commission: dataMap.get(week) || 0,
-            });
-          }
-          break;
-
         case "Year":
           for (let month = 0; month < 12; month++) {
             dataMap.set(month, 0);
@@ -173,12 +137,11 @@ const RevenueChart = ({ orders }: { orders: any[] }) => {
 
     return {
       Day: processData("Day"),
-      Month: processData("Month"),
       Year: processData("Year"),
     };
-  }, [orders, selectedMonth, selectedYear]);
+  }, [orders, selectedYear]);
 
-  const periods = ["Day", "Month", "Year"];
+  const periods = ["Day", "Year"];
   const currentPeriod = periods[value];
   const data = revenueData[currentPeriod as keyof typeof revenueData];
 
@@ -190,7 +153,7 @@ const RevenueChart = ({ orders }: { orders: any[] }) => {
           onChange={handleChange}
           TabIndicatorProps={{ style: { backgroundColor: emeraldBlue } }}
         >
-          {["Ngày", "Tháng", "Năm"].map((label, idx) => (
+          {["Ngày", "Năm"].map((label, idx) => (
             <Tab
               key={label}
               label={label}
@@ -199,24 +162,7 @@ const RevenueChart = ({ orders }: { orders: any[] }) => {
           ))}
         </Tabs>
 
-        {value === 1 && (
-          <FormControl size="small" style={{ minWidth: 150 }}>
-            <InputLabel>Chọn tháng</InputLabel>
-            <Select
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(Number(e.target.value))}
-              label="Chọn tháng"
-            >
-              {Array.from({ length: 12 }, (_, i) => (
-                <MenuItem key={i} value={i}>
-                  Tháng {i + 1}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        )}
-
-        {value === 2 && availableOptions.years.length > 0 && (
+        {value === 1 && availableOptions.years.length > 0 && (
           <FormControl size="small" style={{ minWidth: 150 }}>
             <InputLabel>Chọn năm</InputLabel>
             <Select
