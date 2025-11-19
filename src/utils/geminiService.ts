@@ -1,6 +1,6 @@
 import { ListingAIInfo } from "src/types/listing.type";
 
-const GEMINI_API_KEY = "AIzaSyBRF7lehrABzn1D6S0RnlvBlDXoQDYPTWk";
+const GEMINI_API_KEY = "AIzaSyDTlBTcJ5SOA5B7szsJyrLjnqrpDunBKZY";
 const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
 
 export interface PriceSuggestion {
@@ -60,6 +60,7 @@ export class GeminiPriceService {
           },
         }),
       });
+      console.log(response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));

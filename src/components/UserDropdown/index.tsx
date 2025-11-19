@@ -1,6 +1,5 @@
 import React, { useState, useContext } from "react";
 import {
-  Settings,
   LogOut,
   ShoppingBag,
   ChevronDown,
@@ -111,13 +110,6 @@ const UserDropdown: React.FC = () => {
       },
     },
     { divider: true },
-    {
-      icon: <Settings className="w-5 h-5" />,
-      label: "Cài đặt",
-      onClick: () => {
-        handleClose();
-      },
-    },
     {
       icon: <LogOut className="w-5 h-5" />,
       label: "Đăng xuất",
