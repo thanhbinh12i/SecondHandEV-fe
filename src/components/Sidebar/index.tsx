@@ -119,7 +119,7 @@ const AdminSidebar: React.FC = () => {
             <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
               <Zap className="text-white" size={24} />
             </div>
-            <div>
+            <div onClick={() => navigate("/")} className="cursor-pointer">
               <Typography className="text-white font-bold text-lg">
                 SecondHandEV
               </Typography>
