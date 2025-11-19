@@ -11,6 +11,10 @@ import {
   Tab,
   Box,
   CircularProgress,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { Users, ClipboardList, Package, DollarSign } from "lucide-react";
@@ -30,79 +34,206 @@ import { useGetOrderList } from "src/queries/useOrder";
 
 const emeraldBlue = "rgb(20, 184, 166)";
 
-// Component Biểu đồ Doanh Thu
 const RevenueChart = ({ orders }: { orders: any[] }) => {
   const [value, setValue] = useState(0);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   const handleChange = (event: any, newValue: any) => {
     setValue(newValue);
   };
 
-  // Xử lý dữ liệu doanh thu theo period
+  const availableOptions = useMemo(() => {
+    const months = new Set<number>();
+    const years = new Set<number>();
+
+    orders.forEach((order) => {
+      const date = new Date(order.createdAt);
+
+      const year = date.getFullYear();
+      const jan1 = new Date(year, 0, 1);
+      const firstMonday = new Date(jan1);
+      const dayOfWeek = jan1.getDay();
+      const daysUntilMonday = dayOfWeek === 0 ? 1 : 8 - dayOfWeek;
+      firstMonday.setDate(jan1.getDate() + daysUntilMonday);
+
+      months.add(date.getMonth());
+      years.add(date.getFullYear());
+    });
+
+    return {
+      months: Array.from(months).sort((a, b) => a - b),
+      years: Array.from(years).sort((a, b) => a - b),
+    };
+  }, [orders]);
+
   const revenueData = useMemo(() => {
     const processData = (period: string) => {
+      if (orders.length === 0) return [];
+
       const dataMap = new Map();
+      const result = [];
 
-      orders.forEach((order) => {
-        const date = new Date(order.createdAt);
-        let key = "";
+      switch (period) {
+        case "Day":
+          const current = new Date();
+          current.setDate(current.getDate() - 6);
 
-        switch (period) {
-          case "Day":
-            key = `${date.getDate()}/${date.getMonth() + 1}`;
-            break;
-          case "Week":
-            const weekNum = Math.ceil(date.getDate() / 7);
-            key = `Tuần ${weekNum}`;
-            break;
-          case "Month":
-            key = `Tháng ${date.getMonth() + 1}`;
-            break;
-          case "Year":
-            key = `${date.getFullYear()}`;
-            break;
-        }
+          for (let i = 0; i < 7; i++) {
+            const key = current.toISOString().split("T")[0];
+            dataMap.set(key, 0);
+            current.setDate(current.getDate() + 1);
+          }
 
-        if (dataMap.has(key)) {
-          dataMap.set(key, dataMap.get(key) + order.listing.commissionPrice);
-        } else {
-          dataMap.set(key, order.listing.commissionPrice);
-        }
-      });
+          orders.forEach((order) => {
+            const date = new Date(order.createdAt);
+            const key = date.toISOString().split("T")[0];
+            if (dataMap.has(key)) {
+              dataMap.set(
+                key,
+                dataMap.get(key) + order.listing.commissionPrice
+              );
+            }
+          });
 
-      return Array.from(dataMap.entries())
-        .map(([date, commission]) => ({ date, commission }))
-        .slice(-10); // Lấy 10 records gần nhất
+          const displayCurrent = new Date();
+          displayCurrent.setDate(displayCurrent.getDate() - 6);
+
+          for (let i = 0; i < 7; i++) {
+            const key = displayCurrent.toISOString().split("T")[0];
+            result.push({
+              date: `${displayCurrent.getDate()}/${
+                displayCurrent.getMonth() + 1
+              }`,
+              commission: dataMap.get(key) || 0,
+            });
+            displayCurrent.setDate(displayCurrent.getDate() + 1);
+          }
+          break;
+
+        case "Month":
+          const year = new Date().getFullYear();
+          const lastDayOfMonth = new Date(year, selectedMonth + 1, 0);
+
+          const weeksInMonth = Math.ceil(lastDayOfMonth.getDate() / 7);
+
+          for (let week = 1; week <= weeksInMonth; week++) {
+            dataMap.set(week, 0);
+          }
+
+          orders.forEach((order) => {
+            const date = new Date(order.createdAt);
+            if (
+              date.getMonth() === selectedMonth &&
+              date.getFullYear() === year
+            ) {
+              const weekInMonth = Math.ceil(date.getDate() / 7);
+              dataMap.set(
+                weekInMonth,
+                dataMap.get(weekInMonth) + order.listing.commissionPrice
+              );
+            }
+          });
+
+          for (let week = 1; week <= weeksInMonth; week++) {
+            result.push({
+              date: `Tuần ${week}`,
+              commission: dataMap.get(week) || 0,
+            });
+          }
+          break;
+
+        case "Year":
+          for (let month = 0; month < 12; month++) {
+            dataMap.set(month, 0);
+          }
+
+          orders.forEach((order) => {
+            const date = new Date(order.createdAt);
+            if (date.getFullYear() === selectedYear) {
+              const month = date.getMonth();
+              dataMap.set(
+                month,
+                dataMap.get(month) + order.listing.commissionPrice
+              );
+            }
+          });
+
+          for (let month = 0; month < 12; month++) {
+            result.push({
+              date: `Tháng ${month + 1}`,
+              commission: dataMap.get(month) || 0,
+            });
+          }
+          break;
+      }
+
+      return result;
     };
 
     return {
       Day: processData("Day"),
-      Week: processData("Week"),
       Month: processData("Month"),
       Year: processData("Year"),
     };
-  }, [orders]);
+  }, [orders, selectedMonth, selectedYear]);
 
-  const periods = ["Day", "Week", "Month", "Year"];
+  const periods = ["Day", "Month", "Year"];
   const currentPeriod = periods[value];
   const data = revenueData[currentPeriod as keyof typeof revenueData];
 
   return (
     <Box>
-      <Tabs
-        value={value}
-        onChange={handleChange}
-        TabIndicatorProps={{ style: { backgroundColor: emeraldBlue } }}
-        className="mb-6"
-      >
-        {["Ngày", "Tuần", "Tháng", "Năm"].map((label, idx) => (
-          <Tab
-            key={label}
-            label={label}
-            style={{ color: value === idx ? emeraldBlue : "inherit" }}
-          />
-        ))}
-      </Tabs>
+      <Box className="flex items-center gap-4 mb-6">
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          TabIndicatorProps={{ style: { backgroundColor: emeraldBlue } }}
+        >
+          {["Ngày", "Tháng", "Năm"].map((label, idx) => (
+            <Tab
+              key={label}
+              label={label}
+              style={{ color: value === idx ? emeraldBlue : "inherit" }}
+            />
+          ))}
+        </Tabs>
+
+        {value === 2 && (
+          <FormControl size="small" style={{ minWidth: 150 }}>
+            <InputLabel>Chọn tháng</InputLabel>
+            <Select
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(Number(e.target.value))}
+              label="Chọn tháng"
+            >
+              {Array.from({ length: 12 }, (_, i) => (
+                <MenuItem key={i} value={i}>
+                  Tháng {i + 1}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+
+        {value === 3 && availableOptions.years.length > 0 && (
+          <FormControl size="small" style={{ minWidth: 150 }}>
+            <InputLabel>Chọn năm</InputLabel>
+            <Select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(Number(e.target.value))}
+              label="Chọn năm"
+            >
+              {availableOptions.years.map((year) => (
+                <MenuItem key={year} value={year}>
+                  {year}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+      </Box>
+
       <Box className="h-96 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data}>
@@ -128,9 +259,7 @@ const RevenueChart = ({ orders }: { orders: any[] }) => {
   );
 };
 
-// Component Bảng Thống Kê Tin Đăng
 const ListingTable = ({ listings }: { listings: any[] }) => {
-  // Nhóm listings theo ngày
   const listingStats = useMemo(() => {
     const statsMap = new Map();
 
@@ -158,7 +287,7 @@ const ListingTable = ({ listings }: { listings: any[] }) => {
         ...stats,
       }))
       .sort((a, b) => b.date.localeCompare(a.date))
-      .slice(0, 10); // Lấy 10 ngày gần nhất
+      .slice(0, 10);
   }, [listings]);
 
   const columns = [
@@ -296,7 +425,7 @@ const Dashboard = () => {
             className="text-xl font-semibold mb-4 text-gray-700 pb-2"
             style={{ color: emeraldBlue, borderBottom: "1px solid #ccc" }}
           >
-            📈 Thống Kê Doanh Thu Theo Ngày, Tuần, Tháng, Năm
+            📈 Thống Kê Doanh Thu
           </h2>
           {orderLoading ? (
             <Box className="flex justify-center items-center h-96">

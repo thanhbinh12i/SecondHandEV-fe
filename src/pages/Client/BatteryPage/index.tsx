@@ -45,9 +45,6 @@ const BatteryListingsPage: React.FC = () => {
     pageSize: 200,
   });
 
-  const DEFAULT_IMAGE =
-    "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800&h=600&q=80";
-
   const listings: ListingDto[] = data?.data.items ?? [];
 
   const brands = [
@@ -103,7 +100,7 @@ const BatteryListingsPage: React.FC = () => {
   }, [searchQuery, brandFilter, priceRange, sortBy]);
 
   const getImageUrl = (listing: ListingDto): string => {
-    return listing.primaryImageUrl || listing.imageUrls[0] || DEFAULT_IMAGE;
+    return listing.primaryImageUrl || listing.imageUrls[0];
   };
 
   const getListingTypeLabel = (type?: string) => {
@@ -281,19 +278,10 @@ const BatteryListingsPage: React.FC = () => {
                     <CardContent className="!p-5">
                       <Typography
                         variant="h6"
-                        className="!font-bold !text-slate-900 !mb-3 !line-clamp-2 !min-h-[3.5rem]"
+                        className="!h-18 !font-bold !text-slate-900 !mb-3 !line-clamp-2 !min-h-[3.5rem]"
                       >
                         {listing.title}
                       </Typography>
-
-                      {listing.description && (
-                        <Typography
-                          variant="body2"
-                          className="!text-slate-600 !mb-4 !line-clamp-2"
-                        >
-                          {listing.description}
-                        </Typography>
-                      )}
 
                       <Box className="!flex !flex-wrap !gap-2 !mb-4">
                         {listing.brand && (
