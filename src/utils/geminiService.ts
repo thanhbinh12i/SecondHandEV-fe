@@ -1,6 +1,6 @@
 import { ListingAIInfo } from "src/types/listing.type";
 
-const GEMINI_API_KEY = "AIzaSyDTlBTcJ5SOA5B7szsJyrLjnqrpDunBKZY";
+const GEMINI_API_KEY = "AIzaSyBhzoj3KbXJ7Gh4XrClNPh43Yn8zzqvZRE";
 const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
 
 export interface PriceSuggestion {
