@@ -140,9 +140,6 @@ const ImageUploadStep: React.FC<ImageUploadStepProps> = ({
         <Typography variant="h6" className="mb-2 font-semibold text-slate-800">
           Hình ảnh sản phẩm
         </Typography>
-        <Typography variant="body2" className="text-slate-600 mb-4">
-          Thêm ít nhất 3 hình ảnh. Hình đầu tiên sẽ là ảnh đại diện.
-        </Typography>
       </Grid>
 
       {uploadError && (
