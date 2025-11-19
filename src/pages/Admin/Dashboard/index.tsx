@@ -199,7 +199,7 @@ const RevenueChart = ({ orders }: { orders: any[] }) => {
           ))}
         </Tabs>
 
-        {value === 2 && (
+        {value === 1 && (
           <FormControl size="small" style={{ minWidth: 150 }}>
             <InputLabel>Chọn tháng</InputLabel>
             <Select
@@ -216,7 +216,7 @@ const RevenueChart = ({ orders }: { orders: any[] }) => {
           </FormControl>
         )}
 
-        {value === 3 && availableOptions.years.length > 0 && (
+        {value === 2 && availableOptions.years.length > 0 && (
           <FormControl size="small" style={{ minWidth: 150 }}>
             <InputLabel>Chọn năm</InputLabel>
             <Select
