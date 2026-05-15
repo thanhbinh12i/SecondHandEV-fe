@@ -1,0 +1,6 @@
+@EVAndBatteryTradingAPI_HostAddress = http://localhost:5211
+
+GET {{EVAndBatteryTradingAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
